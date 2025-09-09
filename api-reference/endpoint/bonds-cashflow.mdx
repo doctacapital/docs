@@ -28,47 +28,47 @@ curl -X GET "https://api.doctacapital.com.ar/api/v1/market_data/bonds/AL30/cashf
 
 ## Respuesta Exitosa
 
-<ResponseField name="symbol" type="string">
+<ResponseField name="ticker" type="string">
   El símbolo del bono solicitado.
 </ResponseField>
 
-<ResponseField name="nominal_units" type="integer">
+<ResponseField name="nominal_units" type="number">
   Las unidades nominales utilizadas para el cálculo.
 </ResponseField>
 
-<ResponseField name="cashflow" type="array">
-  Array de eventos de flujo de caja para el bono.
+<ResponseField name="payments" type="array">
+  Array de pagos del flujo de caja para el bono.
 </ResponseField>
 
-<ResponseField name="cashflow[].date" type="string">
+<ResponseField name="payments[].date" type="string">
   La fecha de pago en formato YYYY-MM-DD.
 </ResponseField>
 
-<ResponseField name="cashflow[].type" type="string">
-  El tipo de pago (ej., "interest", "principal", "amortization").
+<ResponseField name="payments[].principal" type="number">
+  El monto de capital pagado en esta fecha.
 </ResponseField>
 
-<ResponseField name="cashflow[].amount" type="number">
-  El monto del pago en la moneda del bono.
+<ResponseField name="payments[].interest" type="number">
+  El monto de intereses pagado en esta fecha.
 </ResponseField>
 
-<ResponseField name="cashflow[].currency" type="string">
-  La moneda del pago (ej., "ARS", "USD").
+<ResponseField name="payments[].total" type="number">
+  El monto total pagado en esta fecha (principal + intereses).
 </ResponseField>
 
-<ResponseField name="cashflow[].description" type="string">
-  Descripción del pago (ej., "Pago de Intereses", "Amortización de Capital").
-</ResponseField>
-
-<ResponseField name="total_interest" type="number">
-  Total de pagos de intereses durante la vida del bono.
+<ResponseField name="payments[].remaining_principal" type="number">
+  El capital restante después de este pago.
 </ResponseField>
 
 <ResponseField name="total_principal" type="number">
   Total de pagos de capital durante la vida del bono.
 </ResponseField>
 
-<ResponseField name="total_amount" type="number">
+<ResponseField name="total_interest" type="number">
+  Total de pagos de intereses durante la vida del bono.
+</ResponseField>
+
+<ResponseField name="total_cashflow" type="number">
   Monto total del flujo de caja durante la vida del bono.
 </ResponseField>
 
@@ -76,49 +76,161 @@ curl -X GET "https://api.doctacapital.com.ar/api/v1/market_data/bonds/AL30/cashf
 
 ```json
 {
-  "symbol": "AL30",
-  "nominal_units": 100,
-  "cashflow": [
+  "ticker": "AL30",
+  "nominal_units": 100.0,
+  "payments": [
     {
-      "date": "2025-03-31",
-      "type": "interest",
-      "amount": 1250.00,
-      "currency": "ARS",
-      "description": "Interest Payment"
+      "date": "2021-07-09",
+      "principal": 0.0,
+      "interest": 0.1101388888888889,
+      "total": 0.1101388888888889,
+      "remaining_principal": 100.0
     },
     {
-      "date": "2025-09-30",
-      "type": "interest",
-      "amount": 1250.00,
-      "currency": "ARS",
-      "description": "Interest Payment"
+      "date": "2022-01-09",
+      "principal": 0.0,
+      "interest": 0.25,
+      "total": 0.25,
+      "remaining_principal": 100.0
     },
     {
-      "date": "2025-12-31",
-      "type": "principal",
-      "amount": 100000.00,
-      "currency": "ARS",
-      "description": "Principal Amortization"
+      "date": "2022-07-09",
+      "principal": 0.0,
+      "interest": 0.25,
+      "total": 0.25,
+      "remaining_principal": 100.0
+    },
+    {
+      "date": "2023-01-09",
+      "principal": 0.0,
+      "interest": 0.25,
+      "total": 0.25,
+      "remaining_principal": 100.0
+    },
+    {
+      "date": "2023-07-09",
+      "principal": 0.0,
+      "interest": 0.25,
+      "total": 0.25,
+      "remaining_principal": 100.0
+    },
+    {
+      "date": "2024-01-09",
+      "principal": 0.0,
+      "interest": 0.375,
+      "total": 0.375,
+      "remaining_principal": 100.0
+    },
+    {
+      "date": "2024-07-09",
+      "principal": 4.0,
+      "interest": 0.375,
+      "total": 4.375,
+      "remaining_principal": 96.0
+    },
+    {
+      "date": "2025-01-09",
+      "principal": 8.0,
+      "interest": 0.375,
+      "total": 8.36,
+      "remaining_principal": 88.0
+    },
+    {
+      "date": "2025-07-09",
+      "principal": 8.0,
+      "interest": 0.375,
+      "total": 8.33,
+      "remaining_principal": 80.0
+    },
+    {
+      "date": "2026-01-09",
+      "principal": 8.0,
+      "interest": 0.375,
+      "total": 8.3,
+      "remaining_principal": 72.0
+    },
+    {
+      "date": "2026-07-09",
+      "principal": 8.0,
+      "interest": 0.375,
+      "total": 8.27,
+      "remaining_principal": 64.0
+    },
+    {
+      "date": "2027-01-09",
+      "principal": 8.0,
+      "interest": 0.375,
+      "total": 8.24,
+      "remaining_principal": 56.0
+    },
+    {
+      "date": "2027-07-09",
+      "principal": 8.0,
+      "interest": 0.375,
+      "total": 8.21,
+      "remaining_principal": 48.0
+    },
+    {
+      "date": "2028-01-09",
+      "principal": 8.0,
+      "interest": 0.8750000000000002,
+      "total": 8.42,
+      "remaining_principal": 40.0
+    },
+    {
+      "date": "2028-07-09",
+      "principal": 8.0,
+      "interest": 0.8750000000000002,
+      "total": 8.35,
+      "remaining_principal": 32.0
+    },
+    {
+      "date": "2029-01-09",
+      "principal": 8.0,
+      "interest": 0.8750000000000002,
+      "total": 8.28,
+      "remaining_principal": 24.0
+    },
+    {
+      "date": "2029-07-09",
+      "principal": 8.0,
+      "interest": 0.8750000000000002,
+      "total": 8.21,
+      "remaining_principal": 16.0
+    },
+    {
+      "date": "2030-01-09",
+      "principal": 8.0,
+      "interest": 0.8750000000000002,
+      "total": 8.14,
+      "remaining_principal": 8.0
+    },
+    {
+      "date": "2030-07-09",
+      "principal": 8.0,
+      "interest": 0.8750000000000002,
+      "total": 8.07,
+      "remaining_principal": 0.0
     }
   ],
-  "total_interest": 2500.00,
-  "total_principal": 100000.00,
-  "total_amount": 102500.00
+  "total_principal": 100.0,
+  "total_interest": 9.360138888888889,
+  "total_cashflow": 105.04013888888889
 }
 ```
 
 ## Respuestas de Error
 
-### 400 Solicitud Incorrecta
-Parámetros inválidos o campos requeridos faltantes.
+### 500 Error Interno del Servidor
+Error interno del servidor.
 
 ```json
 {
-  "type": "/errors/bad-request",
-  "title": "Parámetros de solicitud inválidos",
-  "status": 400,
-  "detail": "nominal_units debe ser un entero positivo",
-  "correlation_id": "12345678-1234-1234-1234-123456789012"
+  "type": "/errors/internal-server-error",
+  "title": "Internal server error",
+  "status": 500,
+  "detail": "Internal server error",
+  "correlation_id": "6cd1fd05-63e9-4863-832f-d873e58e9d67"
 }
 ```
 
@@ -128,10 +240,10 @@ Token de acceso inválido o faltante.
 ```json
 {
   "type": "/errors/authentication-required",
-  "title": "Token de acceso inválido o faltante",
+  "title": "Authorization header missing",
   "status": 401,
-  "detail": "Se requiere token de acceso para este endpoint",
-  "correlation_id": "12345678-1234-1234-1234-123456789012"
+  "detail": "Authorization header missing",
+  "correlation_id": "d6e20e07-0580-4e2d-9480-00a68c1ae493"
 }
 ```
 
@@ -141,10 +253,10 @@ Bono no encontrado o no hay datos de flujo de caja disponibles.
 ```json
 {
   "type": "/errors/not-found",
-  "title": "Bono no encontrado",
+  "title": "Resource not found: /bonds/cash_flow",
   "status": 404,
-  "detail": "No hay datos de flujo de caja disponibles para el símbolo 'INVALID'",
-  "correlation_id": "12345678-1234-1234-1234-123456789012"
+  "detail": "Resource not found: /bonds/cash_flow",
+  "correlation_id": "438caef0-f014-4a80-874c-4d0261ff28a3"
 }
 ```
 
@@ -155,3 +267,6 @@ Bono no encontrado o no hay datos de flujo de caja disponibles.
 - Las fechas de pago son en días hábiles (los fines de semana y feriados pueden afectar las fechas reales de pago)
 - Los pagos de intereses son típicamente semestrales para los bonos argentinos
 - Los pagos de capital pueden incluir amortizaciones parciales o pagos bullet al vencimiento
+- Los montos se expresan en la moneda base del bono (típicamente USD para bonos hard dollar)
+- El campo `remaining_principal` muestra el capital pendiente después de cada pago
+- Los pagos incluyen tanto el desglose de capital e intereses como el total combinado

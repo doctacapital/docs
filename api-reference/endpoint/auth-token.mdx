@@ -58,6 +58,22 @@ curl -X POST https://api.doctacapital.com.ar/api/v1/auth/token \
   El alcance de acceso otorgado por este token.
 </ResponseField>
 
+<ResponseField name="plan" type="string">
+  El plan asociado al token. Puede ser `basic`, `professional` o `enterprise`.
+</ResponseField>
+
+## Ejemplo de Respuesta Exitosa
+
+```json
+{
+    "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJwcm9kLWJhc3Rpb24tMDAxIiwiY2xpZW50X2lkIjoicHJvZC1iYXN0aW9uLTAwMSIsInNjb3BlcyI6WyJtYXJrZXRfZGF0YTpyZWFkIl0sInBsYW4iOiJlbnRlcnByaXNlIiwidG9rZW5fdHlwZSI6ImJlYXJlciIsImV4cCI6MTc1NzQ1Njg5OSwiaWF0IjoxNzU3NDUzMjk5fQ.zbvaoJLRwXFgW0aYG3DiZQM3p_4BZ3SNWj1mZEtN9wU",
+    "token_type": "bearer",
+    "expires_in": 3600,
+    "scope": "market_data:read",
+    "plan": "enterprise"
+}
+```
+
 ## Respuesta de Error
 
 <ResponseField name="type" type="string">

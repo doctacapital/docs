@@ -53,110 +53,214 @@ curl -X GET "https://api.doctacapital.com.ar/api/v1/market_data/historicals/yiel
 
 ## Respuesta Exitosa
 
+<ResponseField name="data" type="array">
+  Array de instrumentos financieros con sus datos de curva de rendimiento.
+</ResponseField>
+
+<ResponseField name="data[].ticker" type="string">
+  El símbolo ticker del instrumento financiero.
+</ResponseField>
+
+<ResponseField name="data[].specie" type="string">
+  La especie de moneda del instrumento.
+</ResponseField>
+
+<ResponseField name="data[].subasset_class" type="string">
+  La clasificación de submercado del instrumento.
+</ResponseField>
+
+<ResponseField name="data[].maturity_date" type="string">
+  La fecha de vencimiento del instrumento (null si no aplica).
+</ResponseField>
+
+<ResponseField name="data[].tir" type="number">
+  La Tasa Interna de Retorno (TIR) del instrumento.
+</ResponseField>
+
+<ResponseField name="data[].tna_30_360" type="number">
+  La Tasa Nominal Anual calculada con base 30/360 (null si no aplica).
+</ResponseField>
+
+<ResponseField name="data[].duration" type="number">
+  La duración del instrumento en años.
+</ResponseField>
+
+<ResponseField name="data[].date" type="string">
+  La fecha de los datos en formato YYYY-MM-DD.
+</ResponseField>
+
 <ResponseField name="date" type="string">
   La fecha histórica para la cual se obtuvieron los datos de curva de rendimiento.
 </ResponseField>
 
-<ResponseField name="subasset_class" type="string">
-  La clasificación de submercado utilizada para la consulta.
+<ResponseField name="filters" type="object">
+  Los filtros aplicados a la consulta.
 </ResponseField>
 
-<ResponseField name="specie" type="string">
-  La especie de moneda utilizada para la consulta.
+<ResponseField name="filters.specie" type="string">
+  La especie de moneda utilizada en el filtro.
 </ResponseField>
 
-<ResponseField name="yield_curve" type="array">
-  Array de puntos de datos de curva de rendimiento con diferentes vencimientos.
+<ResponseField name="filters.subasset_class" type="string">
+  La clasificación de submercado utilizada en el filtro.
 </ResponseField>
 
-<ResponseField name="yield_curve[].maturity" type="string">
-  El período de vencimiento (ej., "1M", "3M", "6M", "1Y", "2Y", "5Y", "10Y", "30Y").
+<ResponseField name="metadata" type="object">
+  Metadatos sobre la consulta y los datos.
 </ResponseField>
 
-<ResponseField name="yield_curve[].yield" type="number">
-  La tasa de rendimiento para el período de vencimiento específico.
+<ResponseField name="metadata.source" type="string">
+  La fuente de los datos.
 </ResponseField>
 
-<ResponseField name="yield_curve[].currency" type="string">
-  La moneda de la tasa de rendimiento (ej., "ARS", "USD").
+<ResponseField name="metadata.cached" type="boolean">
+  Si los datos fueron obtenidos desde caché.
 </ResponseField>
 
-<ResponseField name="yield_curve[].maturity_days" type="integer">
-  El período de vencimiento en días.
+<ResponseField name="metadata.total_points" type="integer">
+  El número total de puntos de datos devueltos.
+</ResponseField>
+
+<ResponseField name="metadata.is_historical" type="boolean">
+  Si los datos son históricos o intradiarios.
 </ResponseField>
 
 ## Ejemplo de Respuesta Exitosa
 
 ```json
 {
-  "date": "2025-01-02",
-  "subasset_class": "HARD_DOLLAR",
-  "specie": "D",
-  "yield_curve": [
+  "data": [
     {
-      "maturity": "1M",
-      "yield": 12.5,
-      "currency": "USD",
-      "maturity_days": 30
+      "ticker": "AL29",
+      "specie": "D",
+      "subasset_class": "HARD_DOLLAR",
+      "maturity_date": null,
+      "tir": 0.104657,
+      "tna_30_360": null,
+      "duration": 2.046129,
+      "date": "2025-01-02"
     },
     {
-      "maturity": "3M",
-      "yield": 13.2,
-      "currency": "USD",
-      "maturity_days": 90
+      "ticker": "GD29",
+      "specie": "D",
+      "subasset_class": "HARD_DOLLAR",
+      "maturity_date": null,
+      "tir": 0.096081,
+      "tna_30_360": null,
+      "duration": 2.062005,
+      "date": "2025-01-02"
     },
     {
-      "maturity": "6M",
-      "yield": 14.1,
-      "currency": "USD",
-      "maturity_days": 180
+      "ticker": "AL30",
+      "specie": "D",
+      "subasset_class": "HARD_DOLLAR",
+      "maturity_date": null,
+      "tir": 0.107148,
+      "tna_30_360": null,
+      "duration": 2.455362,
+      "date": "2025-01-02"
     },
     {
-      "maturity": "1Y",
-      "yield": 15.8,
-      "currency": "USD",
-      "maturity_days": 365
+      "ticker": "GD30",
+      "specie": "D",
+      "subasset_class": "HARD_DOLLAR",
+      "maturity_date": null,
+      "tir": 0.103966,
+      "tna_30_360": null,
+      "duration": 2.463755,
+      "date": "2025-01-02"
     },
     {
-      "maturity": "2Y",
-      "yield": 16.5,
-      "currency": "USD",
-      "maturity_days": 730
+      "ticker": "AE38",
+      "specie": "D",
+      "subasset_class": "HARD_DOLLAR",
+      "maturity_date": null,
+      "tir": 0.10983,
+      "tna_30_360": null,
+      "duration": 5.568537,
+      "date": "2025-01-02"
     },
     {
-      "maturity": "5Y",
-      "yield": 17.2,
-      "currency": "USD",
-      "maturity_days": 1825
+      "ticker": "GD38",
+      "specie": "D",
+      "subasset_class": "HARD_DOLLAR",
+      "maturity_date": null,
+      "tir": 0.108683,
+      "tna_30_360": null,
+      "duration": 5.580345,
+      "date": "2025-01-02"
     },
     {
-      "maturity": "10Y",
-      "yield": 18.1,
-      "currency": "USD",
-      "maturity_days": 3650
+      "ticker": "GD46",
+      "specie": "D",
+      "subasset_class": "HARD_DOLLAR",
+      "maturity_date": null,
+      "tir": 0.101751,
+      "tna_30_360": null,
+      "duration": 6.369838,
+      "date": "2025-01-02"
     },
     {
-      "maturity": "30Y",
-      "yield": 19.5,
-      "currency": "USD",
-      "maturity_days": 10950
+      "ticker": "AL35",
+      "specie": "D",
+      "subasset_class": "HARD_DOLLAR",
+      "maturity_date": null,
+      "tir": 0.108373,
+      "tna_30_360": null,
+      "duration": 6.405778,
+      "date": "2025-01-02"
+    },
+    {
+      "ticker": "GD35",
+      "specie": "D",
+      "subasset_class": "HARD_DOLLAR",
+      "maturity_date": null,
+      "tir": 0.10675,
+      "tna_30_360": null,
+      "duration": 6.41785,
+      "date": "2025-01-02"
+    },
+    {
+      "ticker": "GD41",
+      "specie": "D",
+      "subasset_class": "HARD_DOLLAR",
+      "maturity_date": null,
+      "tir": 0.103902,
+      "tna_30_360": null,
+      "duration": 6.899353,
+      "date": "2025-01-02"
+    },
+    {
+      "ticker": "AL41",
+      "specie": "D",
+      "subasset_class": "HARD_DOLLAR",
+      "maturity_date": null,
+      "tir": 0.103407,
+      "tna_30_360": null,
+      "duration": 6.907022,
+      "date": "2025-01-02"
     }
-  ]
+  ],
+  "date": "2025-01-02",
+  "filters": {
+    "specie": "D",
+    "subasset_class": "HARD_DOLLAR"
+  }
 }
 ```
 
 ## Respuestas de Error
 
-### 400 Solicitud Incorrecta
-Formato de fecha inválido o valor de subasset_class inválido.
+### 500 Error Interno del Servidor
+Error interno del servidor.
 
 ```json
 {
-  "type": "/errors/bad-request",
-  "title": "Parámetros de solicitud inválidos",
-  "status": 400,
-  "detail": "Valor de subasset_class inválido. Debe ser una de las opciones predefinidas.",
-  "correlation_id": "12345678-1234-1234-1234-123456789012"
+  "type": "/errors/internal-server-error",
+  "title": "Internal server error",
+  "status": 500,
+  "detail": "Internal server error",
+  "correlation_id": "6cd1fd05-63e9-4863-832f-d873e58e9d67"
 }
 ```
 
@@ -166,30 +270,31 @@ Token de acceso inválido o faltante.
 ```json
 {
   "type": "/errors/authentication-required",
-  "title": "Token de acceso inválido o faltante",
+  "title": "Authorization header missing",
   "status": 401,
-  "detail": "Se requiere token de acceso para este endpoint",
-  "correlation_id": "12345678-1234-1234-1234-123456789012"
+  "detail": "Authorization header missing",
+  "correlation_id": "d6e20e07-0580-4e2d-9480-00a68c1ae493"
 }
 ```
 
 ### 404 No Encontrado
-No hay datos de curva de rendimiento disponibles para la fecha y parámetros especificados.
+Símbolo/ticker no encontrado o no hay datos disponibles.
 
 ```json
 {
   "type": "/errors/not-found",
-  "title": "Datos de curva de rendimiento no encontrados",
+  "title": "Resource not found: /bonds/tir_curve/historical",
   "status": 404,
-  "detail": "No hay datos de curva de rendimiento disponibles para la fecha y subasset_class especificados",
-  "correlation_id": "12345678-1234-1234-1234-123456789012"
+  "detail": "Resource not found: /bonds/tir_curve/historical",
+  "correlation_id": "438caef0-f014-4a80-874c-4d0261ff28a3"
 }
 ```
 
 ## Notas
 
 - Los datos están disponibles solo para días hábiles (excluyendo fines de semana y feriados)
-- Las tasas de rendimiento se expresan como porcentajes
-- Los períodos de vencimiento incluyen términos financieros estándar (1M, 3M, 6M, 1Y, 2Y, 5Y, 10Y, 30Y)
+- Las TIR (Tasas Internas de Retorno) se expresan como decimales (ej., 0.104657 = 10.4657%)
+- La duración se expresa en años
 - El parámetro `specie` es opcional y por defecto usa la moneda base de la clase de subactivo
 - La disponibilidad de datos históricos puede variar según la clase de subactivo y el rango de fechas
+- Los datos incluyen instrumentos específicos con sus respectivos tickers y características financieras

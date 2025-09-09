@@ -127,12 +127,19 @@
               }
             }
           },
-          "400": {
-            "description": "Solicitud incorrecta - parámetros inválidos",
+          "500": {
+            "description": "Error interno del servidor",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "type": "/errors/internal-server-error",
+                  "title": "Internal server error",
+                  "status": 500,
+                  "detail": "Internal server error",
+                  "correlation_id": "6cd1fd05-63e9-4863-832f-d873e58e9d67"
                 }
               }
             }
@@ -143,16 +150,30 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "type": "/errors/authentication-required",
+                  "title": "Authorization header missing",
+                  "status": 401,
+                  "detail": "Authorization header missing",
+                  "correlation_id": "d6e20e07-0580-4e2d-9480-00a68c1ae493"
                 }
               }
             }
           },
           "404": {
-            "description": "Símbolo no encontrado o no hay datos disponibles",
+            "description": "Símbolo/ticker no encontrado o no hay datos disponibles",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "type": "/errors/not-found",
+                  "title": "Resource not found: /historicals/PASGS",
+                  "status": 404,
+                  "detail": "Resource not found: /historicals/PASGS",
+                  "correlation_id": "438caef0-f014-4a80-874c-4d0261ff28a3"
                 }
               }
             }
@@ -198,32 +219,53 @@
               }
             }
           },
-          "400": {
-            "description": "Bad request - invalid parameters",
+          "500": {
+            "description": "Error interno del servidor",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "type": "/errors/internal-server-error",
+                  "title": "Internal server error",
+                  "status": 500,
+                  "detail": "Internal server error",
+                  "correlation_id": "6cd1fd05-63e9-4863-832f-d873e58e9d67"
                 }
               }
             }
           },
           "401": {
-            "description": "Unauthorized - invalid or missing access token",
+            "description": "No autorizado - token de acceso inválido o faltante",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "type": "/errors/authentication-required",
+                  "title": "Authorization header missing",
+                  "status": 401,
+                  "detail": "Authorization header missing",
+                  "correlation_id": "d6e20e07-0580-4e2d-9480-00a68c1ae493"
                 }
               }
             }
           },
           "404": {
-            "description": "Bond not found or no cashflow data available",
+            "description": "Bono no encontrado o no hay datos de flujo de caja disponibles",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "type": "/errors/not-found",
+                  "title": "Resource not found: /bonds/cash_flow",
+                  "status": 404,
+                  "detail": "Resource not found: /bonds/cash_flow",
+                  "correlation_id": "438caef0-f014-4a80-874c-4d0261ff28a3"
                 }
               }
             }
@@ -300,12 +342,19 @@
               }
             }
           },
-          "400": {
-            "description": "Solicitud incorrecta - parámetros inválidos",
+          "500": {
+            "description": "Error interno del servidor",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "type": "/errors/internal-server-error",
+                  "title": "Internal server error",
+                  "status": 500,
+                  "detail": "Internal server error",
+                  "correlation_id": "6cd1fd05-63e9-4863-832f-d873e58e9d67"
                 }
               }
             }
@@ -316,151 +365,33 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "type": "/errors/authentication-required",
+                  "title": "Authorization header missing",
+                  "status": 401,
+                  "detail": "Authorization header missing",
+                  "correlation_id": "d6e20e07-0580-4e2d-9480-00a68c1ae493"
                 }
               }
             }
           },
           "404": {
-            "description": "Datos de curva de rendimiento no encontrados",
+            "description": "Subasset type no encontrado o no hay datos disponibles",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "type": "/errors/not-found",
+                  "title": "Resource not found: /bonds/tir_curve/historical",
+                  "status": 404,
+                  "detail": "Resource not found: /bonds/tir_curve/historical",
+                  "correlation_id": "438caef0-f014-4a80-874c-4d0261ff28a3"
                 }
               }
             }
-          }
-        }
-      }
-    },
-    "/plants": {
-      "get": {
-        "description": "Returns all plants from the system that the user has access to",
-        "parameters": [
-          {
-            "name": "limit",
-            "in": "query",
-            "description": "The maximum number of results to return",
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Plant response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/Plant"
-                  }
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Unexpected error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
-          }
-        }
-      },
-      "post": {
-        "description": "Creates a new plant in the store",
-        "requestBody": {
-          "description": "Plant to add to the store",
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/NewPlant"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "plant response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Plant"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "unexpected error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/plants/{id}": {
-      "delete": {
-        "description": "Deletes a single plant based on the ID supplied",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "description": "ID of plant to delete",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int64"
-            }
-          }
-        ],
-        "responses": {
-          "204": {
-            "description": "Plant deleted",
-            "content": {}
-          },
-          "400": {
-            "description": "unexpected error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-  },
-  "webhooks": {
-    "/plant/webhook": {
-      "post": {
-        "description": "Information about a new plant added to the store",
-        "requestBody": {
-          "description": "Plant added to the store",
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/NewPlant"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Return a 200 status to indicate that the data was received successfully"
           }
         }
       }
@@ -527,15 +458,17 @@
       },
       "HistoricalPricesResponse": {
         "required": [
-          "symbol",
+          "ticker",
           "data",
           "adjusted",
           "from_date",
-          "to_date"
+          "to_date",
+          "pagination",
+          "metadata"
         ],
         "type": "object",
         "properties": {
-          "symbol": {
+          "ticker": {
             "description": "El símbolo ticker del instrumento solicitado",
             "type": "string",
             "example": "PAGS"
@@ -563,17 +496,27 @@
             "type": "string",
             "format": "date",
             "example": "2025-06-15"
+          },
+          "pagination": {
+            "description": "Información de paginación para los resultados",
+            "$ref": "#/components/schemas/Pagination"
+          },
+          "metadata": {
+            "description": "Metadatos sobre la consulta y los datos",
+            "$ref": "#/components/schemas/Metadata"
           }
         }
       },
       "PriceDataPoint": {
         "required": [
           "date",
-          "open",
-          "high",
-          "low",
-          "close",
-          "volume"
+          "open_price",
+          "high_price",
+          "low_price",
+          "close_price",
+          "volume",
+          "volume_ars",
+          "adjusted"
         ],
         "type": "object",
         "properties": {
@@ -583,83 +526,183 @@
             "format": "date",
             "example": "2025-06-01"
           },
-          "open": {
+          "open_price": {
             "description": "Precio de apertura del día",
             "type": "number",
             "format": "float",
-            "example": 1250.50
+            "example": 3585.0
           },
-          "high": {
+          "high_price": {
             "description": "Precio más alto durante el día",
             "type": "number",
             "format": "float",
-            "example": 1280.75
+            "example": 3645.0
           },
-          "low": {
+          "low_price": {
             "description": "Precio más bajo durante el día",
             "type": "number",
             "format": "float",
-            "example": 1245.25
+            "example": 3510.0
           },
-          "close": {
+          "close_price": {
             "description": "Precio de cierre del día",
             "type": "number",
             "format": "float",
-            "example": 1275.00
+            "example": 3630.0
           },
           "volume": {
-            "description": "Volumen de negociación del día",
+            "description": "Volumen de negociación del día en unidades",
+            "type": "number",
+            "format": "float",
+            "example": 97529.0
+          },
+          "volume_ars": {
+            "description": "Volumen de negociación del día en pesos argentinos",
+            "type": "number",
+            "format": "float",
+            "example": 350740945.0
+          },
+          "adjusted": {
+            "description": "Si este punto de datos específico está ajustado por eventos corporativos",
+            "type": "boolean",
+            "example": false
+          }
+        }
+      },
+      "Pagination": {
+        "required": [
+          "limit",
+          "has_next",
+          "next_cursor",
+          "total_items"
+        ],
+        "type": "object",
+        "properties": {
+          "limit": {
+            "description": "Límite de elementos por página",
             "type": "integer",
-            "format": "int64",
-            "example": 1500000
+            "example": 200
+          },
+          "has_next": {
+            "description": "Si hay más páginas disponibles",
+            "type": "boolean",
+            "example": false
+          },
+          "next_cursor": {
+            "description": "Cursor para la siguiente página (null si no hay más páginas)",
+            "type": "string",
+            "nullable": true,
+            "example": null
+          },
+          "total_items": {
+            "description": "Total de elementos disponibles (null si no está disponible)",
+            "type": "integer",
+            "nullable": true,
+            "example": null
+          }
+        }
+      },
+      "Metadata": {
+        "required": [
+          "total_records"
+        ],
+        "type": "object",
+        "properties": {
+          "total_records": {
+            "description": "Total de registros devueltos en esta respuesta",
+            "type": "integer",
+            "example": 10
           }
         }
       },
       "BondCashflowResponse": {
         "required": [
-          "symbol",
+          "ticker",
           "nominal_units",
-          "cashflow",
-          "total_interest",
+          "payments",
           "total_principal",
-          "total_amount"
+          "total_interest",
+          "total_cashflow"
         ],
         "type": "object",
         "properties": {
-          "symbol": {
+          "ticker": {
             "description": "El símbolo del bono solicitado",
             "type": "string",
             "example": "AL30"
           },
           "nominal_units": {
             "description": "Las unidades nominales utilizadas para el cálculo",
-            "type": "integer",
-            "example": 100
-          },
-          "cashflow": {
-            "description": "Array de eventos de flujo de caja para el bono",
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/CashflowEvent"
-            }
-          },
-          "total_interest": {
-            "description": "Total de pagos de intereses durante la vida del bono",
             "type": "number",
             "format": "float",
-            "example": 2500.00
+            "example": 100.0
+          },
+          "payments": {
+            "description": "Array de pagos del flujo de caja para el bono",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/BondPayment"
+            }
           },
           "total_principal": {
             "description": "Total de pagos de capital durante la vida del bono",
             "type": "number",
             "format": "float",
-            "example": 100000.00
+            "example": 100.0
           },
-          "total_amount": {
+          "total_interest": {
+            "description": "Total de pagos de intereses durante la vida del bono",
+            "type": "number",
+            "format": "float",
+            "example": 9.360138888888889
+          },
+          "total_cashflow": {
             "description": "Monto total del flujo de caja durante la vida del bono",
             "type": "number",
             "format": "float",
-            "example": 102500.00
+            "example": 105.04013888888889
+          }
+        }
+      },
+      "BondPayment": {
+        "required": [
+          "date",
+          "principal",
+          "interest",
+          "total",
+          "remaining_principal"
+        ],
+        "type": "object",
+        "properties": {
+          "date": {
+            "description": "La fecha de pago en formato YYYY-MM-DD",
+            "type": "string",
+            "format": "date",
+            "example": "2025-01-09"
+          },
+          "principal": {
+            "description": "El monto de capital pagado en esta fecha",
+            "type": "number",
+            "format": "float",
+            "example": 8.0
+          },
+          "interest": {
+            "description": "El monto de intereses pagado en esta fecha",
+            "type": "number",
+            "format": "float",
+            "example": 0.375
+          },
+          "total": {
+            "description": "El monto total pagado en esta fecha (principal + intereses)",
+            "type": "number",
+            "format": "float",
+            "example": 8.36
+          },
+          "remaining_principal": {
+            "description": "El capital restante después de este pago",
+            "type": "number",
+            "format": "float",
+            "example": 88.0
           }
         }
       },
@@ -705,34 +748,109 @@
       },
       "YieldCurveResponse": {
         "required": [
+          "data",
           "date",
-          "subasset_class",
-          "yield_curve"
+          "filters",
+          "metadata"
         ],
         "type": "object",
         "properties": {
+          "data": {
+            "description": "Array de instrumentos financieros con sus datos de curva de rendimiento",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/YieldCurveInstrument"
+            }
+          },
           "date": {
             "description": "La fecha histórica para la cual se obtuvieron los datos de curva de rendimiento",
             "type": "string",
             "format": "date",
             "example": "2025-01-02"
           },
-          "subasset_class": {
-            "description": "La clasificación de submercado utilizada para la consulta",
+          "filters": {
+            "description": "Los filtros aplicados a la consulta",
+            "$ref": "#/components/schemas/YieldCurveFilters"
+          }
+        }
+      },
+      "YieldCurveInstrument": {
+        "required": [
+          "ticker",
+          "specie",
+          "subasset_class",
+          "maturity_date",
+          "tir",
+          "tna_30_360",
+          "duration",
+          "date"
+        ],
+        "type": "object",
+        "properties": {
+          "ticker": {
+            "description": "El símbolo ticker del instrumento financiero",
             "type": "string",
-            "example": "HARD_DOLLAR"
+            "example": "AL29"
           },
           "specie": {
-            "description": "La especie de moneda utilizada para la consulta",
+            "description": "La especie de moneda del instrumento",
             "type": "string",
             "example": "D"
           },
-          "yield_curve": {
-            "description": "Array de puntos de datos de curva de rendimiento con diferentes vencimientos",
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/YieldCurvePoint"
-            }
+          "subasset_class": {
+            "description": "La clasificación de submercado del instrumento",
+            "type": "string",
+            "example": "HARD_DOLLAR"
+          },
+          "maturity_date": {
+            "description": "La fecha de vencimiento del instrumento (null si no aplica)",
+            "type": "string",
+            "nullable": true,
+            "example": null
+          },
+          "tir": {
+            "description": "La Tasa Interna de Retorno (TIR) del instrumento",
+            "type": "number",
+            "format": "float",
+            "example": 0.104657
+          },
+          "tna_30_360": {
+            "description": "La Tasa Nominal Anual calculada con base 30/360 (null si no aplica)",
+            "type": "number",
+            "format": "float",
+            "nullable": true,
+            "example": null
+          },
+          "duration": {
+            "description": "La duración del instrumento en años",
+            "type": "number",
+            "format": "float",
+            "example": 2.046129
+          },
+          "date": {
+            "description": "La fecha de los datos en formato YYYY-MM-DD",
+            "type": "string",
+            "format": "date",
+            "example": "2025-01-02"
+          }
+        }
+      },
+      "YieldCurveFilters": {
+        "required": [
+          "specie",
+          "subasset_class"
+        ],
+        "type": "object",
+        "properties": {
+          "specie": {
+            "description": "La especie de moneda utilizada en el filtro",
+            "type": "string",
+            "example": "D"
+          },
+          "subasset_class": {
+            "description": "La clasificación de submercado utilizada en el filtro",
+            "type": "string",
+            "example": "HARD_DOLLAR"
           }
         }
       },

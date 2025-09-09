@@ -36,40 +36,8 @@ curl -X GET "https://api.doctacapital.com.ar/api/v1/market_data/historicals/pric
 
 ## Respuesta Exitosa
 
-<ResponseField name="symbol" type="string">
+<ResponseField name="ticker" type="string">
   El símbolo ticker del instrumento solicitado.
-</ResponseField>
-
-<ResponseField name="data" type="array">
-  Array de puntos de datos de precios históricos.
-</ResponseField>
-
-<ResponseField name="data[].date" type="string">
-  La fecha de los datos de precio en formato YYYY-MM-DD.
-</ResponseField>
-
-<ResponseField name="data[].open" type="number">
-  Precio de apertura del día.
-</ResponseField>
-
-<ResponseField name="data[].high" type="number">
-  Precio más alto durante el día.
-</ResponseField>
-
-<ResponseField name="data[].low" type="number">
-  Precio más bajo durante el día.
-</ResponseField>
-
-<ResponseField name="data[].close" type="number">
-  Precio de cierre del día.
-</ResponseField>
-
-<ResponseField name="data[].volume" type="integer">
-  Volumen de negociación del día.
-</ResponseField>
-
-<ResponseField name="adjusted" type="boolean">
-  Si los precios están ajustados por eventos corporativos.
 </ResponseField>
 
 <ResponseField name="from_date" type="string">
@@ -80,47 +48,138 @@ curl -X GET "https://api.doctacapital.com.ar/api/v1/market_data/historicals/pric
   La fecha de fin del rango de datos solicitado.
 </ResponseField>
 
+<ResponseField name="adjusted" type="boolean">
+  Si los precios están ajustados por eventos corporativos.
+</ResponseField>
+
+<ResponseField name="data" type="array">
+  Array de puntos de datos de precios históricos.
+</ResponseField>
+
+<ResponseField name="data[].date" type="string">
+  La fecha de los datos de precio en formato YYYY-MM-DD.
+</ResponseField>
+
+<ResponseField name="data[].open_price" type="number">
+  Precio de apertura del día.
+</ResponseField>
+
+<ResponseField name="data[].high_price" type="number">
+  Precio más alto durante el día.
+</ResponseField>
+
+<ResponseField name="data[].low_price" type="number">
+  Precio más bajo durante el día.
+</ResponseField>
+
+<ResponseField name="data[].close_price" type="number">
+  Precio de cierre del día.
+</ResponseField>
+
+<ResponseField name="data[].volume" type="number">
+  Volumen de negociación del día en unidades.
+</ResponseField>
+
+<ResponseField name="data[].volume_ars" type="number">
+  Volumen de negociación del día en pesos argentinos.
+</ResponseField>
+
+<ResponseField name="data[].adjusted" type="boolean">
+  Si este punto de datos específico está ajustado por eventos corporativos.
+</ResponseField>
+
+<ResponseField name="pagination" type="object">
+  Información de paginación para los resultados.
+</ResponseField>
+
+<ResponseField name="pagination.limit" type="integer">
+  Límite de elementos por página.
+</ResponseField>
+
+<ResponseField name="pagination.has_next" type="boolean">
+  Si hay más páginas disponibles.
+</ResponseField>
+
+<ResponseField name="pagination.next_cursor" type="string">
+  Cursor para la siguiente página (null si no hay más páginas).
+</ResponseField>
+
+<ResponseField name="pagination.total_items" type="integer">
+  Total de elementos disponibles (null si no está disponible).
+</ResponseField>
+
+<ResponseField name="metadata" type="object">
+  Metadatos sobre la consulta y los datos.
+</ResponseField>
+
+<ResponseField name="metadata.total_records" type="integer">
+  Total de registros devueltos en esta respuesta.
+</ResponseField>
+
 ## Ejemplo de Respuesta Exitosa
 
 ```json
 {
-  "symbol": "PAGS",
+  "ticker": "PAGS",
+  "from_date": "2025-06-01",
+  "to_date": "2025-06-15",
+  "adjusted": false,
   "data": [
     {
-      "date": "2025-06-01",
-      "open": 1250.50,
-      "high": 1280.75,
-      "low": 1245.25,
-      "close": 1275.00,
-      "volume": 1500000
+      "date": "2025-06-02",
+      "open_price": 3585.0,
+      "high_price": 3645.0,
+      "low_price": 3510.0,
+      "close_price": 3630.0,
+      "volume": 97529.0,
+      "volume_ars": 350740945.0,
+      "adjusted": false
     },
     {
-      "date": "2025-06-02",
-      "open": 1275.00,
-      "high": 1290.50,
-      "low": 1265.75,
-      "close": 1285.25,
-      "volume": 1200000
+      "date": "2025-06-03",
+      "open_price": 3560.0,
+      "high_price": 3670.0,
+      "low_price": 3520.0,
+      "close_price": 3670.0,
+      "volume": 286752.0,
+      "volume_ars": 1034703810.0,
+      "adjusted": false
+    },
+    {
+      "date": "2025-06-04",
+      "open_price": 3625.0,
+      "high_price": 3660.0,
+      "low_price": 3475.0,
+      "close_price": 3595.0,
+      "volume": 1059417.0,
+      "volume_ars": 3764594965.0,
+      "adjusted": false
     }
   ],
-  "adjusted": false,
-  "from_date": "2025-06-01",
-  "to_date": "2025-06-15"
+  "pagination": {
+    "limit": 200,
+    "has_next": false,
+    "next_cursor": null,
+    "total_items": null
+  },
+  "metadata": {
+    "total_records": 10
+  }
 }
 ```
 
 ## Respuestas de Error
 
-### 400 Solicitud Incorrecta
-Formato de fecha inválido o parámetros requeridos faltantes.
+### 500 Error Interno del Servidor
+Error interno del servidor.
 
 ```json
 {
-  "type": "/errors/bad-request",
-  "title": "Parámetros de solicitud inválidos",
-  "status": 400,
-  "detail": "Formato de fecha inválido. Usar formato YYYY-MM-DD.",
-  "correlation_id": "12345678-1234-1234-1234-123456789012"
+  "type": "/errors/internal-server-error",
+  "title": "Internal server error",
+  "status": 500,
+  "detail": "Internal server error",
+  "correlation_id": "6cd1fd05-63e9-4863-832f-d873e58e9d67"
 }
 ```
 
@@ -130,29 +189,26 @@ Token de acceso inválido o faltante.
 ```json
 {
   "type": "/errors/authentication-required",
-  "title": "Token de acceso inválido o faltante",
+  "title": "Authorization header missing",
   "status": 401,
-  "detail": "Se requiere token de acceso para este endpoint",
-  "correlation_id": "12345678-1234-1234-1234-123456789012"
+  "detail": "Authorization header missing",
+  "correlation_id": "d6e20e07-0580-4e2d-9480-00a68c1ae493"
 }
 ```
 
 ### 404 No Encontrado
-Símbolo no encontrado o no hay datos disponibles para el rango de fechas especificado.
+Símbolo/ticker no encontrado o no hay datos disponibles.
 
 ```json
 {
   "type": "/errors/not-found",
-  "title": "Símbolo no encontrado",
+  "title": "Resource not found: /historicals/PASGS",
   "status": 404,
-  "detail": "No hay datos disponibles para el símbolo 'INVALID' en el rango de fechas especificado",
-  "correlation_id": "12345678-1234-1234-1234-123456789012"
+  "detail": "Resource not found: /historicals/PASGS",
+  "correlation_id": "438caef0-f014-4a80-874c-4d0261ff28a3"
 }
 ```
 
 ## Notas
 
-- El rango de fechas no puede exceder 1 año
-- Máximo 1000 puntos de datos por solicitud
 - Los datos están disponibles solo para días hábiles (excluyendo fines de semana y feriados)
-- Los precios están en la moneda local del instrumento
