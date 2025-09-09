@@ -1,45 +1,45 @@
 ---
-title: 'Introduction'
-description: 'Docta Capital API documentation'
+title: 'Introducción'
+description: 'Documentación de la API de Docta Capital'
 ---
 
-## Welcome to Docta Capital API
+## Bienvenido a la API de Docta Capital
 
-The Docta Capital API provides access to market data and financial services. This API uses OAuth 2.0 client credentials flow for authentication.
+La API de Docta Capital proporciona acceso a datos de mercado y servicios financieros. Esta API utiliza el flujo de credenciales de cliente OAuth 2.0 para la autenticación.
 
 <Card
-  title="Base URL"
+  title="URL Base"
   icon="globe"
 >
   https://api.doctacapital.com.ar
 </Card>
 
-## Getting Started
+## Comenzando
 
-1. **Obtain Credentials**: Contact Docta Capital to get your `client_id` and `client_secret`
-2. **Get Access Token**: Use the authentication endpoint to obtain an access token
-3. **Make API Calls**: Include the access token in the Authorization header for all subsequent requests
+1. **Obtener Credenciales**: Contacta a Docta Capital para obtener tu `client_id` y `client_secret`
+2. **Obtener Token de Acceso**: Usa el endpoint de autenticación para obtener un token de acceso
+3. **Realizar Llamadas a la API**: Incluye el token de acceso en el header Authorization para todas las solicitudes posteriores
 
-## Authentication
+## Autenticación
 
-The API uses OAuth 2.0 client credentials flow. You need to obtain an access token before making any API calls.
+La API utiliza el flujo de credenciales de cliente OAuth 2.0. Necesitas obtener un token de acceso antes de realizar cualquier llamada a la API.
 
 <Steps>
-  <Step title="Request Access Token">
-    Send a POST request to `/api/v1/auth/token` with your client credentials
+  <Step title="Solicitar Token de Acceso">
+    Envía una solicitud POST a `/api/v1/auth/token` con tus credenciales de cliente
   </Step>
-  <Step title="Use the Token">
-    Include the access token in the Authorization header: `Bearer {access_token}`
+  <Step title="Usar el Token">
+    Incluye el token de acceso en el header Authorization: `Bearer {access_token}`
   </Step>
-  <Step title="Token Expiration">
-    Tokens expire after a certain period. You'll need to request a new token when the current one expires.
+  <Step title="Expiración del Token">
+    Los tokens expiran después de un cierto período. Necesitarás solicitar un nuevo token cuando el actual expire.
   </Step>
 </Steps>
 
-## Rate Limits
+## Límites de Velocidad
 
-API requests are subject to rate limiting. Please refer to the response headers for current rate limit information.
+Las solicitudes a la API están sujetas a límites de velocidad. Por favor, consulta los headers de respuesta para obtener información actual sobre los límites de velocidad.
 
-## Support
+## Soporte
 
-For technical support or questions about the API, please contact our support team.
+Para soporte técnico o preguntas sobre la API, por favor contacta a nuestro equipo de soporte.

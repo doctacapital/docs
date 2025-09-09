@@ -1,7 +1,7 @@
 {
   "$schema": "https://mintlify.com/docs.json",
   "theme": "willow",
-  "name": "Mint Starter Kit",
+  "name": "Docta Capital API",
   "colors": {
     "primary": "#16A34A",
     "light": "#07C983",
@@ -48,33 +48,29 @@
   "navbar": {
     "links": [
       {
-        "label": "Support",
-        "href": "mailto:hi@mintlify.com"
+        "label": "Soporte",
+        "href": "mailto:pedro@doctacapital.com.ar"
       }
     ],
     "primary": {
       "type": "button",
-      "label": "Dashboard",
-      "href": "https://dashboard.mintlify.com"
+      "label": "Página principal",
+      "href": "https://doctacapital.com.ar"
     }
   },
   "contextual": {
     "options": [
-     "copy",
-     "view",
-     "chatgpt",
-     "claude",
-     "perplexity",
-     "mcp",
-     "cursor",
-     "vscode"
-   ]
+      "copy",
+      "view",
+      "chatgpt",
+      "claude",
+      "perplexity"
+    ]
   },
   "footer": {
     "socials": {
-      "x": "https://x.com/mintlify",
-      "github": "https://github.com/mintlify",
-      "linkedin": "https://linkedin.com/company/mintlify"
+      "x": "https://x.com/doctacapital",
+      "linkedin": "https://linkedin.com/company/docta-cap"
     }
   }
 }
