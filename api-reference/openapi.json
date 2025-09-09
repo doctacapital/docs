@@ -1,8 +1,8 @@
 {
   "openapi": "3.1.0",
   "info": {
-    "title": "Docta Capital API",
-    "description": "API for accessing Docta Capital market data and financial services",
+    "title": "API de Docta Capital",
+    "description": "API para acceder a datos de mercado y servicios financieros de Docta Capital",
     "license": {
       "name": "MIT"
     },
@@ -21,10 +21,10 @@
   "paths": {
     "/api/v1/auth/token": {
       "post": {
-        "description": "Obtain an access token using client credentials for API authentication",
-        "tags": ["Authentication"],
+        "description": "Obtener un token de acceso usando credenciales de cliente para la autenticación de la API",
+        "tags": ["Autenticación"],
         "requestBody": {
-          "description": "Client credentials for authentication",
+          "description": "Credenciales de cliente para autenticación",
           "content": {
             "application/json": {
               "schema": {
@@ -36,7 +36,7 @@
         },
         "responses": {
           "200": {
-            "description": "Access token successfully obtained",
+            "description": "Token de acceso obtenido exitosamente",
             "content": {
               "application/json": {
                 "schema": {
@@ -46,7 +46,7 @@
             }
           },
           "401": {
-            "description": "Invalid client credentials",
+            "description": "Credenciales de cliente inválidas",
             "content": {
               "application/json": {
                 "schema": {
@@ -56,7 +56,7 @@
             }
           },
           "400": {
-            "description": "Bad request - invalid parameters",
+            "description": "Solicitud incorrecta - parámetros inválidos",
             "content": {
               "application/json": {
                 "schema": {
@@ -70,13 +70,13 @@
     },
     "/api/v1/market_data/historicals/prices/{symbol}": {
       "get": {
-        "description": "Retrieve historical price data for a specific financial instrument over a specified date range",
-        "tags": ["Market Data"],
+        "description": "Obtener datos de precios históricos para un instrumento financiero específico durante un rango de fechas determinado",
+        "tags": ["Datos de Mercado"],
         "parameters": [
           {
             "name": "symbol",
             "in": "path",
-            "description": "The ticker symbol or identifier for the financial instrument",
+            "description": "El símbolo ticker o identificador del instrumento financiero",
             "required": true,
             "schema": {
               "type": "string"
@@ -86,7 +86,7 @@
           {
             "name": "from_date",
             "in": "query",
-            "description": "Start date for the historical data in YYYY-MM-DD format",
+            "description": "Fecha de inicio para los datos históricos en formato YYYY-MM-DD",
             "required": true,
             "schema": {
               "type": "string",
@@ -97,7 +97,7 @@
           {
             "name": "to_date",
             "in": "query",
-            "description": "End date for the historical data in YYYY-MM-DD format",
+            "description": "Fecha de fin para los datos históricos en formato YYYY-MM-DD",
             "required": true,
             "schema": {
               "type": "string",
@@ -108,7 +108,7 @@
           {
             "name": "adjusted",
             "in": "query",
-            "description": "Whether to return prices adjusted for corporate events",
+            "description": "Si devolver precios ajustados por eventos corporativos",
             "required": true,
             "schema": {
               "type": "boolean"
@@ -118,7 +118,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Historical price data successfully retrieved",
+            "description": "Datos de precios históricos obtenidos exitosamente",
             "content": {
               "application/json": {
                 "schema": {
@@ -128,7 +128,7 @@
             }
           },
           "400": {
-            "description": "Bad request - invalid parameters",
+            "description": "Solicitud incorrecta - parámetros inválidos",
             "content": {
               "application/json": {
                 "schema": {
@@ -138,7 +138,7 @@
             }
           },
           "401": {
-            "description": "Unauthorized - invalid or missing access token",
+            "description": "No autorizado - token de acceso inválido o faltante",
             "content": {
               "application/json": {
                 "schema": {
@@ -148,7 +148,7 @@
             }
           },
           "404": {
-            "description": "Symbol not found or no data available",
+            "description": "Símbolo no encontrado o no hay datos disponibles",
             "content": {
               "application/json": {
                 "schema": {
@@ -162,13 +162,13 @@
     },
     "/api/v1/market_data/bonds/{symbol}/cashflow": {
       "get": {
-        "description": "Retrieve the cashflow schedule for a specific bond, showing all future payments including principal and interest",
-        "tags": ["Bonds"],
+        "description": "Obtener el cronograma de flujo de caja para un bono específico, mostrando todos los pagos futuros incluyendo capital e intereses",
+        "tags": ["Bonos"],
         "parameters": [
           {
             "name": "symbol",
             "in": "path",
-            "description": "The bond symbol",
+            "description": "El símbolo del bono",
             "required": true,
             "schema": {
               "type": "string"
@@ -178,7 +178,7 @@
           {
             "name": "nominal_units",
             "in": "query",
-            "description": "Nominal units for the calculation",
+            "description": "Unidades nominales para el cálculo",
             "required": true,
             "schema": {
               "type": "integer",
@@ -233,13 +233,13 @@
     },
     "/api/v1/market_data/historicals/yield-curve": {
       "get": {
-        "description": "Retrieve historical yield curve data for a specific date and subasset class, showing interest rates across different maturities",
-        "tags": ["Market Data"],
+        "description": "Obtener datos históricos o intradiarios de curva de rendimiento para una fecha específica y clase de subactivo, mostrando tasas de interés a través de diferentes vencimientos",
+        "tags": ["Datos de Mercado"],
         "parameters": [
           {
             "name": "date",
             "in": "query",
-            "description": "Specific historical date in YYYY-MM-DD format",
+            "description": "Fecha histórica específica en formato YYYY-MM-DD",
             "required": true,
             "schema": {
               "type": "string",
@@ -250,7 +250,7 @@
           {
             "name": "subasset_class",
             "in": "query",
-            "description": "The submarket classification for the yield curve data",
+            "description": "La clasificación de submercado para los datos de curva de rendimiento",
             "required": true,
             "schema": {
               "type": "string",
@@ -280,7 +280,7 @@
           {
             "name": "specie",
             "in": "query",
-            "description": "Currency species. Use 'D' for Dollar (optional)",
+            "description": "Especie de moneda. Usar 'D' para Dólar (opcional)",
             "required": false,
             "schema": {
               "type": "string",
@@ -291,7 +291,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Historical yield curve data successfully retrieved",
+            "description": "Datos de curva de rendimiento históricos obtenidos exitosamente",
             "content": {
               "application/json": {
                 "schema": {
@@ -301,7 +301,7 @@
             }
           },
           "400": {
-            "description": "Bad request - invalid parameters",
+            "description": "Solicitud incorrecta - parámetros inválidos",
             "content": {
               "application/json": {
                 "schema": {
@@ -311,7 +311,7 @@
             }
           },
           "401": {
-            "description": "Unauthorized - invalid or missing access token",
+            "description": "No autorizado - token de acceso inválido o faltante",
             "content": {
               "application/json": {
                 "schema": {
@@ -321,7 +321,7 @@
             }
           },
           "404": {
-            "description": "Yield curve data not found",
+            "description": "Datos de curva de rendimiento no encontrados",
             "content": {
               "application/json": {
                 "schema": {
@@ -478,20 +478,20 @@
         "type": "object",
         "properties": {
           "grant_type": {
-            "description": "The OAuth 2.0 grant type. Must be set to client_credentials",
+            "description": "El tipo de concesión OAuth 2.0. Debe establecerse en client_credentials",
             "type": "string",
             "enum": ["client_credentials"]
           },
           "client_id": {
-            "description": "Your client identifier provided by Docta Capital",
+            "description": "Tu identificador de cliente proporcionado por Docta Capital",
             "type": "string"
           },
           "client_secret": {
-            "description": "Your client secret provided by Docta Capital",
+            "description": "Tu secreto de cliente proporcionado por Docta Capital",
             "type": "string"
           },
           "scope": {
-            "description": "The scope of access requested",
+            "description": "El alcance de acceso solicitado",
             "type": "string",
             "example": "market_data:read"
           }
@@ -507,20 +507,20 @@
         "type": "object",
         "properties": {
           "access_token": {
-            "description": "The access token to be used for subsequent API requests",
+            "description": "El token de acceso a ser usado para solicitudes posteriores de la API",
             "type": "string"
           },
           "token_type": {
-            "description": "The type of token. Will be Bearer",
+            "description": "El tipo de token. Será Bearer",
             "type": "string",
             "enum": ["Bearer"]
           },
           "expires_in": {
-            "description": "The number of seconds until the token expires",
+            "description": "El número de segundos hasta que el token expire",
             "type": "integer"
           },
           "scope": {
-            "description": "The scope of access granted by this token",
+            "description": "El alcance de acceso otorgado por este token",
             "type": "string"
           }
         }
@@ -536,30 +536,30 @@
         "type": "object",
         "properties": {
           "symbol": {
-            "description": "The ticker symbol of the requested instrument",
+            "description": "El símbolo ticker del instrumento solicitado",
             "type": "string",
             "example": "PAGS"
           },
           "data": {
-            "description": "Array of historical price data points",
+            "description": "Array de puntos de datos de precios históricos",
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/PriceDataPoint"
             }
           },
           "adjusted": {
-            "description": "Whether the prices are adjusted for corporate events",
+            "description": "Si los precios están ajustados por eventos corporativos",
             "type": "boolean",
             "example": false
           },
           "from_date": {
-            "description": "The start date of the requested data range",
+            "description": "La fecha de inicio del rango de datos solicitado",
             "type": "string",
             "format": "date",
             "example": "2025-06-01"
           },
           "to_date": {
-            "description": "The end date of the requested data range",
+            "description": "La fecha de fin del rango de datos solicitado",
             "type": "string",
             "format": "date",
             "example": "2025-06-15"
@@ -578,37 +578,37 @@
         "type": "object",
         "properties": {
           "date": {
-            "description": "The date of the price data in YYYY-MM-DD format",
+            "description": "La fecha de los datos de precio en formato YYYY-MM-DD",
             "type": "string",
             "format": "date",
             "example": "2025-06-01"
           },
           "open": {
-            "description": "Opening price for the day",
+            "description": "Precio de apertura del día",
             "type": "number",
             "format": "float",
             "example": 1250.50
           },
           "high": {
-            "description": "Highest price during the day",
+            "description": "Precio más alto durante el día",
             "type": "number",
             "format": "float",
             "example": 1280.75
           },
           "low": {
-            "description": "Lowest price during the day",
+            "description": "Precio más bajo durante el día",
             "type": "number",
             "format": "float",
             "example": 1245.25
           },
           "close": {
-            "description": "Closing price for the day",
+            "description": "Precio de cierre del día",
             "type": "number",
             "format": "float",
             "example": 1275.00
           },
           "volume": {
-            "description": "Trading volume for the day",
+            "description": "Volumen de negociación del día",
             "type": "integer",
             "format": "int64",
             "example": 1500000
@@ -627,36 +627,36 @@
         "type": "object",
         "properties": {
           "symbol": {
-            "description": "The symbol of the requested bond",
+            "description": "El símbolo del bono solicitado",
             "type": "string",
             "example": "AL30"
           },
           "nominal_units": {
-            "description": "The nominal units used for the calculation",
+            "description": "Las unidades nominales utilizadas para el cálculo",
             "type": "integer",
             "example": 100
           },
           "cashflow": {
-            "description": "Array of cashflow events for the bond",
+            "description": "Array de eventos de flujo de caja para el bono",
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/CashflowEvent"
             }
           },
           "total_interest": {
-            "description": "Total interest payments over the bond's lifetime",
+            "description": "Total de pagos de intereses durante la vida del bono",
             "type": "number",
             "format": "float",
             "example": 2500.00
           },
           "total_principal": {
-            "description": "Total principal payments over the bond's lifetime",
+            "description": "Total de pagos de capital durante la vida del bono",
             "type": "number",
             "format": "float",
             "example": 100000.00
           },
           "total_amount": {
-            "description": "Total cashflow amount over the bond's lifetime",
+            "description": "Monto total del flujo de caja durante la vida del bono",
             "type": "number",
             "format": "float",
             "example": 102500.00
@@ -674,30 +674,30 @@
         "type": "object",
         "properties": {
           "date": {
-            "description": "The payment date in YYYY-MM-DD format",
+            "description": "La fecha de pago en formato YYYY-MM-DD",
             "type": "string",
             "format": "date",
             "example": "2025-03-31"
           },
           "type": {
-            "description": "The type of payment",
+            "description": "El tipo de pago",
             "type": "string",
             "enum": ["interest", "principal", "amortization"],
             "example": "interest"
           },
           "amount": {
-            "description": "The payment amount in the bond's currency",
+            "description": "El monto del pago en la moneda del bono",
             "type": "number",
             "format": "float",
             "example": 1250.00
           },
           "currency": {
-            "description": "The currency of the payment",
+            "description": "La moneda del pago",
             "type": "string",
             "example": "ARS"
           },
           "description": {
-            "description": "Description of the payment",
+            "description": "Descripción del pago",
             "type": "string",
             "example": "Interest Payment"
           }
@@ -712,23 +712,23 @@
         "type": "object",
         "properties": {
           "date": {
-            "description": "The historical date for which the yield curve data was retrieved",
+            "description": "La fecha histórica para la cual se obtuvieron los datos de curva de rendimiento",
             "type": "string",
             "format": "date",
             "example": "2025-01-02"
           },
           "subasset_class": {
-            "description": "The submarket classification used for the query",
+            "description": "La clasificación de submercado utilizada para la consulta",
             "type": "string",
             "example": "HARD_DOLLAR"
           },
           "specie": {
-            "description": "The currency species used for the query",
+            "description": "La especie de moneda utilizada para la consulta",
             "type": "string",
             "example": "D"
           },
           "yield_curve": {
-            "description": "Array of yield curve data points with different maturities",
+            "description": "Array de puntos de datos de curva de rendimiento con diferentes vencimientos",
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/YieldCurvePoint"
@@ -746,23 +746,23 @@
         "type": "object",
         "properties": {
           "maturity": {
-            "description": "The maturity period",
+            "description": "El período de vencimiento",
             "type": "string",
             "example": "1Y"
           },
           "yield": {
-            "description": "The yield rate for the specific maturity period",
+            "description": "La tasa de rendimiento para el período de vencimiento específico",
             "type": "number",
             "format": "float",
             "example": 15.8
           },
           "currency": {
-            "description": "The currency of the yield rate",
+            "description": "La moneda de la tasa de rendimiento",
             "type": "string",
             "example": "USD"
           },
           "maturity_days": {
-            "description": "The maturity period in days",
+            "description": "El período de vencimiento en días",
             "type": "integer",
             "example": 365
           }
@@ -815,27 +815,27 @@
         "type": "object",
         "properties": {
           "type": {
-            "description": "The error type identifier",
+            "description": "El identificador del tipo de error",
             "type": "string",
             "example": "/errors/authentication-required"
           },
           "title": {
-            "description": "A brief description of the error",
+            "description": "Una breve descripción del error",
             "type": "string",
             "example": "Invalid client credentials"
           },
           "status": {
-            "description": "The HTTP status code",
+            "description": "El código de estado HTTP",
             "type": "integer",
             "example": 401
           },
           "detail": {
-            "description": "A detailed description of the error",
+            "description": "Una descripción detallada del error",
             "type": "string",
             "example": "Invalid client credentials"
           },
           "correlation_id": {
-            "description": "A unique identifier for tracking this error request",
+            "description": "Un identificador único para rastrear esta solicitud de error",
             "type": "string",
             "format": "uuid",
             "example": "2eb07802-94de-468a-b70f-75a49f3e9516"

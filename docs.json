@@ -20,7 +20,7 @@
             ]
           },
           {
-            "group": "Authentication",
+            "group": "Autenticación",
             "pages": [
               "api-reference/endpoint/auth-token"
             ]
@@ -33,7 +33,7 @@
             ]
           },
           {
-            "group": "Bonds",
+            "group": "Bonos",
             "pages": [
               "api-reference/endpoint/bonds-cashflow"
             ]
