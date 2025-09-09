@@ -1,0 +1,158 @@
+---
+title: 'Get Historical Prices'
+openapi: 'GET /api/v1/market_data/historicals/prices/{symbol}'
+---
+
+<Note>
+  This endpoint retrieves historical price data for a specific financial instrument over a specified date range.
+</Note>
+
+## Path Parameters
+
+<ParamField path="symbol" type="string" required>
+  The ticker symbol or identifier for the financial instrument (e.g., "PAGS", "GGAL", "YPFD").
+</ParamField>
+
+## Query Parameters
+
+<ParamField query="from_date" type="string" required>
+  Start date for the historical data in YYYY-MM-DD format.
+</ParamField>
+
+<ParamField query="to_date" type="string" required>
+  End date for the historical data in YYYY-MM-DD format.
+</ParamField>
+
+<ParamField query="adjusted" type="boolean" required>
+  Whether to return prices adjusted for corporate events (splits, dividends, etc.). Set to `true` for adjusted prices, `false` for raw prices.
+</ParamField>
+
+## Example Request
+
+```bash
+curl -X GET "https://api.doctacapital.com.ar/api/v1/market_data/historicals/prices/PAGS?from_date=2025-06-01&to_date=2025-06-15&adjusted=false" \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
+```
+
+## Success Response
+
+<ResponseField name="symbol" type="string">
+  The ticker symbol of the requested instrument.
+</ResponseField>
+
+<ResponseField name="data" type="array">
+  Array of historical price data points.
+</ResponseField>
+
+<ResponseField name="data[].date" type="string">
+  The date of the price data in YYYY-MM-DD format.
+</ResponseField>
+
+<ResponseField name="data[].open" type="number">
+  Opening price for the day.
+</ResponseField>
+
+<ResponseField name="data[].high" type="number">
+  Highest price during the day.
+</ResponseField>
+
+<ResponseField name="data[].low" type="number">
+  Lowest price during the day.
+</ResponseField>
+
+<ResponseField name="data[].close" type="number">
+  Closing price for the day.
+</ResponseField>
+
+<ResponseField name="data[].volume" type="integer">
+  Trading volume for the day.
+</ResponseField>
+
+<ResponseField name="adjusted" type="boolean">
+  Whether the prices are adjusted for corporate events.
+</ResponseField>
+
+<ResponseField name="from_date" type="string">
+  The start date of the requested data range.
+</ResponseField>
+
+<ResponseField name="to_date" type="string">
+  The end date of the requested data range.
+</ResponseField>
+
+## Example Success Response
+
+```json
+{
+  "symbol": "PAGS",
+  "data": [
+    {
+      "date": "2025-06-01",
+      "open": 1250.50,
+      "high": 1280.75,
+      "low": 1245.25,
+      "close": 1275.00,
+      "volume": 1500000
+    },
+    {
+      "date": "2025-06-02",
+      "open": 1275.00,
+      "high": 1290.50,
+      "low": 1265.75,
+      "close": 1285.25,
+      "volume": 1200000
+    }
+  ],
+  "adjusted": false,
+  "from_date": "2025-06-01",
+  "to_date": "2025-06-15"
+}
+```
+
+## Error Responses
+
+### 400 Bad Request
+Invalid date format or missing required parameters.
+
+```json
+{
+  "type": "/errors/bad-request",
+  "title": "Invalid request parameters",
+  "status": 400,
+  "detail": "Invalid date format. Use YYYY-MM-DD format.",
+  "correlation_id": "12345678-1234-1234-1234-123456789012"
+}
+```
+
+### 401 Unauthorized
+Invalid or missing access token.
+
+```json
+{
+  "type": "/errors/authentication-required",
+  "title": "Invalid or missing access token",
+  "status": 401,
+  "detail": "Access token is required for this endpoint",
+  "correlation_id": "12345678-1234-1234-1234-123456789012"
+}
+```
+
+### 404 Not Found
+Symbol not found or no data available for the specified date range.
+
+```json
+{
+  "type": "/errors/not-found",
+  "title": "Symbol not found",
+  "status": 404,
+  "detail": "No data available for symbol 'INVALID' in the specified date range",
+  "correlation_id": "12345678-1234-1234-1234-123456789012"
+}
+```
+
+## Notes
+
+- Date range cannot exceed 1 year
+- Maximum 1000 data points per request
+- Data is available for business days only (weekends and holidays excluded)
+- Prices are in the local currency of the instrument

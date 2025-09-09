@@ -1,0 +1,93 @@
+---
+title: 'Get Access Token'
+openapi: 'POST /api/v1/auth/token'
+---
+
+<Note>
+  This endpoint is used to obtain an access token using client credentials for API authentication.
+</Note>
+
+## Request Body
+
+The request body must contain the following required fields:
+
+<ParamField body="grant_type" type="string" required>
+  The OAuth 2.0 grant type. Must be set to `client_credentials`.
+</ParamField>
+
+<ParamField body="client_id" type="string" required>
+  Your client identifier provided by Docta Capital.
+</ParamField>
+
+<ParamField body="client_secret" type="string" required>
+  Your client secret provided by Docta Capital.
+</ParamField>
+
+<ParamField body="scope" type="string" required>
+  The scope of access requested. For market data access, use `market_data:read`.
+</ParamField>
+
+## Example Request
+
+```bash
+curl -X POST https://api.doctacapital.com.ar/api/v1/auth/token \
+  -H "Content-Type: application/json" \
+  -d '{
+    "grant_type": "client_credentials",
+    "client_id": "your-client-id",
+    "client_secret": "your-client-secret",
+    "scope": "market_data:read"
+  }'
+```
+
+## Success Response
+
+<ResponseField name="access_token" type="string">
+  The access token to be used for subsequent API requests.
+</ResponseField>
+
+<ResponseField name="token_type" type="string">
+  The type of token. Will be `Bearer`.
+</ResponseField>
+
+<ResponseField name="expires_in" type="integer">
+  The number of seconds until the token expires.
+</ResponseField>
+
+<ResponseField name="scope" type="string">
+  The scope of access granted by this token.
+</ResponseField>
+
+## Error Response
+
+<ResponseField name="type" type="string">
+  The error type identifier.
+</ResponseField>
+
+<ResponseField name="title" type="string">
+  A brief description of the error.
+</ResponseField>
+
+<ResponseField name="status" type="integer">
+  The HTTP status code.
+</ResponseField>
+
+<ResponseField name="detail" type="string">
+  A detailed description of the error.
+</ResponseField>
+
+<ResponseField name="correlation_id" type="string">
+  A unique identifier for tracking this error request.
+</ResponseField>
+
+## Example Error Response
+
+```json
+{
+  "type": "/errors/authentication-required",
+  "title": "Invalid client credentials",
+  "status": 401,
+  "detail": "Invalid client credentials",
+  "correlation_id": "2eb07802-94de-468a-b70f-75a49f3e9516"
+}
+```

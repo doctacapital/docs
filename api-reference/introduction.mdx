@@ -1,33 +1,45 @@
 ---
 title: 'Introduction'
-description: 'Example section for showcasing API endpoints'
+description: 'Docta Capital API documentation'
 ---
 
-<Note>
-  If you're not looking to build API reference documentation, you can delete
-  this section by removing the api-reference folder.
-</Note>
+## Welcome to Docta Capital API
 
-## Welcome
-
-There are two ways to build API documentation: [OpenAPI](https://mintlify.com/docs/api-playground/openapi/setup) and [MDX components](https://mintlify.com/docs/api-playground/mdx/configuration). For the starter kit, we are using the following OpenAPI specification.
+The Docta Capital API provides access to market data and financial services. This API uses OAuth 2.0 client credentials flow for authentication.
 
 <Card
-  title="Plant Store Endpoints"
-  icon="leaf"
-  href="https://github.com/mintlify/starter/blob/main/api-reference/openapi.json"
+  title="Base URL"
+  icon="globe"
 >
-  View the OpenAPI specification file
+  https://api.doctacapital.com.ar
 </Card>
+
+## Getting Started
+
+1. **Obtain Credentials**: Contact Docta Capital to get your `client_id` and `client_secret`
+2. **Get Access Token**: Use the authentication endpoint to obtain an access token
+3. **Make API Calls**: Include the access token in the Authorization header for all subsequent requests
 
 ## Authentication
 
-All API endpoints are authenticated using Bearer tokens and picked up from the specification file.
+The API uses OAuth 2.0 client credentials flow. You need to obtain an access token before making any API calls.
 
-```json
-"security": [
-  {
-    "bearerAuth": []
-  }
-]
-```
+<Steps>
+  <Step title="Request Access Token">
+    Send a POST request to `/api/v1/auth/token` with your client credentials
+  </Step>
+  <Step title="Use the Token">
+    Include the access token in the Authorization header: `Bearer {access_token}`
+  </Step>
+  <Step title="Token Expiration">
+    Tokens expire after a certain period. You'll need to request a new token when the current one expires.
+  </Step>
+</Steps>
+
+## Rate Limits
+
+API requests are subject to rate limiting. Please refer to the response headers for current rate limit information.
+
+## Support
+
+For technical support or questions about the API, please contact our support team.

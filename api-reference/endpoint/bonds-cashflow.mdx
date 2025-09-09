@@ -1,0 +1,157 @@
+---
+title: 'Get Bond Cashflow'
+openapi: 'GET /api/v1/market_data/bonds/{symbol}/cashflow'
+---
+
+<Note>
+  This endpoint retrieves the cashflow schedule for a specific bond, showing all future payments including principal and interest.
+</Note>
+
+## Path Parameters
+
+<ParamField path="symbol" type="string" required>
+  The bond symbol (e.g., "AL30", "GD30", "AE38").
+</ParamField>
+
+## Query Parameters
+
+<ParamField query="nominal_units" type="integer" required>
+  Nominal units for the calculation. This determines the face value of the bond position for which to calculate the cashflow.
+</ParamField>
+
+## Example Request
+
+```bash
+curl -X GET "https://api.doctacapital.com.ar/api/v1/market_data/bonds/AL30/cashflow?nominal_units=100" \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
+```
+
+## Success Response
+
+<ResponseField name="symbol" type="string">
+  The symbol of the requested bond.
+</ResponseField>
+
+<ResponseField name="nominal_units" type="integer">
+  The nominal units used for the calculation.
+</ResponseField>
+
+<ResponseField name="cashflow" type="array">
+  Array of cashflow events for the bond.
+</ResponseField>
+
+<ResponseField name="cashflow[].date" type="string">
+  The payment date in YYYY-MM-DD format.
+</ResponseField>
+
+<ResponseField name="cashflow[].type" type="string">
+  The type of payment (e.g., "interest", "principal", "amortization").
+</ResponseField>
+
+<ResponseField name="cashflow[].amount" type="number">
+  The payment amount in the bond's currency.
+</ResponseField>
+
+<ResponseField name="cashflow[].currency" type="string">
+  The currency of the payment (e.g., "ARS", "USD").
+</ResponseField>
+
+<ResponseField name="cashflow[].description" type="string">
+  Description of the payment (e.g., "Interest Payment", "Principal Amortization").
+</ResponseField>
+
+<ResponseField name="total_interest" type="number">
+  Total interest payments over the bond's lifetime.
+</ResponseField>
+
+<ResponseField name="total_principal" type="number">
+  Total principal payments over the bond's lifetime.
+</ResponseField>
+
+<ResponseField name="total_amount" type="number">
+  Total cashflow amount over the bond's lifetime.
+</ResponseField>
+
+## Example Success Response
+
+```json
+{
+  "symbol": "AL30",
+  "nominal_units": 100,
+  "cashflow": [
+    {
+      "date": "2025-03-31",
+      "type": "interest",
+      "amount": 1250.00,
+      "currency": "ARS",
+      "description": "Interest Payment"
+    },
+    {
+      "date": "2025-09-30",
+      "type": "interest",
+      "amount": 1250.00,
+      "currency": "ARS",
+      "description": "Interest Payment"
+    },
+    {
+      "date": "2025-12-31",
+      "type": "principal",
+      "amount": 100000.00,
+      "currency": "ARS",
+      "description": "Principal Amortization"
+    }
+  ],
+  "total_interest": 2500.00,
+  "total_principal": 100000.00,
+  "total_amount": 102500.00
+}
+```
+
+## Error Responses
+
+### 400 Bad Request
+Invalid parameters or missing required fields.
+
+```json
+{
+  "type": "/errors/bad-request",
+  "title": "Invalid request parameters",
+  "status": 400,
+  "detail": "nominal_units must be a positive integer",
+  "correlation_id": "12345678-1234-1234-1234-123456789012"
+}
+```
+
+### 401 Unauthorized
+Invalid or missing access token.
+
+```json
+{
+  "type": "/errors/authentication-required",
+  "title": "Invalid or missing access token",
+  "status": 401,
+  "detail": "Access token is required for this endpoint",
+  "correlation_id": "12345678-1234-1234-1234-123456789012"
+}
+```
+
+### 404 Not Found
+Bond not found or no cashflow data available.
+
+```json
+{
+  "type": "/errors/not-found",
+  "title": "Bond not found",
+  "status": 404,
+  "detail": "No cashflow data available for symbol 'INVALID'",
+  "correlation_id": "12345678-1234-1234-1234-123456789012"
+}
+```
+
+## Notes
+
+- Cashflow data includes all future payments until bond maturity
+- Amounts are calculated based on the specified nominal units
+- Payment dates are in business days (weekends and holidays may affect actual payment dates)
+- Interest payments are typically semi-annual for Argentine bonds
+- Principal payments may include partial amortizations or bullet payments at maturity
