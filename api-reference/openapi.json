@@ -23,6 +23,7 @@
       "post": {
         "description": "Obtener un token de acceso usando credenciales de cliente para la autenticación de la API",
         "tags": ["Autenticación"],
+        "security": [],
         "requestBody": {
           "description": "Credenciales de cliente para autenticación",
           "content": {
