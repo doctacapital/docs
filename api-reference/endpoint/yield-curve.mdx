@@ -1,0 +1,195 @@
+---
+title: 'Curva de Rendimiento Histórica'
+openapi: 'GET /api/v1/market_data/historicals/yield-curve'
+---
+
+<Note>
+  Este endpoint obtiene datos históricos de curva de rendimiento para una fecha específica y clase de subactivo, mostrando tasas de interés a través de diferentes vencimientos.
+</Note>
+
+## Parámetros de Consulta
+
+<ParamField query="date" type="string" required>
+  Fecha histórica específica en formato YYYY-MM-DD.
+</ParamField>
+
+<ParamField query="subasset_class" type="string" required>
+  La clasificación de submercado para los datos de curva de rendimiento. Debe ser uno de los valores predefinidos.
+</ParamField>
+
+<ParamField query="specie" type="string">
+  Especie de moneda. Usar "D" para Dólar (opcional).
+</ParamField>
+
+## Opciones de Clase de Subactivo
+
+El parámetro `subasset_class` acepta los siguientes valores:
+
+- `FIXED_RATE` - Soberano - Tasa Fija
+- `CER` - Soberano - CER
+- `DOLLAR_LINKED` - Soberano - Dólar Linked
+- `TAMAR` - Soberano - Tamar
+- `BADLAR` - Soberano - Badlar
+- `HARD_DOLLAR` - Soberano - Globales / Bonares
+- `BOPREAL` - Soberano - Bopreal / BCRA
+- `ON_FIXED_RATE` - ON - Tasa Fija
+- `ON` - ON - Hard Dólar
+- `ON_CER` - ON - CER
+- `ON_BADLAR` - ON - Badlar
+- `ON_TAMAR` - ON - Tamar
+- `ON_DOLLAR_LINKED` - ON - Dólar Linked
+- `SUB_SOBERANO_FIXED_RATE` - Subsoberano - Tasa Fija
+- `SUB_SOBERANO` - Subsoberano - Hard Dólar
+- `SUB_SOBERANO_CER` - Subsoberano - CER
+- `SUB_SOBERANO_BADLAR` - Subsoberano - Badlar
+- `SUB_SOBERANO_TAMAR` - Subsoberano - Tamar
+
+## Ejemplo de Solicitud
+
+```bash
+curl -X GET "https://api.doctacapital.com.ar/api/v1/market_data/historicals/yield-curve?date=2025-01-02&subasset_class=HARD_DOLLAR&specie=D" \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
+```
+
+## Respuesta Exitosa
+
+<ResponseField name="date" type="string">
+  La fecha histórica para la cual se obtuvieron los datos de curva de rendimiento.
+</ResponseField>
+
+<ResponseField name="subasset_class" type="string">
+  La clasificación de submercado utilizada para la consulta.
+</ResponseField>
+
+<ResponseField name="specie" type="string">
+  La especie de moneda utilizada para la consulta.
+</ResponseField>
+
+<ResponseField name="yield_curve" type="array">
+  Array de puntos de datos de curva de rendimiento con diferentes vencimientos.
+</ResponseField>
+
+<ResponseField name="yield_curve[].maturity" type="string">
+  El período de vencimiento (ej., "1M", "3M", "6M", "1Y", "2Y", "5Y", "10Y", "30Y").
+</ResponseField>
+
+<ResponseField name="yield_curve[].yield" type="number">
+  La tasa de rendimiento para el período de vencimiento específico.
+</ResponseField>
+
+<ResponseField name="yield_curve[].currency" type="string">
+  La moneda de la tasa de rendimiento (ej., "ARS", "USD").
+</ResponseField>
+
+<ResponseField name="yield_curve[].maturity_days" type="integer">
+  El período de vencimiento en días.
+</ResponseField>
+
+## Ejemplo de Respuesta Exitosa
+
+```json
+{
+  "date": "2025-01-02",
+  "subasset_class": "HARD_DOLLAR",
+  "specie": "D",
+  "yield_curve": [
+    {
+      "maturity": "1M",
+      "yield": 12.5,
+      "currency": "USD",
+      "maturity_days": 30
+    },
+    {
+      "maturity": "3M",
+      "yield": 13.2,
+      "currency": "USD",
+      "maturity_days": 90
+    },
+    {
+      "maturity": "6M",
+      "yield": 14.1,
+      "currency": "USD",
+      "maturity_days": 180
+    },
+    {
+      "maturity": "1Y",
+      "yield": 15.8,
+      "currency": "USD",
+      "maturity_days": 365
+    },
+    {
+      "maturity": "2Y",
+      "yield": 16.5,
+      "currency": "USD",
+      "maturity_days": 730
+    },
+    {
+      "maturity": "5Y",
+      "yield": 17.2,
+      "currency": "USD",
+      "maturity_days": 1825
+    },
+    {
+      "maturity": "10Y",
+      "yield": 18.1,
+      "currency": "USD",
+      "maturity_days": 3650
+    },
+    {
+      "maturity": "30Y",
+      "yield": 19.5,
+      "currency": "USD",
+      "maturity_days": 10950
+    }
+  ]
+}
+```
+
+## Respuestas de Error
+
+### 400 Solicitud Incorrecta
+Formato de fecha inválido o valor de subasset_class inválido.
+
+```json
+{
+  "type": "/errors/bad-request",
+  "title": "Parámetros de solicitud inválidos",
+  "status": 400,
+  "detail": "Valor de subasset_class inválido. Debe ser una de las opciones predefinidas.",
+  "correlation_id": "12345678-1234-1234-1234-123456789012"
+}
+```
+
+### 401 No Autorizado
+Token de acceso inválido o faltante.
+
+```json
+{
+  "type": "/errors/authentication-required",
+  "title": "Token de acceso inválido o faltante",
+  "status": 401,
+  "detail": "Se requiere token de acceso para este endpoint",
+  "correlation_id": "12345678-1234-1234-1234-123456789012"
+}
+```
+
+### 404 No Encontrado
+No hay datos de curva de rendimiento disponibles para la fecha y parámetros especificados.
+
+```json
+{
+  "type": "/errors/not-found",
+  "title": "Datos de curva de rendimiento no encontrados",
+  "status": 404,
+  "detail": "No hay datos de curva de rendimiento disponibles para la fecha y subasset_class especificados",
+  "correlation_id": "12345678-1234-1234-1234-123456789012"
+}
+```
+
+## Notas
+
+- Los datos están disponibles solo para días hábiles (excluyendo fines de semana y feriados)
+- Las tasas de rendimiento se expresan como porcentajes
+- Los períodos de vencimiento incluyen términos financieros estándar (1M, 3M, 6M, 1Y, 2Y, 5Y, 10Y, 30Y)
+- El parámetro `specie` es opcional y por defecto usa la moneda base de la clase de subactivo
+- La disponibilidad de datos históricos puede variar según la clase de subactivo y el rango de fechas

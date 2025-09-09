@@ -28,7 +28,8 @@
           {
             "group": "Market Data",
             "pages": [
-              "api-reference/endpoint/historical-prices"
+              "api-reference/endpoint/historical-prices",
+              "api-reference/endpoint/yield-curve"
             ]
           },
           {

@@ -1,86 +1,86 @@
 ---
-title: 'Get Historical Prices'
+title: 'Precios Históricos'
 openapi: 'GET /api/v1/market_data/historicals/prices/{symbol}'
 ---
 
 <Note>
-  This endpoint retrieves historical price data for a specific financial instrument over a specified date range.
+  Este endpoint obtiene datos de precios históricos para un instrumento financiero específico durante un rango de fechas determinado.
 </Note>
 
-## Path Parameters
+## Parámetros de Ruta
 
 <ParamField path="symbol" type="string" required>
-  The ticker symbol or identifier for the financial instrument (e.g., "PAGS", "GGAL", "YPFD").
+  El símbolo ticker o identificador del instrumento financiero (ej., "PAGS", "GGAL", "YPFD").
 </ParamField>
 
-## Query Parameters
+## Parámetros de Consulta
 
 <ParamField query="from_date" type="string" required>
-  Start date for the historical data in YYYY-MM-DD format.
+  Fecha de inicio para los datos históricos en formato YYYY-MM-DD.
 </ParamField>
 
 <ParamField query="to_date" type="string" required>
-  End date for the historical data in YYYY-MM-DD format.
+  Fecha de fin para los datos históricos en formato YYYY-MM-DD.
 </ParamField>
 
 <ParamField query="adjusted" type="boolean" required>
-  Whether to return prices adjusted for corporate events (splits, dividends, etc.). Set to `true` for adjusted prices, `false` for raw prices.
+  Si devolver precios ajustados por eventos corporativos (splits, dividendos, etc.). Establecer en `true` para precios ajustados, `false` para precios sin ajustar.
 </ParamField>
 
-## Example Request
+## Ejemplo de Solicitud
 
 ```bash
 curl -X GET "https://api.doctacapital.com.ar/api/v1/market_data/historicals/prices/PAGS?from_date=2025-06-01&to_date=2025-06-15&adjusted=false" \
   -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
 ```
 
-## Success Response
+## Respuesta Exitosa
 
 <ResponseField name="symbol" type="string">
-  The ticker symbol of the requested instrument.
+  El símbolo ticker del instrumento solicitado.
 </ResponseField>
 
 <ResponseField name="data" type="array">
-  Array of historical price data points.
+  Array de puntos de datos de precios históricos.
 </ResponseField>
 
 <ResponseField name="data[].date" type="string">
-  The date of the price data in YYYY-MM-DD format.
+  La fecha de los datos de precio en formato YYYY-MM-DD.
 </ResponseField>
 
 <ResponseField name="data[].open" type="number">
-  Opening price for the day.
+  Precio de apertura del día.
 </ResponseField>
 
 <ResponseField name="data[].high" type="number">
-  Highest price during the day.
+  Precio más alto durante el día.
 </ResponseField>
 
 <ResponseField name="data[].low" type="number">
-  Lowest price during the day.
+  Precio más bajo durante el día.
 </ResponseField>
 
 <ResponseField name="data[].close" type="number">
-  Closing price for the day.
+  Precio de cierre del día.
 </ResponseField>
 
 <ResponseField name="data[].volume" type="integer">
-  Trading volume for the day.
+  Volumen de negociación del día.
 </ResponseField>
 
 <ResponseField name="adjusted" type="boolean">
-  Whether the prices are adjusted for corporate events.
+  Si los precios están ajustados por eventos corporativos.
 </ResponseField>
 
 <ResponseField name="from_date" type="string">
-  The start date of the requested data range.
+  La fecha de inicio del rango de datos solicitado.
 </ResponseField>
 
 <ResponseField name="to_date" type="string">
-  The end date of the requested data range.
+  La fecha de fin del rango de datos solicitado.
 </ResponseField>
 
-## Example Success Response
+## Ejemplo de Respuesta Exitosa
 
 ```json
 {
@@ -109,50 +109,50 @@ curl -X GET "https://api.doctacapital.com.ar/api/v1/market_data/historicals/pric
 }
 ```
 
-## Error Responses
+## Respuestas de Error
 
-### 400 Bad Request
-Invalid date format or missing required parameters.
+### 400 Solicitud Incorrecta
+Formato de fecha inválido o parámetros requeridos faltantes.
 
 ```json
 {
   "type": "/errors/bad-request",
-  "title": "Invalid request parameters",
+  "title": "Parámetros de solicitud inválidos",
   "status": 400,
-  "detail": "Invalid date format. Use YYYY-MM-DD format.",
+  "detail": "Formato de fecha inválido. Usar formato YYYY-MM-DD.",
   "correlation_id": "12345678-1234-1234-1234-123456789012"
 }
 ```
 
-### 401 Unauthorized
-Invalid or missing access token.
+### 401 No Autorizado
+Token de acceso inválido o faltante.
 
 ```json
 {
   "type": "/errors/authentication-required",
-  "title": "Invalid or missing access token",
+  "title": "Token de acceso inválido o faltante",
   "status": 401,
-  "detail": "Access token is required for this endpoint",
+  "detail": "Se requiere token de acceso para este endpoint",
   "correlation_id": "12345678-1234-1234-1234-123456789012"
 }
 ```
 
-### 404 Not Found
-Symbol not found or no data available for the specified date range.
+### 404 No Encontrado
+Símbolo no encontrado o no hay datos disponibles para el rango de fechas especificado.
 
 ```json
 {
   "type": "/errors/not-found",
-  "title": "Symbol not found",
+  "title": "Símbolo no encontrado",
   "status": 404,
-  "detail": "No data available for symbol 'INVALID' in the specified date range",
+  "detail": "No hay datos disponibles para el símbolo 'INVALID' en el rango de fechas especificado",
   "correlation_id": "12345678-1234-1234-1234-123456789012"
 }
 ```
 
-## Notes
+## Notas
 
-- Date range cannot exceed 1 year
-- Maximum 1000 data points per request
-- Data is available for business days only (weekends and holidays excluded)
-- Prices are in the local currency of the instrument
+- El rango de fechas no puede exceder 1 año
+- Máximo 1000 puntos de datos por solicitud
+- Los datos están disponibles solo para días hábiles (excluyendo fines de semana y feriados)
+- Los precios están en la moneda local del instrumento

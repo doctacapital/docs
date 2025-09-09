@@ -231,6 +231,108 @@
         }
       }
     },
+    "/api/v1/market_data/historicals/yield-curve": {
+      "get": {
+        "description": "Retrieve historical yield curve data for a specific date and subasset class, showing interest rates across different maturities",
+        "tags": ["Market Data"],
+        "parameters": [
+          {
+            "name": "date",
+            "in": "query",
+            "description": "Specific historical date in YYYY-MM-DD format",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            },
+            "example": "2025-01-02"
+          },
+          {
+            "name": "subasset_class",
+            "in": "query",
+            "description": "The submarket classification for the yield curve data",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "DOLLAR_LINKED",
+                "HARD_DOLLAR",
+                "CER",
+                "BOPREAL",
+                "FIXED_RATE",
+                "SUB_SOBERANO",
+                "ON",
+                "TAMAR",
+                "BADLAR",
+                "ON_FIXED_RATE",
+                "ON_CER",
+                "ON_BADLAR",
+                "ON_TAMAR",
+                "ON_DOLLAR_LINKED",
+                "SUB_SOBERANO_FIXED_RATE",
+                "SUB_SOBERANO_CER",
+                "SUB_SOBERANO_BADLAR",
+                "SUB_SOBERANO_TAMAR"
+              ]
+            },
+            "example": "HARD_DOLLAR"
+          },
+          {
+            "name": "specie",
+            "in": "query",
+            "description": "Currency species. Use 'D' for Dollar (optional)",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": ["D"]
+            },
+            "example": "D"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Historical yield curve data successfully retrieved",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/YieldCurveResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request - invalid parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - invalid or missing access token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Yield curve data not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/plants": {
       "get": {
         "description": "Returns all plants from the system that the user has access to",
@@ -598,6 +700,71 @@
             "description": "Description of the payment",
             "type": "string",
             "example": "Interest Payment"
+          }
+        }
+      },
+      "YieldCurveResponse": {
+        "required": [
+          "date",
+          "subasset_class",
+          "yield_curve"
+        ],
+        "type": "object",
+        "properties": {
+          "date": {
+            "description": "The historical date for which the yield curve data was retrieved",
+            "type": "string",
+            "format": "date",
+            "example": "2025-01-02"
+          },
+          "subasset_class": {
+            "description": "The submarket classification used for the query",
+            "type": "string",
+            "example": "HARD_DOLLAR"
+          },
+          "specie": {
+            "description": "The currency species used for the query",
+            "type": "string",
+            "example": "D"
+          },
+          "yield_curve": {
+            "description": "Array of yield curve data points with different maturities",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/YieldCurvePoint"
+            }
+          }
+        }
+      },
+      "YieldCurvePoint": {
+        "required": [
+          "maturity",
+          "yield",
+          "currency",
+          "maturity_days"
+        ],
+        "type": "object",
+        "properties": {
+          "maturity": {
+            "description": "The maturity period",
+            "type": "string",
+            "example": "1Y"
+          },
+          "yield": {
+            "description": "The yield rate for the specific maturity period",
+            "type": "number",
+            "format": "float",
+            "example": 15.8
+          },
+          "currency": {
+            "description": "The currency of the yield rate",
+            "type": "string",
+            "example": "USD"
+          },
+          "maturity_days": {
+            "description": "The maturity period in days",
+            "type": "integer",
+            "example": 365
           }
         }
       },

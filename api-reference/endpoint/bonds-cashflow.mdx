@@ -1,78 +1,78 @@
 ---
-title: 'Get Bond Cashflow'
+title: 'Flujo de Caja de Bonos'
 openapi: 'GET /api/v1/market_data/bonds/{symbol}/cashflow'
 ---
 
 <Note>
-  This endpoint retrieves the cashflow schedule for a specific bond, showing all future payments including principal and interest.
+  Este endpoint obtiene el cronograma de flujo de caja para un bono específico, mostrando todos los pagos futuros incluyendo capital e intereses.
 </Note>
 
-## Path Parameters
+## Parámetros de Ruta
 
 <ParamField path="symbol" type="string" required>
-  The bond symbol (e.g., "AL30", "GD30", "AE38").
+  El símbolo del bono (ej., "AL30", "GD30", "AE38").
 </ParamField>
 
-## Query Parameters
+## Parámetros de Consulta
 
 <ParamField query="nominal_units" type="integer" required>
-  Nominal units for the calculation. This determines the face value of the bond position for which to calculate the cashflow.
+  Unidades nominales para el cálculo. Esto determina el valor nominal de la posición del bono para la cual calcular el flujo de caja.
 </ParamField>
 
-## Example Request
+## Ejemplo de Solicitud
 
 ```bash
 curl -X GET "https://api.doctacapital.com.ar/api/v1/market_data/bonds/AL30/cashflow?nominal_units=100" \
   -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
 ```
 
-## Success Response
+## Respuesta Exitosa
 
 <ResponseField name="symbol" type="string">
-  The symbol of the requested bond.
+  El símbolo del bono solicitado.
 </ResponseField>
 
 <ResponseField name="nominal_units" type="integer">
-  The nominal units used for the calculation.
+  Las unidades nominales utilizadas para el cálculo.
 </ResponseField>
 
 <ResponseField name="cashflow" type="array">
-  Array of cashflow events for the bond.
+  Array de eventos de flujo de caja para el bono.
 </ResponseField>
 
 <ResponseField name="cashflow[].date" type="string">
-  The payment date in YYYY-MM-DD format.
+  La fecha de pago en formato YYYY-MM-DD.
 </ResponseField>
 
 <ResponseField name="cashflow[].type" type="string">
-  The type of payment (e.g., "interest", "principal", "amortization").
+  El tipo de pago (ej., "interest", "principal", "amortization").
 </ResponseField>
 
 <ResponseField name="cashflow[].amount" type="number">
-  The payment amount in the bond's currency.
+  El monto del pago en la moneda del bono.
 </ResponseField>
 
 <ResponseField name="cashflow[].currency" type="string">
-  The currency of the payment (e.g., "ARS", "USD").
+  La moneda del pago (ej., "ARS", "USD").
 </ResponseField>
 
 <ResponseField name="cashflow[].description" type="string">
-  Description of the payment (e.g., "Interest Payment", "Principal Amortization").
+  Descripción del pago (ej., "Pago de Intereses", "Amortización de Capital").
 </ResponseField>
 
 <ResponseField name="total_interest" type="number">
-  Total interest payments over the bond's lifetime.
+  Total de pagos de intereses durante la vida del bono.
 </ResponseField>
 
 <ResponseField name="total_principal" type="number">
-  Total principal payments over the bond's lifetime.
+  Total de pagos de capital durante la vida del bono.
 </ResponseField>
 
 <ResponseField name="total_amount" type="number">
-  Total cashflow amount over the bond's lifetime.
+  Monto total del flujo de caja durante la vida del bono.
 </ResponseField>
 
-## Example Success Response
+## Ejemplo de Respuesta Exitosa
 
 ```json
 {
@@ -107,51 +107,51 @@ curl -X GET "https://api.doctacapital.com.ar/api/v1/market_data/bonds/AL30/cashf
 }
 ```
 
-## Error Responses
+## Respuestas de Error
 
-### 400 Bad Request
-Invalid parameters or missing required fields.
+### 400 Solicitud Incorrecta
+Parámetros inválidos o campos requeridos faltantes.
 
 ```json
 {
   "type": "/errors/bad-request",
-  "title": "Invalid request parameters",
+  "title": "Parámetros de solicitud inválidos",
   "status": 400,
-  "detail": "nominal_units must be a positive integer",
+  "detail": "nominal_units debe ser un entero positivo",
   "correlation_id": "12345678-1234-1234-1234-123456789012"
 }
 ```
 
-### 401 Unauthorized
-Invalid or missing access token.
+### 401 No Autorizado
+Token de acceso inválido o faltante.
 
 ```json
 {
   "type": "/errors/authentication-required",
-  "title": "Invalid or missing access token",
+  "title": "Token de acceso inválido o faltante",
   "status": 401,
-  "detail": "Access token is required for this endpoint",
+  "detail": "Se requiere token de acceso para este endpoint",
   "correlation_id": "12345678-1234-1234-1234-123456789012"
 }
 ```
 
-### 404 Not Found
-Bond not found or no cashflow data available.
+### 404 No Encontrado
+Bono no encontrado o no hay datos de flujo de caja disponibles.
 
 ```json
 {
   "type": "/errors/not-found",
-  "title": "Bond not found",
+  "title": "Bono no encontrado",
   "status": 404,
-  "detail": "No cashflow data available for symbol 'INVALID'",
+  "detail": "No hay datos de flujo de caja disponibles para el símbolo 'INVALID'",
   "correlation_id": "12345678-1234-1234-1234-123456789012"
 }
 ```
 
-## Notes
+## Notas
 
-- Cashflow data includes all future payments until bond maturity
-- Amounts are calculated based on the specified nominal units
-- Payment dates are in business days (weekends and holidays may affect actual payment dates)
-- Interest payments are typically semi-annual for Argentine bonds
-- Principal payments may include partial amortizations or bullet payments at maturity
+- Los datos de flujo de caja incluyen todos los pagos futuros hasta el vencimiento del bono
+- Los montos se calculan basándose en las unidades nominales especificadas
+- Las fechas de pago son en días hábiles (los fines de semana y feriados pueden afectar las fechas reales de pago)
+- Los pagos de intereses son típicamente semestrales para los bonos argentinos
+- Los pagos de capital pueden incluir amortizaciones parciales o pagos bullet al vencimiento
