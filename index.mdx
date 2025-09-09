@@ -1,36 +1,36 @@
 ---
 title: "Introducción"
-description: "Bienvenidos a la documentación API de Docta. Usa este documento para navegar nuestros diferentes endpoints"
+description: "Bienvenidos a la documentación API de Docta Capital. Usa este documento para navegar nuestros diferentes endpoints"
 ---
-## API Overview
+## Resumen de la API
 
 <Columns cols={2}>
   <Card
-    title="Authentication"
+    title="Autenticación"
     icon="key"
-    href="/development"
+    href="/api-reference/endpoint/auth-token"
   >
-    Edit your docs locally and preview them in real time.
+    Obtén un token de acceso usando credenciales de cliente para autenticarte en la API.
   </Card>
   <Card
-    title="Precios Historicos"
+    title="Precios Históricos"
     icon="database"
-    href="/essentials/settings"
+    href="/api-reference/endpoint/historical-prices"
   >
-    Customize the design and colors of your site to match your brand.
-  </Card>
-    <Card
-    title="Cashflows"
-    icon="money-bill"
-    href="/essentials/navigation"
-  >
-    Organize your docs to help users find what they need and succeed with your product.
+    Obtén datos de precios históricos para instrumentos financieros específicos durante un rango de fechas.
   </Card>
   <Card
-    title="Curvas"
-    icon="chart-line"
-    href="/api-reference/introduction"
+    title="Flujos de Caja"
+    icon="money-bill"
+    href="/api-reference/endpoint/bonds-cashflow"
   >
-    Auto-generate API documentation from OpenAPI specifications.
+    Obtén el cronograma de flujo de caja para bonos específicos, mostrando todos los pagos futuros.
+  </Card>
+  <Card
+    title="Curvas de Rendimiento"
+    icon="chart-line"
+    href="/api-reference/endpoint/yield-curve"
+  >
+    Obtén datos históricos de curva de rendimiento para diferentes clases de subactivos y vencimientos.
   </Card>
 </Columns>
