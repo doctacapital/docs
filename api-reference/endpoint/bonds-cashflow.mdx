@@ -4,7 +4,7 @@ openapi: 'GET /api/v1/market_data/bonds/{symbol}/cashflow'
 ---
 
 <Note>
-  Este endpoint obtiene el cronograma de flujo de caja para un bono específico, mostrando todos los pagos futuros incluyendo capital e intereses.
+  Este endpoint obtiene el flujo de caja de un bono específico, incluyendo todos los pagos de capital e intereses.
 </Note>
 
 ## Parámetros de Ruta
@@ -265,7 +265,6 @@ Bono no encontrado o no hay datos de flujo de caja disponibles.
 - Los datos de flujo de caja incluyen todos los pagos futuros hasta el vencimiento del bono
 - Los montos se calculan basándose en las unidades nominales especificadas
 - Las fechas de pago son en días hábiles (los fines de semana y feriados pueden afectar las fechas reales de pago)
-- Los pagos de intereses son típicamente semestrales para los bonos argentinos
 - Los pagos de capital pueden incluir amortizaciones parciales o pagos bullet al vencimiento
 - Los montos se expresan en la moneda base del bono (típicamente USD para bonos hard dollar)
 - El campo `remaining_principal` muestra el capital pendiente después de cada pago

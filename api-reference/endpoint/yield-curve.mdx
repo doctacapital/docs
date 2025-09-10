@@ -4,7 +4,7 @@ openapi: 'GET /api/v1/market_data/historicals/yield-curve'
 ---
 
 <Note>
-  Este endpoint obtiene datos históricos o intradiarios de curva de rendimiento para una fecha específica y clase de subactivo, mostrando tasas de interés a través de diferentes vencimientos.
+  Este endpoint obtiene las curvas de rendimiento (yield-curve) históricas o intradiarias de bonos para una fecha y sub-asset class determinado.
 </Note>
 
 ## Parámetros de Consulta
@@ -103,26 +103,6 @@ curl -X GET "https://api.doctacapital.com.ar/api/v1/market_data/historicals/yiel
 
 <ResponseField name="filters.subasset_class" type="string">
   La clasificación de submercado utilizada en el filtro.
-</ResponseField>
-
-<ResponseField name="metadata" type="object">
-  Metadatos sobre la consulta y los datos.
-</ResponseField>
-
-<ResponseField name="metadata.source" type="string">
-  La fuente de los datos.
-</ResponseField>
-
-<ResponseField name="metadata.cached" type="boolean">
-  Si los datos fueron obtenidos desde caché.
-</ResponseField>
-
-<ResponseField name="metadata.total_points" type="integer">
-  El número total de puntos de datos devueltos.
-</ResponseField>
-
-<ResponseField name="metadata.is_historical" type="boolean">
-  Si los datos son históricos o intradiarios.
 </ResponseField>
 
 ## Ejemplo de Respuesta Exitosa
@@ -294,7 +274,5 @@ Símbolo/ticker no encontrado o no hay datos disponibles.
 
 - Los datos están disponibles solo para días hábiles (excluyendo fines de semana y feriados)
 - Las TIR (Tasas Internas de Retorno) se expresan como decimales (ej., 0.104657 = 10.4657%)
-- La duración se expresa en años
-- El parámetro `specie` es opcional y por defecto usa la moneda base de la clase de subactivo
 - La disponibilidad de datos históricos puede variar según la clase de subactivo y el rango de fechas
 - Los datos incluyen instrumentos específicos con sus respectivos tickers y características financieras

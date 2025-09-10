@@ -22,7 +22,9 @@
     "/api/v1/auth/token": {
       "post": {
         "description": "Obtener un token de acceso usando credenciales de cliente para la autenticación de la API",
-        "tags": ["Autenticación"],
+        "tags": [
+          "Autenticación"
+        ],
         "security": [],
         "requestBody": {
           "description": "Credenciales de cliente para autenticación",
@@ -71,8 +73,10 @@
     },
     "/api/v1/market_data/historicals/prices/{symbol}": {
       "get": {
-        "description": "Obtener datos de precios históricos para un instrumento financiero específico durante un rango de fechas determinado",
-        "tags": ["Datos de Mercado"],
+        "description": "Obtener datos de precios históricos (ajustados por cupones, amortizaciones, splits y dividendos, o sin ajustar) para un ticker específico dentro de un rango de fechas",
+        "tags": [
+          "Datos de Mercado"
+        ],
         "parameters": [
           {
             "name": "symbol",
@@ -184,8 +188,10 @@
     },
     "/api/v1/market_data/bonds/{symbol}/cashflow": {
       "get": {
-        "description": "Obtener el cronograma de flujo de caja para un bono específico, mostrando todos los pagos futuros incluyendo capital e intereses",
-        "tags": ["Bonos"],
+        "description": "Obtener el flujo de caja de un bono específico, incluyendo todos los pagos de capital e intereses",
+        "tags": [
+          "Bonos"
+        ],
         "parameters": [
           {
             "name": "symbol",
@@ -276,8 +282,10 @@
     },
     "/api/v1/market_data/historicals/yield-curve": {
       "get": {
-        "description": "Obtener datos históricos o intradiarios de curva de rendimiento para una fecha específica y clase de subactivo, mostrando tasas de interés a través de diferentes vencimientos",
-        "tags": ["Datos de Mercado"],
+        "description": "Obtener las curvas de rendimiento (yield-curve) históricas o intradiarias de bonos para una fecha y sub-asset class determinado",
+        "tags": [
+          "Datos de Mercado"
+        ],
         "parameters": [
           {
             "name": "date",
@@ -327,7 +335,9 @@
             "required": false,
             "schema": {
               "type": "string",
-              "enum": ["D"]
+              "enum": [
+                "D"
+              ]
             },
             "example": "D"
           }
@@ -412,7 +422,9 @@
           "grant_type": {
             "description": "El tipo de concesión OAuth 2.0. Debe establecerse en client_credentials",
             "type": "string",
-            "enum": ["client_credentials"]
+            "enum": [
+              "client_credentials"
+            ]
           },
           "client_id": {
             "description": "Tu identificador de cliente proporcionado por Docta Capital",
@@ -445,7 +457,9 @@
           "token_type": {
             "description": "El tipo de token. Será Bearer",
             "type": "string",
-            "enum": ["Bearer"]
+            "enum": [
+              "Bearer"
+            ]
           },
           "expires_in": {
             "description": "El número de segundos hasta que el token expire",
@@ -726,7 +740,11 @@
           "type": {
             "description": "El tipo de pago",
             "type": "string",
-            "enum": ["interest", "principal", "amortization"],
+            "enum": [
+              "interest",
+              "principal",
+              "amortization"
+            ],
             "example": "interest"
           },
           "amount": {

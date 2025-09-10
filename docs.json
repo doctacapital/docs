@@ -14,7 +14,7 @@
         "tab": "API reference",
         "groups": [
           {
-            "group": "API documentation",
+            "group": "Getting started",
             "pages": [
               "api-reference/introduction"
             ]
@@ -28,14 +28,14 @@
           {
             "group": "Market Data",
             "pages": [
-              "api-reference/endpoint/historical-prices",
-              "api-reference/endpoint/yield-curve"
+              "api-reference/endpoint/historical-prices"
             ]
           },
           {
             "group": "Bonos",
             "pages": [
-              "api-reference/endpoint/bonds-cashflow"
+              "api-reference/endpoint/bonds-cashflow",
+              "api-reference/endpoint/yield-curve"
             ]
           }
         ]
