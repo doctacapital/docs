@@ -197,15 +197,26 @@ Token de acceso inválido o faltante.
 ```
 
 ### 404 No Encontrado
-Símbolo/ticker no encontrado o no hay datos disponibles.
+Ticker no encontrado.
 
 ```json
 {
   "type": "/errors/not-found",
-  "title": "Resource not found: /historicals/PASGS",
+  "title": "Resource not found",
   "status": 404,
-  "detail": "Resource not found: /historicals/PASGS",
-  "correlation_id": "438caef0-f014-4a80-874c-4d0261ff28a3"
+  "detail": "Ticker not found"
+}
+```
+
+### 422 Error de Validación
+Parámetros de fecha inválidos.
+
+```json
+{
+  "type": "/errors/http-error",
+  "title": "Start date cannot be after end date",
+  "status": 422,
+  "detail": "Start date cannot be after end date"
 }
 ```
 

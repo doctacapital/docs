@@ -257,6 +257,30 @@ Token de acceso inválido o faltante.
 }
 ```
 
+### 400 Solicitud Incorrecta
+Parámetro subasset_class inválido.
+
+```json
+{
+  "type": "/errors/http-error",
+  "title": "subasset_class: Value error, Invalid subasset_class 'FIXED_RATES'. Supported values: BOPREAL, CER, DOLLAR_LINKED, FIXED_RATE, HARD_DOLLAR, ON, ON_BADLAR, ON_DOLLAR_LINKED, ON_TAMAR, SUB_SOBERANO, SUB_SOBERANO_BADLAR, SUB_SOBERANO_CER",
+  "status": 400,
+  "detail": "subasset_class: Value error, Invalid subasset_class 'FIXED_RATES'. Supported values: BOPREAL, CER, DOLLAR_LINKED, FIXED_RATE, HARD_DOLLAR, ON, ON_BADLAR, ON_DOLLAR_LINKED, ON_TAMAR, SUB_SOBERANO, SUB_SOBERANO_BADLAR, SUB_SOBERANO_CER"
+}
+```
+
+### 400 Fecha Futura
+Fecha histórica no puede ser en el futuro.
+
+```json
+{
+  "type": "/errors/http-error",
+  "title": "date: Value error, Historical date must be in the past",
+  "status": 400,
+  "detail": "date: Value error, Historical date must be in the past"
+}
+```
+
 ### 404 No Encontrado
 Símbolo/ticker no encontrado o no hay datos disponibles.
 

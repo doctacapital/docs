@@ -167,7 +167,7 @@
             }
           },
           "404": {
-            "description": "Símbolo/ticker no encontrado o no hay datos disponibles",
+            "description": "Ticker no encontrado",
             "content": {
               "application/json": {
                 "schema": {
@@ -175,10 +175,25 @@
                 },
                 "example": {
                   "type": "/errors/not-found",
-                  "title": "Resource not found: /historicals/PASGS",
+                  "title": "Resource not found",
                   "status": 404,
-                  "detail": "Resource not found: /historicals/PASGS",
-                  "correlation_id": "438caef0-f014-4a80-874c-4d0261ff28a3"
+                  "detail": "Ticker not found"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Parámetros de fecha inválidos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "type": "/errors/http-error",
+                  "title": "Start date cannot be after end date",
+                  "status": 422,
+                  "detail": "Start date cannot be after end date"
                 }
               }
             }
@@ -261,7 +276,7 @@
             }
           },
           "404": {
-            "description": "Bono no encontrado o no hay datos de flujo de caja disponibles",
+            "description": "Ticker no encontrado",
             "content": {
               "application/json": {
                 "schema": {
@@ -269,10 +284,9 @@
                 },
                 "example": {
                   "type": "/errors/not-found",
-                  "title": "Resource not found: /bonds/cash_flow",
+                  "title": "Resource not found",
                   "status": 404,
-                  "detail": "Resource not found: /bonds/cash_flow",
-                  "correlation_id": "438caef0-f014-4a80-874c-4d0261ff28a3"
+                  "detail": "Ticker not found"
                 }
               }
             }
@@ -383,6 +397,38 @@
                   "status": 401,
                   "detail": "Authorization header missing",
                   "correlation_id": "d6e20e07-0580-4e2d-9480-00a68c1ae493"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Parámetro subasset_class inválido",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "type": "/errors/http-error",
+                  "title": "subasset_class: Value error, Invalid subasset_class 'FIXED_RATES'. Supported values: BOPREAL, CER, DOLLAR_LINKED, FIXED_RATE, HARD_DOLLAR, ON, ON_BADLAR, ON_DOLLAR_LINKED, ON_TAMAR, SUB_SOBERANO, SUB_SOBERANO_BADLAR, SUB_SOBERANO_CER",
+                  "status": 400,
+                  "detail": "subasset_class: Value error, Invalid subasset_class 'FIXED_RATES'. Supported values: BOPREAL, CER, DOLLAR_LINKED, FIXED_RATE, HARD_DOLLAR, ON, ON_BADLAR, ON_DOLLAR_LINKED, ON_TAMAR, SUB_SOBERANO, SUB_SOBERANO_BADLAR, SUB_SOBERANO_CER"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Fecha histórica no puede ser en el futuro",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "type": "/errors/http-error",
+                  "title": "date: Value error, Historical date must be in the past",
+                  "status": 400,
+                  "detail": "date: Value error, Historical date must be in the past"
                 }
               }
             }
