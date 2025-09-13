@@ -402,33 +402,33 @@
             }
           },
           "400": {
-            "description": "Parámetro subasset_class inválido",
+            "description": "Bad Request - Invalid parameters or data",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/Error"
                 },
-                "example": {
-                  "type": "/errors/http-error",
-                  "title": "subasset_class: Value error, Invalid subasset_class 'FIXED_RATES'. Supported values: BOPREAL, CER, DOLLAR_LINKED, FIXED_RATE, HARD_DOLLAR, ON, ON_BADLAR, ON_DOLLAR_LINKED, ON_TAMAR, SUB_SOBERANO, SUB_SOBERANO_BADLAR, SUB_SOBERANO_CER",
-                  "status": 400,
-                  "detail": "subasset_class: Value error, Invalid subasset_class 'FIXED_RATES'. Supported values: BOPREAL, CER, DOLLAR_LINKED, FIXED_RATE, HARD_DOLLAR, ON, ON_BADLAR, ON_DOLLAR_LINKED, ON_TAMAR, SUB_SOBERANO, SUB_SOBERANO_BADLAR, SUB_SOBERANO_CER"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Fecha histórica no puede ser en el futuro",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                },
-                "example": {
-                  "type": "/errors/http-error",
-                  "title": "date: Value error, Historical date must be in the past",
-                  "status": 400,
-                  "detail": "date: Value error, Historical date must be in the past"
+                "examples": {
+                  "invalid_subasset_class": {
+                    "summary": "Invalid subasset_class parameter",
+                    "description": "When the subasset_class parameter contains an invalid value",
+                    "value": {
+                      "type": "/errors/http-error",
+                      "title": "subasset_class: Value error, Invalid subasset_class 'FIXED_RATES'. Supported values: BOPREAL, CER, DOLLAR_LINKED, FIXED_RATE, HARD_DOLLAR, ON, ON_BADLAR, ON_DOLLAR_LINKED, ON_TAMAR, SUB_SOBERANO, SUB_SOBERANO_BADLAR, SUB_SOBERANO_CER",
+                      "status": 400,
+                      "detail": "subasset_class: Value error, Invalid subasset_class 'FIXED_RATES'. Supported values: BOPREAL, CER, DOLLAR_LINKED, FIXED_RATE, HARD_DOLLAR, ON, ON_BADLAR, ON_DOLLAR_LINKED, ON_TAMAR, SUB_SOBERANO, SUB_SOBERANO_BADLAR, SUB_SOBERANO_CER"
+                    }
+                  },
+                  "future_date": {
+                    "summary": "Historical date in the future",
+                    "description": "When the date parameter is set to a future date",
+                    "value": {
+                      "type": "/errors/http-error",
+                      "title": "date: Value error, Historical date must be in the past",
+                      "status": 400,
+                      "detail": "date: Value error, Historical date must be in the past"
+                    }
+                  }
                 }
               }
             }
