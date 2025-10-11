@@ -1,6 +1,6 @@
 ---
-title: 'Acciones - OHLC histórico'
-openapi: 'GET /api/v1/stocks/market-data/{symbol}/ohlc'
+title: 'OHLC histórico'
+openapi: 'GET /api/v1/stocks/market-data/{symbol}/ohlc/'
 ---
 
 <Note>
@@ -28,7 +28,7 @@ openapi: 'GET /api/v1/stocks/market-data/{symbol}/ohlc'
 ## Ejemplo
 
 ```bash
-curl -X GET "https://api.doctacapital.com.ar/api/v1/stocks/market-data/GGAL/ohlc?from_date=2025-01-01&to_date=2025-10-09&adjusted=false" \
+curl -X GET "https://api.doctacapital.com.ar/api/v1/stocks/market-data/GGAL/ohlc/?from_date=2025-01-01&to_date=2025-10-09&adjusted=false" \
   -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
 ```
 

@@ -1,6 +1,6 @@
 ---
-title: 'Bonos - Instrumentos'
-openapi: 'GET /api/v1/bonds/instruments'
+title: 'Instrumentos'
+openapi: 'GET /api/v1/bonds/instruments/'
 ---
 
 <Note>
@@ -17,6 +17,29 @@ openapi: 'GET /api/v1/bonds/instruments'
   Filtra por subclase de activo (ej., "HARD_DOLLAR").
 </ParamField>
 
+<Info>
+Valores válidos para <code>sub_asset_class</code>:
+
+- <code>DOLLAR_LINKED</code>
+- <code>HARD_DOLLAR</code>
+- <code>CER</code>
+- <code>BOPREAL</code>
+- <code>FIXED_RATE</code>
+- <code>SUB_SOBERANO</code>
+- <code>ON</code>
+- <code>TAMAR</code>
+- <code>BADLAR</code>
+- <code>ON_FIXED_RATE</code>
+- <code>ON_CER</code>
+- <code>ON_BADLAR</code>
+- <code>ON_TAMAR</code>
+- <code>ON_DOLLAR_LINKED</code>
+- <code>SUB_SOBERANO_FIXED_RATE</code>
+- <code>SUB_SOBERANO_CER</code>
+- <code>SUB_SOBERANO_BADLAR</code>
+- <code>SUB_SOBERANO_TAMAR</code>
+</Info>
+
 <ParamField query="limit" type="integer">
   Límite de elementos por página (predeterminado 50).
 </ParamField>
@@ -28,7 +51,7 @@ openapi: 'GET /api/v1/bonds/instruments'
 ## Ejemplo
 
 ```bash
-curl -X GET "https://api.doctacapital.com.ar/api/v1/bonds/instruments?limit=50" \
+curl -X GET "https://api.doctacapital.com.ar/api/v1/bonds/instruments/?limit=50" \
   -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
 ```
 

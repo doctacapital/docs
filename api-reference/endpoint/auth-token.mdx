@@ -1,6 +1,6 @@
 ---
 title: 'Obtener Token de Acceso'
-openapi: 'POST /api/v1/auth/token'
+openapi: 'POST /api/v1/auth/token/'
 ---
 
 <Note>
@@ -34,7 +34,7 @@ El cuerpo de la solicitud debe contener los siguientes campos requeridos:
 ## Ejemplo de Solicitud
 
 ```bash
-curl -X POST https://api.doctacapital.com.ar/api/v1/auth/token \
+curl -X POST https://api.doctacapital.com.ar/api/v1/auth/token/ \
   -H "Content-Type: application/json" \
   -d '{
     "grant_type": "client_credentials",

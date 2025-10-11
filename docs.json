@@ -31,14 +31,14 @@
               "api-reference/endpoint/bonds-instruments",
               "api-reference/endpoint/bonds-instruments-detail",
               "api-reference/endpoint/bonds-instruments-search",
-              "api-reference/endpoint/historical-prices",
+              "api-reference/endpoint/bonds-historical-prices",
               "api-reference/endpoint/yield-curve",
               "api-reference/endpoint/bonds-cashflow"
             ]
           }
           ,
           {
-            "group": "CEDEARs",
+            "group": "Cedears",
             "pages": [
               "api-reference/endpoint/cedears-instruments",
               "api-reference/endpoint/cedears-instruments-detail",

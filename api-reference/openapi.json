@@ -19,7 +19,7 @@
     }
   ],
   "paths": {
-    "/api/v1/auth/token": {
+    "/api/v1/auth/token/": {
       "post": {
         "description": "Obtener un token de acceso usando credenciales de cliente para la autenticación de la API",
         "tags": [
@@ -71,7 +71,7 @@
         }
       }
     },
-    "/api/v1/bonds/market-data/{symbol}/ohlc": {
+    "/api/v1/bonds/market-data/{symbol}/ohlc/": {
       "get": {
         "description": "Obtener datos de precios históricos (ajustados por cupones, amortizaciones, splits y dividendos, o sin ajustar) para un ticker específico dentro de un rango de fechas",
         "tags": [
@@ -201,7 +201,7 @@
         }
       }
     },
-    "/api/v1/bonds/analytics/cashflow/{symbol}": {
+    "/api/v1/bonds/analytics/cashflow/{symbol}/": {
       "get": {
         "description": "Obtener el flujo de caja de un bono específico, incluyendo todos los pagos de capital e intereses",
         "tags": [
@@ -294,7 +294,7 @@
         }
       }
     },
-    "/api/v1/bonds/yields/historical-curve": {
+    "/api/v1/bonds/yields/historical-curve/": {
       "get": {
         "description": "Obtener las curvas de rendimiento (yield-curve) históricas o intradiarias de bonos para una fecha y sub-asset class determinado",
         "tags": [
@@ -452,7 +452,66 @@
       }
     }
     ,
-    "/api/v1/bonds/market-data/{symbol}/intraday": {
+    "/api/v1/bonds/yields/curve/": {
+      "get": {
+        "description": "Obtener la curva de rendimiento actual para una subclase de bonos",
+        "tags": [
+          "Bonds"
+        ],
+        "parameters": [
+          {
+            "name": "sub_asset_class",
+            "in": "query",
+            "description": "La subclase de activo para la curva",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "DOLLAR_LINKED",
+                "HARD_DOLLAR",
+                "CER",
+                "BOPREAL",
+                "FIXED_RATE",
+                "SUB_SOBERANO",
+                "ON",
+                "TAMAR",
+                "BADLAR",
+                "ON_FIXED_RATE",
+                "ON_CER",
+                "ON_BADLAR",
+                "ON_TAMAR",
+                "ON_DOLLAR_LINKED",
+                "SUB_SOBERANO_FIXED_RATE",
+                "SUB_SOBERANO_CER",
+                "SUB_SOBERANO_BADLAR",
+                "SUB_SOBERANO_TAMAR"
+              ]
+            },
+            "example": "HARD_DOLLAR"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Curva de rendimiento obtenida exitosamente",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/YieldCurveResponse" }
+              }
+            }
+          },
+          "401": {
+            "description": "No autorizado - token faltante o inválido",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } }
+          },
+          "500": {
+            "description": "Error interno del servidor",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } }
+          }
+        }
+      }
+    }
+    ,
+    "/api/v1/bonds/market-data/{symbol}/intraday/": {
       "get": {
         "description": "Obtener datos intradiarios para un bono específico",
         "tags": [
@@ -480,14 +539,33 @@
         }
       }
     },
-    "/api/v1/bonds/instruments": {
+    "/api/v1/bonds/instruments/": {
       "get": {
         "description": "Listar instrumentos de bonos",
         "tags": [
           "Bonds"
         ],
         "parameters": [
-          { "name": "sub_asset_class", "in": "query", "required": false, "schema": { "type": "string" } },
+          { "name": "sub_asset_class", "in": "query", "required": false, "schema": { "type": "string", "enum": [
+            "DOLLAR_LINKED",
+            "HARD_DOLLAR",
+            "CER",
+            "BOPREAL",
+            "FIXED_RATE",
+            "SUB_SOBERANO",
+            "ON",
+            "TAMAR",
+            "BADLAR",
+            "ON_FIXED_RATE",
+            "ON_CER",
+            "ON_BADLAR",
+            "ON_TAMAR",
+            "ON_DOLLAR_LINKED",
+            "SUB_SOBERANO_FIXED_RATE",
+            "SUB_SOBERANO_CER",
+            "SUB_SOBERANO_BADLAR",
+            "SUB_SOBERANO_TAMAR"
+          ] } },
           { "name": "limit", "in": "query", "required": false, "schema": { "type": "integer", "default": 50 } },
           { "name": "cursor", "in": "query", "required": false, "schema": { "type": "string", "nullable": true } }
         ],
@@ -501,7 +579,7 @@
         }
       }
     },
-    "/api/v1/bonds/instruments/{symbol}": {
+    "/api/v1/bonds/instruments/{symbol}/": {
       "get": {
         "description": "Obtener detalle de un instrumento de bono",
         "tags": [ "Bonds" ],
@@ -518,7 +596,7 @@
         }
       }
     },
-    "/api/v1/bonds/instruments/search": {
+    "/api/v1/bonds/instruments/search/": {
       "get": {
         "description": "Buscar instrumentos de bonos",
         "tags": [ "Bonds" ],
@@ -537,7 +615,7 @@
         }
       }
     },
-    "/api/v1/bonds/analytics/pricing": {
+    "/api/v1/bonds/analytics/pricing/": {
       "post": {
         "description": "Calcular precio teórico de un bono",
         "tags": [ "Bonds" ],
@@ -567,7 +645,7 @@
         }
       }
     },
-    "/api/v1/bonds/analytics/risk-metrics": {
+    "/api/v1/bonds/analytics/risk-metrics/": {
       "post": {
         "description": "Calcular métricas de riesgo del bono",
         "tags": [ "Bonds" ],
@@ -597,7 +675,7 @@
         }
       }
     },
-    "/api/v1/cedears/instruments": {
+    "/api/v1/cedears/instruments/": {
       "get": {
         "description": "Listar instrumentos CEDEAR",
         "tags": [ "CEDEARs" ],
@@ -608,7 +686,7 @@
         "responses": { "200": { "description": "Listado CEDEARs", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/InstrumentListResponse" } } } } }
       }
     },
-    "/api/v1/cedears/instruments/{symbol}": {
+    "/api/v1/cedears/instruments/{symbol}/": {
       "get": {
         "description": "Detalle de CEDEAR",
         "tags": [ "CEDEARs" ],
@@ -616,7 +694,7 @@
         "responses": { "200": { "description": "Detalle CEDEAR", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Instrument" } } } } }
       }
     },
-    "/api/v1/cedears/instruments/search": {
+    "/api/v1/cedears/instruments/search/": {
       "get": {
         "description": "Buscar CEDEARs",
         "tags": [ "CEDEARs" ],
@@ -624,7 +702,7 @@
         "responses": { "200": { "description": "Resultados de búsqueda", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/InstrumentListResponse" } } } } }
       }
     },
-    "/api/v1/cedears/market-data/{symbol}/ohlc": {
+    "/api/v1/cedears/market-data/{symbol}/ohlc/": {
       "get": {
         "description": "OHLC histórico de CEDEAR",
         "tags": [ "CEDEARs" ],
@@ -637,7 +715,7 @@
         "responses": { "200": { "description": "Datos OHLC", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/HistoricalPricesResponse" } } } } }
       }
     },
-    "/api/v1/cedears/market-data/{symbol}/intraday": {
+    "/api/v1/cedears/market-data/{symbol}/intraday/": {
       "get": {
         "description": "Intraday CEDEAR",
         "tags": [ "CEDEARs" ],
@@ -645,7 +723,7 @@
         "responses": { "200": { "description": "Datos intradiarios", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/HistoricalPricesResponse" } } } } }
       }
     },
-    "/api/v1/stocks/instruments": {
+    "/api/v1/stocks/instruments/": {
       "get": {
         "description": "Listar instrumentos de acciones",
         "tags": [ "Stocks" ],
@@ -653,7 +731,7 @@
         "responses": { "200": { "description": "Listado acciones", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/InstrumentListResponse" } } } } }
       }
     },
-    "/api/v1/stocks/instruments/{symbol}": {
+    "/api/v1/stocks/instruments/{symbol}/": {
       "get": {
         "description": "Detalle de acción",
         "tags": [ "Stocks" ],
@@ -661,7 +739,7 @@
         "responses": { "200": { "description": "Detalle acción", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Instrument" } } } } }
       }
     },
-    "/api/v1/stocks/instruments/search": {
+    "/api/v1/stocks/instruments/search/": {
       "get": {
         "description": "Buscar acciones",
         "tags": [ "Stocks" ],
@@ -669,7 +747,7 @@
         "responses": { "200": { "description": "Resultados de búsqueda", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/InstrumentListResponse" } } } } }
       }
     },
-    "/api/v1/stocks/market-data/{symbol}/ohlc": {
+    "/api/v1/stocks/market-data/{symbol}/ohlc/": {
       "get": {
         "description": "OHLC histórico de acción",
         "tags": [ "Stocks" ],
@@ -682,7 +760,7 @@
         "responses": { "200": { "description": "Datos OHLC", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/HistoricalPricesResponse" } } } } }
       }
     },
-    "/api/v1/stocks/market-data/{symbol}/intraday": {
+    "/api/v1/stocks/market-data/{symbol}/intraday/": {
       "get": {
         "description": "Intraday acción",
         "tags": [ "Stocks" ],

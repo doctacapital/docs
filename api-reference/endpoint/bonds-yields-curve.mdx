@@ -1,0 +1,27 @@
+---
+title: 'Bonos - Curva de rendimiento (actual)'
+openapi: 'GET /api/v1/bonds/yields/curve/'
+---
+
+<Note>
+  Obtiene la curva de rendimiento actual para una subclase de bonos.
+</Note>
+
+## Parámetros de consulta
+
+<ParamField query="sub_asset_class" type="string" required>
+  Subclase de activo (ej., "HARD_DOLLAR").
+</ParamField>
+
+<Info>
+Valores válidos: `DOLLAR_LINKED`, `HARD_DOLLAR`, `CER`, `BOPREAL`, `FIXED_RATE`, `SUB_SOBERANO`, `ON`, `TAMAR`, `BADLAR`, `ON_FIXED_RATE`, `ON_CER`, `ON_BADLAR`, `ON_TAMAR`, `ON_DOLLAR_LINKED`, `SUB_SOBERANO_FIXED_RATE`, `SUB_SOBERANO_CER`, `SUB_SOBERANO_BADLAR`, `SUB_SOBERANO_TAMAR`.
+</Info>
+
+## Ejemplo
+
+```bash
+curl -X GET "https://api.doctacapital.com.ar/api/v1/bonds/yields/curve/?sub_asset_class=HARD_DOLLAR" \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
+```
+
+

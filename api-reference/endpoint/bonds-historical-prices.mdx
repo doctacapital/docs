@@ -1,6 +1,6 @@
 ---
-title: 'Precios Históricos (OHLC)'
-openapi: 'GET /api/v1/bonds/market-data/{symbol}/ohlc'
+title: 'OHLC histórico'
+openapi: 'GET /api/v1/bonds/market-data/{symbol}/ohlc/'
 ---
 
 <Note>
@@ -30,7 +30,7 @@ openapi: 'GET /api/v1/bonds/market-data/{symbol}/ohlc'
 ## Ejemplo de Solicitud
 
 ```bash
-curl -X GET "https://api.doctacapital.com.ar/api/v1/bonds/market-data/AL30/ohlc?from_date=2025-06-01&to_date=2025-06-15&adjusted=false" \
+curl -X GET "https://api.doctacapital.com.ar/api/v1/bonds/market-data/AL30/ohlc/?from_date=2025-06-01&to_date=2025-06-15&adjusted=false" \
   -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
 ```
 
