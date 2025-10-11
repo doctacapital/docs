@@ -24,7 +24,11 @@ El cuerpo de la solicitud debe contener los siguientes campos requeridos:
 </ParamField>
 
 <ParamField body="scope" type="string" required>
-  El alcance de acceso solicitado. Para acceso a datos de mercado, usar `market_data:read`.
+  El alcance de acceso solicitado. En v3 usa scopes por mercado, por ejemplo: `bonds:read cedears:read stocks:read`.
+  
+  <Tip>
+  Puedes solicitar múltiples scopes separados por espacio para habilitar varios mercados con un solo token.
+  </Tip>
 </ParamField>
 
 ## Ejemplo de Solicitud
@@ -36,7 +40,7 @@ curl -X POST https://api.doctacapital.com.ar/api/v1/auth/token \
     "grant_type": "client_credentials",
     "client_id": "your-client-id",
     "client_secret": "your-client-secret",
-    "scope": "market_data:read"
+    "scope": "bonds:read cedears:read stocks:read"
   }'
 ```
 
@@ -69,7 +73,7 @@ curl -X POST https://api.doctacapital.com.ar/api/v1/auth/token \
     "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJwcm9kLWJhc3Rpb24tMDAxIiwiY2xpZW50X2lkIjoicHJvZC1iYXN0aW9uLTAwMSIsInNjb3BlcyI6WyJtYXJrZXRfZGF0YTpyZWFkIl0sInBsYW4iOiJlbnRlcnByaXNlIiwidG9rZW5fdHlwZSI6ImJlYXJlciIsImV4cCI6MTc1NzQ1Njg5OSwiaWF0IjoxNzU3NDUzMjk5fQ.zbvaoJLRwXFgW0aYG3DiZQM3p_4BZ3SNWj1mZEtN9wU",
     "token_type": "bearer",
     "expires_in": 3600,
-    "scope": "market_data:read",
+    "scope": "bonds:read cedears:read stocks:read",
     "plan": "enterprise"
 }
 ```

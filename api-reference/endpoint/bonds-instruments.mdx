@@ -1,0 +1,35 @@
+---
+title: 'Bonos - Instrumentos'
+openapi: 'GET /api/v1/bonds/instruments'
+---
+
+<Note>
+  Lista instrumentos de bonos con soporte de paginación y filtrado opcional por subclase de activo.
+</Note>
+
+<Tip>
+  Este endpoint requiere el scope `bonds:read` en tu token.
+</Tip>
+
+## Parámetros de consulta
+
+<ParamField query="sub_asset_class" type="string">
+  Filtra por subclase de activo (ej., "HARD_DOLLAR").
+</ParamField>
+
+<ParamField query="limit" type="integer">
+  Límite de elementos por página (predeterminado 50).
+</ParamField>
+
+<ParamField query="cursor" type="string">
+  Cursor de paginación para obtener la siguiente página.
+</ParamField>
+
+## Ejemplo
+
+```bash
+curl -X GET "https://api.doctacapital.com.ar/api/v1/bonds/instruments?limit=50" \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
+```
+
+

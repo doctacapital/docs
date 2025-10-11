@@ -1,0 +1,23 @@
+---
+title: 'Acciones - Intraday'
+openapi: 'GET /api/v1/stocks/market-data/{symbol}/intraday'
+---
+
+<Note>
+  Devuelve datos intradiarios para una acción.
+</Note>
+
+## Parámetros
+
+<ParamField path="symbol" type="string" required>
+  Símbolo de la acción (ej., "GGAL").
+</ParamField>
+
+## Ejemplo
+
+```bash
+curl -X GET "https://api.doctacapital.com.ar/api/v1/stocks/market-data/GGAL/intraday" \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
+```
+
+

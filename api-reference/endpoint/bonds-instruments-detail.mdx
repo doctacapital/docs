@@ -1,0 +1,23 @@
+---
+title: 'Bonos - Detalle de instrumento'
+openapi: 'GET /api/v1/bonds/instruments/{symbol}'
+---
+
+<Note>
+  Devuelve el detalle de un instrumento de bono.
+</Note>
+
+## Parámetros de ruta
+
+<ParamField path="symbol" type="string" required>
+  Símbolo del bono (ej., "AL30").
+</ParamField>
+
+## Ejemplo
+
+```bash
+curl -X GET "https://api.doctacapital.com.ar/api/v1/bonds/instruments/AL30" \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
+```
+
+

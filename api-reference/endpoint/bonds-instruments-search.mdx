@@ -1,0 +1,31 @@
+---
+title: 'Bonos - Buscar instrumentos'
+openapi: 'GET /api/v1/bonds/instruments/search'
+---
+
+<Note>
+  Busca instrumentos de bonos por texto.
+</Note>
+
+## Parámetros de consulta
+
+<ParamField query="query" type="string" required>
+  Texto de búsqueda (ticker o nombre).
+</ParamField>
+
+<ParamField query="limit" type="integer">
+  Límite de resultados (predeterminado 10).
+</ParamField>
+
+<ParamField query="cursor" type="string">
+  Cursor de paginación.
+</ParamField>
+
+## Ejemplo
+
+```bash
+curl -X GET "https://api.doctacapital.com.ar/api/v1/bonds/instruments/search?query=AL30&limit=10" \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
+```
+
+

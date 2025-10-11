@@ -71,11 +71,11 @@
         }
       }
     },
-    "/api/v1/market_data/historicals/prices/{symbol}": {
+    "/api/v1/bonds/market-data/{symbol}/ohlc": {
       "get": {
         "description": "Obtener datos de precios históricos (ajustados por cupones, amortizaciones, splits y dividendos, o sin ajustar) para un ticker específico dentro de un rango de fechas",
         "tags": [
-          "Datos de Mercado"
+          "Bonds"
         ],
         "parameters": [
           {
@@ -201,11 +201,11 @@
         }
       }
     },
-    "/api/v1/market_data/bonds/{symbol}/cashflow": {
+    "/api/v1/bonds/analytics/cashflow/{symbol}": {
       "get": {
         "description": "Obtener el flujo de caja de un bono específico, incluyendo todos los pagos de capital e intereses",
         "tags": [
-          "Bonos"
+          "Bonds"
         ],
         "parameters": [
           {
@@ -294,26 +294,15 @@
         }
       }
     },
-    "/api/v1/market_data/historicals/yield-curve": {
+    "/api/v1/bonds/yields/historical-curve": {
       "get": {
         "description": "Obtener las curvas de rendimiento (yield-curve) históricas o intradiarias de bonos para una fecha y sub-asset class determinado",
         "tags": [
-          "Datos de Mercado"
+          "Bonds"
         ],
         "parameters": [
           {
-            "name": "date",
-            "in": "query",
-            "description": "Fecha histórica específica en formato YYYY-MM-DD",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "date"
-            },
-            "example": "2025-01-02"
-          },
-          {
-            "name": "subasset_class",
+            "name": "sub_asset_class",
             "in": "query",
             "description": "La clasificación de submercado para los datos de curva de rendimiento",
             "required": true,
@@ -343,17 +332,26 @@
             "example": "HARD_DOLLAR"
           },
           {
-            "name": "specie",
+            "name": "from_date",
             "in": "query",
-            "description": "Especie de moneda. Usar 'D' para Dólar (opcional)",
-            "required": false,
+            "description": "Fecha de inicio del rango (YYYY-MM-DD)",
+            "required": true,
             "schema": {
               "type": "string",
-              "enum": [
-                "D"
-              ]
+              "format": "date"
             },
-            "example": "D"
+            "example": "2025-01-01"
+          },
+          {
+            "name": "to_date",
+            "in": "query",
+            "description": "Fecha de fin del rango (YYYY-MM-DD)",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            },
+            "example": "2025-01-02"
           }
         ],
         "responses": {
@@ -453,6 +451,245 @@
         }
       }
     }
+    ,
+    "/api/v1/bonds/market-data/{symbol}/intraday": {
+      "get": {
+        "description": "Obtener datos intradiarios para un bono específico",
+        "tags": [
+          "Bonds"
+        ],
+        "parameters": [
+          {
+            "name": "symbol",
+            "in": "path",
+            "description": "El símbolo del bono",
+            "required": true,
+            "schema": { "type": "string" },
+            "example": "AL30"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Datos intradiarios obtenidos exitosamente",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/HistoricalPricesResponse" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/bonds/instruments": {
+      "get": {
+        "description": "Listar instrumentos de bonos",
+        "tags": [
+          "Bonds"
+        ],
+        "parameters": [
+          { "name": "sub_asset_class", "in": "query", "required": false, "schema": { "type": "string" } },
+          { "name": "limit", "in": "query", "required": false, "schema": { "type": "integer", "default": 50 } },
+          { "name": "cursor", "in": "query", "required": false, "schema": { "type": "string", "nullable": true } }
+        ],
+        "responses": {
+          "200": {
+            "description": "Listado de instrumentos de bonos",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/InstrumentListResponse" } }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/bonds/instruments/{symbol}": {
+      "get": {
+        "description": "Obtener detalle de un instrumento de bono",
+        "tags": [ "Bonds" ],
+        "parameters": [
+          { "name": "symbol", "in": "path", "required": true, "schema": { "type": "string" }, "example": "AL30" }
+        ],
+        "responses": {
+          "200": {
+            "description": "Detalle del instrumento",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/Instrument" } }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/bonds/instruments/search": {
+      "get": {
+        "description": "Buscar instrumentos de bonos",
+        "tags": [ "Bonds" ],
+        "parameters": [
+          { "name": "query", "in": "query", "required": true, "schema": { "type": "string" } },
+          { "name": "limit", "in": "query", "required": false, "schema": { "type": "integer", "default": 10 } },
+          { "name": "cursor", "in": "query", "required": false, "schema": { "type": "string", "nullable": true } }
+        ],
+        "responses": {
+          "200": {
+            "description": "Resultados de búsqueda",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/InstrumentListResponse" } }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/bonds/analytics/pricing": {
+      "post": {
+        "description": "Calcular precio teórico de un bono",
+        "tags": [ "Bonds" ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["ticker", "settlement_date", "yield_rate"],
+                "properties": {
+                  "ticker": { "type": "string", "example": "AL30" },
+                  "settlement_date": { "type": "string", "format": "date", "example": "2025-10-15" },
+                  "yield_rate": { "type": "number", "format": "float", "example": 15.5 }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Precio calculado",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/PricingResponse" } }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/bonds/analytics/risk-metrics": {
+      "post": {
+        "description": "Calcular métricas de riesgo del bono",
+        "tags": [ "Bonds" ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["ticker", "settlement_date", "yield_rate"],
+                "properties": {
+                  "ticker": { "type": "string", "example": "AL30" },
+                  "settlement_date": { "type": "string", "format": "date", "example": "2025-10-15" },
+                  "yield_rate": { "type": "number", "format": "float", "example": 15.5 }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Métricas de riesgo",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/RiskMetricsResponse" } }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/cedears/instruments": {
+      "get": {
+        "description": "Listar instrumentos CEDEAR",
+        "tags": [ "CEDEARs" ],
+        "parameters": [
+          { "name": "limit", "in": "query", "required": false, "schema": { "type": "integer", "default": 50 } },
+          { "name": "cursor", "in": "query", "required": false, "schema": { "type": "string", "nullable": true } }
+        ],
+        "responses": { "200": { "description": "Listado CEDEARs", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/InstrumentListResponse" } } } } }
+      }
+    },
+    "/api/v1/cedears/instruments/{symbol}": {
+      "get": {
+        "description": "Detalle de CEDEAR",
+        "tags": [ "CEDEARs" ],
+        "parameters": [ { "name": "symbol", "in": "path", "required": true, "schema": { "type": "string" }, "example": "AAPL" } ],
+        "responses": { "200": { "description": "Detalle CEDEAR", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Instrument" } } } } }
+      }
+    },
+    "/api/v1/cedears/instruments/search": {
+      "get": {
+        "description": "Buscar CEDEARs",
+        "tags": [ "CEDEARs" ],
+        "parameters": [ { "name": "query", "in": "query", "required": true, "schema": { "type": "string" } }, { "name": "limit", "in": "query", "required": false, "schema": { "type": "integer", "default": 10 } } ],
+        "responses": { "200": { "description": "Resultados de búsqueda", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/InstrumentListResponse" } } } } }
+      }
+    },
+    "/api/v1/cedears/market-data/{symbol}/ohlc": {
+      "get": {
+        "description": "OHLC histórico de CEDEAR",
+        "tags": [ "CEDEARs" ],
+        "parameters": [
+          { "name": "symbol", "in": "path", "required": true, "schema": { "type": "string" }, "example": "AAPL" },
+          { "name": "from_date", "in": "query", "required": true, "schema": { "type": "string", "format": "date" } },
+          { "name": "to_date", "in": "query", "required": true, "schema": { "type": "string", "format": "date" } },
+          { "name": "adjusted", "in": "query", "required": true, "schema": { "type": "boolean" } }
+        ],
+        "responses": { "200": { "description": "Datos OHLC", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/HistoricalPricesResponse" } } } } }
+      }
+    },
+    "/api/v1/cedears/market-data/{symbol}/intraday": {
+      "get": {
+        "description": "Intraday CEDEAR",
+        "tags": [ "CEDEARs" ],
+        "parameters": [ { "name": "symbol", "in": "path", "required": true, "schema": { "type": "string" }, "example": "AAPL" } ],
+        "responses": { "200": { "description": "Datos intradiarios", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/HistoricalPricesResponse" } } } } }
+      }
+    },
+    "/api/v1/stocks/instruments": {
+      "get": {
+        "description": "Listar instrumentos de acciones",
+        "tags": [ "Stocks" ],
+        "parameters": [ { "name": "limit", "in": "query", "required": false, "schema": { "type": "integer", "default": 50 } }, { "name": "cursor", "in": "query", "required": false, "schema": { "type": "string", "nullable": true } } ],
+        "responses": { "200": { "description": "Listado acciones", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/InstrumentListResponse" } } } } }
+      }
+    },
+    "/api/v1/stocks/instruments/{symbol}": {
+      "get": {
+        "description": "Detalle de acción",
+        "tags": [ "Stocks" ],
+        "parameters": [ { "name": "symbol", "in": "path", "required": true, "schema": { "type": "string" }, "example": "GGAL" } ],
+        "responses": { "200": { "description": "Detalle acción", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Instrument" } } } } }
+      }
+    },
+    "/api/v1/stocks/instruments/search": {
+      "get": {
+        "description": "Buscar acciones",
+        "tags": [ "Stocks" ],
+        "parameters": [ { "name": "query", "in": "query", "required": true, "schema": { "type": "string" } }, { "name": "limit", "in": "query", "required": false, "schema": { "type": "integer", "default": 10 } } ],
+        "responses": { "200": { "description": "Resultados de búsqueda", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/InstrumentListResponse" } } } } }
+      }
+    },
+    "/api/v1/stocks/market-data/{symbol}/ohlc": {
+      "get": {
+        "description": "OHLC histórico de acción",
+        "tags": [ "Stocks" ],
+        "parameters": [
+          { "name": "symbol", "in": "path", "required": true, "schema": { "type": "string" }, "example": "GGAL" },
+          { "name": "from_date", "in": "query", "required": true, "schema": { "type": "string", "format": "date" } },
+          { "name": "to_date", "in": "query", "required": true, "schema": { "type": "string", "format": "date" } },
+          { "name": "adjusted", "in": "query", "required": true, "schema": { "type": "boolean" } }
+        ],
+        "responses": { "200": { "description": "Datos OHLC", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/HistoricalPricesResponse" } } } } }
+      }
+    },
+    "/api/v1/stocks/market-data/{symbol}/intraday": {
+      "get": {
+        "description": "Intraday acción",
+        "tags": [ "Stocks" ],
+        "parameters": [ { "name": "symbol", "in": "path", "required": true, "schema": { "type": "string" }, "example": "GGAL" } ],
+        "responses": { "200": { "description": "Datos intradiarios", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/HistoricalPricesResponse" } } } } }
+      }
+    }
   },
   "components": {
     "schemas": {
@@ -483,7 +720,7 @@
           "scope": {
             "description": "El alcance de acceso solicitado",
             "type": "string",
-            "example": "market_data:read"
+            "example": "bonds:read cedears:read stocks:read"
           }
         }
       },
@@ -1023,6 +1260,40 @@
             "format": "uuid",
             "example": "2eb07802-94de-468a-b70f-75a49f3e9516"
           }
+        }
+      },
+      "Instrument": {
+        "type": "object",
+        "properties": {
+          "ticker": { "type": "string", "description": "Símbolo del instrumento" },
+          "name": { "type": "string", "description": "Nombre del instrumento" },
+          "currency": { "type": "string", "description": "Moneda" },
+          "exchange": { "type": "string", "description": "Mercado" },
+          "sub_asset_class": { "type": "string", "description": "Sub-clase de activo", "nullable": true }
+        }
+      },
+      "InstrumentListResponse": {
+        "type": "object",
+        "properties": {
+          "items": { "type": "array", "items": { "$ref": "#/components/schemas/Instrument" } },
+          "pagination": { "$ref": "#/components/schemas/Pagination" }
+        }
+      },
+      "PricingResponse": {
+        "type": "object",
+        "properties": {
+          "ticker": { "type": "string" },
+          "clean_price": { "type": "number", "format": "float" },
+          "dirty_price": { "type": "number", "format": "float" },
+          "accrued_interest": { "type": "number", "format": "float" }
+        }
+      },
+      "RiskMetricsResponse": {
+        "type": "object",
+        "properties": {
+          "ticker": { "type": "string" },
+          "duration": { "type": "number", "format": "float" },
+          "convexity": { "type": "number", "format": "float" }
         }
       }
     },

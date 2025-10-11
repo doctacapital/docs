@@ -26,16 +26,35 @@
             ]
           },
           {
-            "group": "Market Data",
+            "group": "Bonos",
             "pages": [
-              "api-reference/endpoint/historical-prices"
+              "api-reference/endpoint/bonds-instruments",
+              "api-reference/endpoint/bonds-instruments-detail",
+              "api-reference/endpoint/bonds-instruments-search",
+              "api-reference/endpoint/historical-prices",
+              "api-reference/endpoint/yield-curve",
+              "api-reference/endpoint/bonds-cashflow"
+            ]
+          }
+          ,
+          {
+            "group": "CEDEARs",
+            "pages": [
+              "api-reference/endpoint/cedears-instruments",
+              "api-reference/endpoint/cedears-instruments-detail",
+              "api-reference/endpoint/cedears-instruments-search",
+              "api-reference/endpoint/cedears-marketdata-ohlc",
+              "api-reference/endpoint/cedears-marketdata-intraday"
             ]
           },
           {
-            "group": "Bonos",
+            "group": "Acciones",
             "pages": [
-              "api-reference/endpoint/bonds-cashflow",
-              "api-reference/endpoint/yield-curve"
+              "api-reference/endpoint/stocks-instruments",
+              "api-reference/endpoint/stocks-instruments-detail",
+              "api-reference/endpoint/stocks-instruments-search",
+              "api-reference/endpoint/stocks-marketdata-ohlc",
+              "api-reference/endpoint/stocks-marketdata-intraday"
             ]
           }
         ]

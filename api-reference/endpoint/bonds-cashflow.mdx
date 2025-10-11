@@ -1,6 +1,6 @@
 ---
 title: 'Flujo de Caja de Bonos'
-openapi: 'GET /api/v1/market_data/bonds/{symbol}/cashflow'
+openapi: 'GET /api/v1/bonds/analytics/cashflow/{symbol}'
 ---
 
 <Note>
@@ -22,7 +22,7 @@ openapi: 'GET /api/v1/market_data/bonds/{symbol}/cashflow'
 ## Ejemplo de Solicitud
 
 ```bash
-curl -X GET "https://api.doctacapital.com.ar/api/v1/market_data/bonds/AL30/cashflow?nominal_units=100" \
+curl -X GET "https://api.doctacapital.com.ar/api/v1/bonds/analytics/cashflow/AL30?nominal_units=100" \
   -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
 ```
 

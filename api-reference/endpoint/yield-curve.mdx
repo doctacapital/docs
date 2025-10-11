@@ -1,6 +1,6 @@
 ---
 title: 'Curvas de Rendimiento'
-openapi: 'GET /api/v1/market_data/historicals/yield-curve'
+openapi: 'GET /api/v1/bonds/yields/historical-curve'
 ---
 
 <Note>
@@ -47,7 +47,7 @@ El parámetro `subasset_class` acepta los siguientes valores:
 ## Ejemplo de Solicitud
 
 ```bash
-curl -X GET "https://api.doctacapital.com.ar/api/v1/market_data/historicals/yield-curve?date=2025-01-02&subasset_class=HARD_DOLLAR&specie=D" \
+curl -X GET "https://api.doctacapital.com.ar/api/v1/bonds/yields/historical-curve?sub_asset_class=HARD_DOLLAR&from_date=2025-01-01&to_date=2025-01-02" \
   -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
 ```
 
