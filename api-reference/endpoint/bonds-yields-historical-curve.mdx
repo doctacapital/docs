@@ -17,32 +17,32 @@ openapi: 'GET /api/v1/bonds/yields/historical-curve'
   La clasificación de submercado para los datos de curva de rendimiento. Debe ser uno de los valores predefinidos.
 </ParamField>
 
+<Info>
+Valores válidos para <code>sub_asset_class</code>:
+
+- <code>DOLLAR_LINKED</code>
+- <code>HARD_DOLLAR</code>
+- <code>CER</code>
+- <code>BOPREAL</code>
+- <code>FIXED_RATE</code>
+- <code>SUB_SOBERANO</code>
+- <code>ON</code>
+- <code>TAMAR</code>
+- <code>BADLAR</code>
+- <code>ON_FIXED_RATE</code>
+- <code>ON_CER</code>
+- <code>ON_BADLAR</code>
+- <code>ON_TAMAR</code>
+- <code>ON_DOLLAR_LINKED</code>
+- <code>SUB_SOBERANO_FIXED_RATE</code>
+- <code>SUB_SOBERANO_CER</code>
+- <code>SUB_SOBERANO_BADLAR</code>
+- <code>SUB_SOBERANO_TAMAR</code>
+</Info>
+
 <ParamField query="specie" type="string">
   Especie de moneda. Usar "D" para Dólar (opcional).
 </ParamField>
-
-## Opciones de Clase de Subactivo
-
-El parámetro `subasset_class` acepta los siguientes valores:
-
-- `FIXED_RATE` - Soberano - Tasa Fija
-- `CER` - Soberano - CER
-- `DOLLAR_LINKED` - Soberano - Dólar Linked
-- `TAMAR` - Soberano - Tamar
-- `BADLAR` - Soberano - Badlar
-- `HARD_DOLLAR` - Soberano - Globales / Bonares
-- `BOPREAL` - Soberano - Bopreal / BCRA
-- `ON_FIXED_RATE` - ON - Tasa Fija
-- `ON` - ON - Hard Dólar
-- `ON_CER` - ON - CER
-- `ON_BADLAR` - ON - Badlar
-- `ON_TAMAR` - ON - Tamar
-- `ON_DOLLAR_LINKED` - ON - Dólar Linked
-- `SUB_SOBERANO_FIXED_RATE` - Subsoberano - Tasa Fija
-- `SUB_SOBERANO` - Subsoberano - Hard Dólar
-- `SUB_SOBERANO_CER` - Subsoberano - CER
-- `SUB_SOBERANO_BADLAR` - Subsoberano - Badlar
-- `SUB_SOBERANO_TAMAR` - Subsoberano - Tamar
 
 ## Ejemplo de Solicitud
 
