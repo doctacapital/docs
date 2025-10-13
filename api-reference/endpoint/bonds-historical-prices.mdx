@@ -1,6 +1,6 @@
 ---
 title: 'OHLC histórico'
-openapi: 'GET /api/v1/bonds/market-data/{symbol}/ohlc/'
+openapi: 'GET /api/v1/bonds/market-data/{symbol}/ohlc'
 ---
 
 <Note>
@@ -23,7 +23,7 @@ openapi: 'GET /api/v1/bonds/market-data/{symbol}/ohlc/'
   Fecha de fin para los datos históricos en formato YYYY-MM-DD.
 </ParamField>
 
-<ParamField query="adjusted" type="boolean" required>
+<ParamField query="adjusted" type="boolean">
   Si devolver precios ajustados por eventos corporativos (splits, dividendos, etc.). Establecer en `true` para precios ajustados, `false` para precios sin ajustar.
 </ParamField>
 

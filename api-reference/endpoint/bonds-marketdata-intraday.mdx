@@ -1,0 +1,23 @@
+---
+title: 'Intradiario'
+openapi: 'GET /api/v1/bonds/market-data/{symbol}/intraday'
+---
+
+<Note>
+  Devuelve datos intradiarios para un bono.
+</Note>
+
+## Parámetros
+
+<ParamField path="symbol" type="string" required>
+  Símbolo del bono (ej., "AL30").
+</ParamField>
+
+## Ejemplo
+
+```bash
+curl -X GET "https://api.doctacapital.com.ar/api/v1/bonds/market-data/AL30/intraday/" \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
+```
+
+

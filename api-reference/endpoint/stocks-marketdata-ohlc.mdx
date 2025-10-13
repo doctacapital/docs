@@ -1,6 +1,6 @@
 ---
 title: 'OHLC histórico'
-openapi: 'GET /api/v1/stocks/market-data/{symbol}/ohlc/'
+openapi: 'GET /api/v1/stocks/market-data/{symbol}/ohlc'
 ---
 
 <Note>
@@ -21,7 +21,7 @@ openapi: 'GET /api/v1/stocks/market-data/{symbol}/ohlc/'
   Fecha de fin (YYYY-MM-DD).
 </ParamField>
 
-<ParamField query="adjusted" type="boolean" required>
+<ParamField query="adjusted" type="boolean">
   Si se devuelven precios ajustados.
 </ParamField>
 

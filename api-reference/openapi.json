@@ -19,7 +19,7 @@
     }
   ],
   "paths": {
-    "/api/v1/auth/token/": {
+    "/api/v1/auth/token": {
       "post": {
         "description": "Obtener un token de acceso usando credenciales de cliente para la autenticación de la API",
         "tags": [
@@ -71,7 +71,7 @@
         }
       }
     },
-    "/api/v1/bonds/market-data/{symbol}/ohlc/": {
+    "/api/v1/bonds/market-data/{symbol}/ohlc": {
       "get": {
         "description": "Obtener datos de precios históricos (ajustados por cupones, amortizaciones, splits y dividendos, o sin ajustar) para un ticker específico dentro de un rango de fechas",
         "tags": [
@@ -114,7 +114,7 @@
             "name": "adjusted",
             "in": "query",
             "description": "Si devolver precios ajustados por eventos corporativos",
-            "required": true,
+            "required": false,
             "schema": {
               "type": "boolean"
             },
@@ -201,7 +201,7 @@
         }
       }
     },
-    "/api/v1/bonds/analytics/cashflow/{symbol}/": {
+    "/api/v1/bonds/analytics/cashflow/{symbol}": {
       "get": {
         "description": "Obtener el flujo de caja de un bono específico, incluyendo todos los pagos de capital e intereses",
         "tags": [
@@ -294,7 +294,7 @@
         }
       }
     },
-    "/api/v1/bonds/yields/historical-curve/": {
+    "/api/v1/bonds/yields/historical-curve": {
       "get": {
         "description": "Obtener las curvas de rendimiento (yield-curve) históricas o intradiarias de bonos para una fecha y sub-asset class determinado",
         "tags": [
@@ -450,9 +450,8 @@
           }
         }
       }
-    }
-    ,
-    "/api/v1/bonds/yields/curve/": {
+    },
+    "/api/v1/bonds/yields/curve": {
       "get": {
         "description": "Obtener la curva de rendimiento actual para una subclase de bonos",
         "tags": [
@@ -511,7 +510,7 @@
       }
     }
     ,
-    "/api/v1/bonds/market-data/{symbol}/intraday/": {
+    "/api/v1/bonds/market-data/{symbol}/intraday": {
       "get": {
         "description": "Obtener datos intradiarios para un bono específico",
         "tags": [
@@ -539,7 +538,7 @@
         }
       }
     },
-    "/api/v1/bonds/instruments/": {
+    "/api/v1/bonds/instruments": {
       "get": {
         "description": "Listar instrumentos de bonos",
         "tags": [
@@ -579,7 +578,7 @@
         }
       }
     },
-    "/api/v1/bonds/instruments/{symbol}/": {
+    "/api/v1/bonds/instruments/{symbol}": {
       "get": {
         "description": "Obtener detalle de un instrumento de bono",
         "tags": [ "Bonds" ],
@@ -596,7 +595,7 @@
         }
       }
     },
-    "/api/v1/bonds/instruments/search/": {
+    "/api/v1/bonds/instruments/search": {
       "get": {
         "description": "Buscar instrumentos de bonos",
         "tags": [ "Bonds" ],
@@ -615,7 +614,7 @@
         }
       }
     },
-    "/api/v1/bonds/analytics/pricing/": {
+    "/api/v1/bonds/analytics/pricing": {
       "post": {
         "description": "Calcular precio teórico de un bono",
         "tags": [ "Bonds" ],
@@ -645,7 +644,7 @@
         }
       }
     },
-    "/api/v1/bonds/analytics/risk-metrics/": {
+    "/api/v1/bonds/analytics/risk-metrics": {
       "post": {
         "description": "Calcular métricas de riesgo del bono",
         "tags": [ "Bonds" ],
@@ -675,7 +674,7 @@
         }
       }
     },
-    "/api/v1/cedears/instruments/": {
+    "/api/v1/cedears/instruments": {
       "get": {
         "description": "Listar instrumentos CEDEAR",
         "tags": [ "CEDEARs" ],
@@ -686,7 +685,7 @@
         "responses": { "200": { "description": "Listado CEDEARs", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/InstrumentListResponse" } } } } }
       }
     },
-    "/api/v1/cedears/instruments/{symbol}/": {
+    "/api/v1/cedears/instruments/{symbol}": {
       "get": {
         "description": "Detalle de CEDEAR",
         "tags": [ "CEDEARs" ],
@@ -694,7 +693,7 @@
         "responses": { "200": { "description": "Detalle CEDEAR", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Instrument" } } } } }
       }
     },
-    "/api/v1/cedears/instruments/search/": {
+    "/api/v1/cedears/instruments/search": {
       "get": {
         "description": "Buscar CEDEARs",
         "tags": [ "CEDEARs" ],
@@ -702,7 +701,7 @@
         "responses": { "200": { "description": "Resultados de búsqueda", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/InstrumentListResponse" } } } } }
       }
     },
-    "/api/v1/cedears/market-data/{symbol}/ohlc/": {
+    "/api/v1/cedears/market-data/{symbol}/ohlc": {
       "get": {
         "description": "OHLC histórico de CEDEAR",
         "tags": [ "CEDEARs" ],
@@ -710,12 +709,12 @@
           { "name": "symbol", "in": "path", "required": true, "schema": { "type": "string" }, "example": "AAPL" },
           { "name": "from_date", "in": "query", "required": true, "schema": { "type": "string", "format": "date" } },
           { "name": "to_date", "in": "query", "required": true, "schema": { "type": "string", "format": "date" } },
-          { "name": "adjusted", "in": "query", "required": true, "schema": { "type": "boolean" } }
+          { "name": "adjusted", "in": "query", "required": false, "schema": { "type": "boolean" } }
         ],
         "responses": { "200": { "description": "Datos OHLC", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/HistoricalPricesResponse" } } } } }
       }
     },
-    "/api/v1/cedears/market-data/{symbol}/intraday/": {
+    "/api/v1/cedears/market-data/{symbol}/intraday": {
       "get": {
         "description": "Intraday CEDEAR",
         "tags": [ "CEDEARs" ],
@@ -723,7 +722,7 @@
         "responses": { "200": { "description": "Datos intradiarios", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/HistoricalPricesResponse" } } } } }
       }
     },
-    "/api/v1/stocks/instruments/": {
+    "/api/v1/stocks/instruments": {
       "get": {
         "description": "Listar instrumentos de acciones",
         "tags": [ "Stocks" ],
@@ -731,7 +730,7 @@
         "responses": { "200": { "description": "Listado acciones", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/InstrumentListResponse" } } } } }
       }
     },
-    "/api/v1/stocks/instruments/{symbol}/": {
+    "/api/v1/stocks/instruments/{symbol}": {
       "get": {
         "description": "Detalle de acción",
         "tags": [ "Stocks" ],
@@ -739,7 +738,7 @@
         "responses": { "200": { "description": "Detalle acción", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Instrument" } } } } }
       }
     },
-    "/api/v1/stocks/instruments/search/": {
+    "/api/v1/stocks/instruments/search": {
       "get": {
         "description": "Buscar acciones",
         "tags": [ "Stocks" ],
@@ -747,7 +746,7 @@
         "responses": { "200": { "description": "Resultados de búsqueda", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/InstrumentListResponse" } } } } }
       }
     },
-    "/api/v1/stocks/market-data/{symbol}/ohlc/": {
+    "/api/v1/stocks/market-data/{symbol}/ohlc": {
       "get": {
         "description": "OHLC histórico de acción",
         "tags": [ "Stocks" ],
@@ -755,12 +754,12 @@
           { "name": "symbol", "in": "path", "required": true, "schema": { "type": "string" }, "example": "GGAL" },
           { "name": "from_date", "in": "query", "required": true, "schema": { "type": "string", "format": "date" } },
           { "name": "to_date", "in": "query", "required": true, "schema": { "type": "string", "format": "date" } },
-          { "name": "adjusted", "in": "query", "required": true, "schema": { "type": "boolean" } }
+          { "name": "adjusted", "in": "query", "required": false, "schema": { "type": "boolean" } }
         ],
         "responses": { "200": { "description": "Datos OHLC", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/HistoricalPricesResponse" } } } } }
       }
     },
-    "/api/v1/stocks/market-data/{symbol}/intraday/": {
+    "/api/v1/stocks/market-data/{symbol}/intraday": {
       "get": {
         "description": "Intraday acción",
         "tags": [ "Stocks" ],
@@ -836,7 +835,6 @@
         "required": [
           "ticker",
           "data",
-          "adjusted",
           "from_date",
           "to_date",
           "pagination",
@@ -891,8 +889,7 @@
           "low_price",
           "close_price",
           "volume",
-          "volume_ars",
-          "adjusted"
+          "volume_ars"
         ],
         "type": "object",
         "properties": {
@@ -1265,42 +1262,6 @@
             "example": 365
           }
         }
-      },
-      "Plant": {
-        "required": [
-          "name"
-        ],
-        "type": "object",
-        "properties": {
-          "name": {
-            "description": "The name of the plant",
-            "type": "string"
-          },
-          "tag": {
-            "description": "Tag to specify the type",
-            "type": "string"
-          }
-        }
-      },
-      "NewPlant": {
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/Plant"
-          },
-          {
-            "required": [
-              "id"
-            ],
-            "type": "object",
-            "properties": {
-              "id": {
-                "description": "Identification number of the plant",
-                "type": "integer",
-                "format": "int64"
-              }
-            }
-          }
-        ]
       },
       "Error": {
         "required": [

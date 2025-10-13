@@ -31,8 +31,10 @@
               "api-reference/endpoint/bonds-instruments",
               "api-reference/endpoint/bonds-instruments-detail",
               "api-reference/endpoint/bonds-instruments-search",
+              "api-reference/endpoint/bonds-marketdata-intraday",
               "api-reference/endpoint/bonds-historical-prices",
-              "api-reference/endpoint/yield-curve",
+              "api-reference/endpoint/bonds-yields-curve",
+              "api-reference/endpoint/bonds-yields-historical-curve",
               "api-reference/endpoint/bonds-cashflow"
             ]
           }
