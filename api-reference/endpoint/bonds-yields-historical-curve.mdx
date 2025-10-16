@@ -1,230 +1,106 @@
 ---
-title: 'Curvas de Rendimiento Históricas'
-openapi: 'GET /api/v1/bonds/yields/historical-curve'
+title: 'Rendimiento de bonos históricos'
+openapi: 'GET /api/v1/bonds/yields/{symbol}/historical'
 ---
 
 <Note>
-  Este endpoint obtiene las curvas de rendimiento (yield-curve) históricas o intradiarias de bonos para una fecha y sub-asset class determinado.
+  Obtiene los datos históricos de rendimiento de un bono específico.
 </Note>
+
+## Parámetros
+
+<ParamField path="symbol" type="string" required>
+  Ticker del bono (ej., "AL30").
+ </ParamField>
 
 ## Parámetros de Consulta
 
-<ParamField query="date" type="string" required>
+<ParamField query="from_date" type="string" required>
   Fecha histórica específica en formato YYYY-MM-DD.
 </ParamField>
 
-<ParamField query="subasset_class" type="string" required>
-  La clasificación de submercado para los datos de curva de rendimiento. Debe ser uno de los valores predefinidos.
-</ParamField>
-
-<Info>
-Valores válidos para <code>sub_asset_class</code>:
-
-- <code>DOLLAR_LINKED</code>
-- <code>HARD_DOLLAR</code>
-- <code>CER</code>
-- <code>BOPREAL</code>
-- <code>FIXED_RATE</code>
-- <code>SUB_SOBERANO</code>
-- <code>ON</code>
-- <code>TAMAR</code>
-- <code>BADLAR</code>
-- <code>ON_FIXED_RATE</code>
-- <code>ON_CER</code>
-- <code>ON_BADLAR</code>
-- <code>ON_TAMAR</code>
-- <code>ON_DOLLAR_LINKED</code>
-- <code>SUB_SOBERANO_FIXED_RATE</code>
-- <code>SUB_SOBERANO_CER</code>
-- <code>SUB_SOBERANO_BADLAR</code>
-- <code>SUB_SOBERANO_TAMAR</code>
-</Info>
-
-<ParamField query="specie" type="string">
-  Especie de moneda. Usar "D" para Dólar (opcional).
+<ParamField query="to_date" type="string" required>
+  Fecha histórica específica en formato YYYY-MM-DD.
 </ParamField>
 
 ## Ejemplo de Solicitud
 
 ```bash
-curl -X GET "https://api.doctacapital.com.ar/api/v1/bonds/yields/historical-curve/?sub_asset_class=HARD_DOLLAR&from_date=2025-01-01&to_date=2025-01-02" \
+curl -X GET "https://api.doctacapital.com.ar/api/v1/bonds/yields/AL30/historical/?from_date=2025-01-01&to_date=2025-01-02" \
   -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
 ```
 
 ## Respuesta Exitosa
 
+<ResponseField name="ticker" type="string">
+  Ticker del bono solicitado (ej., "AL30").
+</ResponseField>
+
 <ResponseField name="data" type="array">
-  Array de instrumentos financieros con sus datos de curva de rendimiento.
-</ResponseField>
-
-<ResponseField name="data[].ticker" type="string">
-  El símbolo ticker del instrumento financiero.
-</ResponseField>
-
-<ResponseField name="data[].specie" type="string">
-  La especie de moneda del instrumento.
-</ResponseField>
-
-<ResponseField name="data[].subasset_class" type="string">
-  La clasificación de submercado del instrumento.
-</ResponseField>
-
-<ResponseField name="data[].maturity_date" type="string">
-  La fecha de vencimiento del instrumento (null si no aplica).
-</ResponseField>
-
-<ResponseField name="data[].tir" type="number">
-  La Tasa Interna de Retorno (TIR) del instrumento.
-</ResponseField>
-
-<ResponseField name="data[].tna_30_360" type="number">
-  La Tasa Nominal Anual calculada con base 30/360 (null si no aplica).
-</ResponseField>
-
-<ResponseField name="data[].duration" type="number">
-  La duración del instrumento en años.
+  Serie histórica de rendimientos para el bono solicitado.
 </ResponseField>
 
 <ResponseField name="data[].date" type="string">
-  La fecha de los datos en formato YYYY-MM-DD.
+  Fecha del dato en formato YYYY-MM-DD.
 </ResponseField>
 
-<ResponseField name="date" type="string">
-  La fecha histórica para la cual se obtuvieron los datos de curva de rendimiento.
+<ResponseField name="data[].tir" type="number">
+  Tasa Interna de Retorno (TIR) expresada como decimal.
 </ResponseField>
 
-<ResponseField name="filters" type="object">
-  Los filtros aplicados a la consulta.
+<ResponseField name="data[].tna" type="number">
+  Tasa Nominal Anual (TNA) expresada como decimal.
 </ResponseField>
 
-<ResponseField name="filters.specie" type="string">
-  La especie de moneda utilizada en el filtro.
+<ResponseField name="data[].tea" type="number">
+  Tasa Efectiva Anual (TEA) expresada como decimal.
 </ResponseField>
 
-<ResponseField name="filters.subasset_class" type="string">
-  La clasificación de submercado utilizada en el filtro.
+<ResponseField name="data[].tem" type="number">
+  Tasa Efectiva Mensual (TEM) expresada como decimal.
+</ResponseField>
+
+<ResponseField name="from_date" type="string">
+  Fecha inicial del rango solicitado (YYYY-MM-DD).
+</ResponseField>
+
+<ResponseField name="to_date" type="string">
+  Fecha final del rango solicitado (YYYY-MM-DD).
+</ResponseField>
+
+<ResponseField name="metadata" type="object">
+  Metadatos de la respuesta.
+</ResponseField>
+
+<ResponseField name="metadata.total_records" type="number">
+  Cantidad total de registros en el período solicitado.
 </ResponseField>
 
 ## Ejemplo de Respuesta Exitosa
 
 ```json
 {
+  "ticker": "AL30",
   "data": [
     {
-      "ticker": "AL29",
-      "specie": "D",
-      "subasset_class": "HARD_DOLLAR",
-      "maturity_date": null,
-      "tir": 0.104657,
-      "tna_30_360": null,
-      "duration": 2.046129,
-      "date": "2025-01-02"
-    },
-    {
-      "ticker": "GD29",
-      "specie": "D",
-      "subasset_class": "HARD_DOLLAR",
-      "maturity_date": null,
-      "tir": 0.096081,
-      "tna_30_360": null,
-      "duration": 2.062005,
-      "date": "2025-01-02"
-    },
-    {
-      "ticker": "AL30",
-      "specie": "D",
-      "subasset_class": "HARD_DOLLAR",
-      "maturity_date": null,
+      "date": "2025-01-02",
       "tir": 0.107148,
-      "tna_30_360": null,
-      "duration": 2.455362,
-      "date": "2025-01-02"
+      "tna": 0.136547,
+      "tea": 0.107148,
+      "tem": 0.008518
     },
     {
-      "ticker": "GD30",
-      "specie": "D",
-      "subasset_class": "HARD_DOLLAR",
-      "maturity_date": null,
-      "tir": 0.103966,
-      "tna_30_360": null,
-      "duration": 2.463755,
-      "date": "2025-01-02"
-    },
-    {
-      "ticker": "AE38",
-      "specie": "D",
-      "subasset_class": "HARD_DOLLAR",
-      "maturity_date": null,
-      "tir": 0.10983,
-      "tna_30_360": null,
-      "duration": 5.568537,
-      "date": "2025-01-02"
-    },
-    {
-      "ticker": "GD38",
-      "specie": "D",
-      "subasset_class": "HARD_DOLLAR",
-      "maturity_date": null,
-      "tir": 0.108683,
-      "tna_30_360": null,
-      "duration": 5.580345,
-      "date": "2025-01-02"
-    },
-    {
-      "ticker": "GD46",
-      "specie": "D",
-      "subasset_class": "HARD_DOLLAR",
-      "maturity_date": null,
-      "tir": 0.101751,
-      "tna_30_360": null,
-      "duration": 6.369838,
-      "date": "2025-01-02"
-    },
-    {
-      "ticker": "AL35",
-      "specie": "D",
-      "subasset_class": "HARD_DOLLAR",
-      "maturity_date": null,
-      "tir": 0.108373,
-      "tna_30_360": null,
-      "duration": 6.405778,
-      "date": "2025-01-02"
-    },
-    {
-      "ticker": "GD35",
-      "specie": "D",
-      "subasset_class": "HARD_DOLLAR",
-      "maturity_date": null,
-      "tir": 0.10675,
-      "tna_30_360": null,
-      "duration": 6.41785,
-      "date": "2025-01-02"
-    },
-    {
-      "ticker": "GD41",
-      "specie": "D",
-      "subasset_class": "HARD_DOLLAR",
-      "maturity_date": null,
-      "tir": 0.103902,
-      "tna_30_360": null,
-      "duration": 6.899353,
-      "date": "2025-01-02"
-    },
-    {
-      "ticker": "AL41",
-      "specie": "D",
-      "subasset_class": "HARD_DOLLAR",
-      "maturity_date": null,
-      "tir": 0.103407,
-      "tna_30_360": null,
-      "duration": 6.907022,
-      "date": "2025-01-02"
+      "date": "2025-01-03",
+      "tir": 0.106576,
+      "tna": 0.135581,
+      "tea": 0.106576,
+      "tem": 0.008475
     }
   ],
-  "date": "2025-01-02",
-  "filters": {
-    "specie": "D",
-    "subasset_class": "HARD_DOLLAR"
+  "from_date": "2025-01-01",
+  "to_date": "2025-02-01",
+  "metadata": {
+    "total_records": 2
   }
 }
 ```

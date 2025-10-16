@@ -1,0 +1,23 @@
+---
+title: 'Rendimiento de bonos intradiarios'
+openapi: 'GET /api/v1/bonds/yields/{symbol}/intraday'
+---
+
+<Note>
+  Obtiene los datos intradiarios de rendimiento de un bono específico.
+</Note>
+
+## Parámetros
+
+<ParamField path="symbol" type="string" required>
+  Ticker del bono (ej., "AL30").
+ </ParamField>
+
+## Ejemplo
+
+```bash
+curl -X GET "https://api.doctacapital.com.ar/api/v1/bonds/yields/AL30/intraday" \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
+```
+
+
