@@ -129,7 +129,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/BondOHLCResponse"
+                  "$ref": "#/components/schemas/OHLCResponse"
                 }
               }
             }
@@ -203,7 +203,7 @@
         }
       }
     },
-    "/api/v1/bonds/analytics/cashflow/{symbol}": {
+    "/api/v1/bonds/analytics/{symbol}/cashflow": {
       "get": {
         "description": "Obtener el flujo de caja de un bono específico, incluyendo todos los pagos de capital e intereses",
         "tags": [
@@ -224,7 +224,7 @@
             "name": "nominal_units",
             "in": "query",
             "description": "Unidades nominales para el cálculo",
-            "required": true,
+            "required": false,
             "schema": {
               "type": "integer",
               "minimum": 1
@@ -238,7 +238,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/BondCashflowResponse"
+                  "$ref": "#/components/schemas/CashflowResponse"
                 }
               }
             }
@@ -1032,7 +1032,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Instrument"
+                  "$ref": "#/components/schemas/InstrumentDetailResponse"
                 }
               }
             }
@@ -1071,7 +1071,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/InstrumentListResponse"
+                  "$ref": "#/components/schemas/InstrumentsSearchResponse"
                 }
               }
             }
@@ -1130,7 +1130,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HistoricalPricesResponse"
+                  "$ref": "#/components/schemas/OHLCResponse"
                 }
               }
             }
@@ -1161,7 +1161,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HistoricalPricesResponse"
+                  "$ref": "#/components/schemas/IntradayPricesResponse"
                 }
               }
             }
@@ -1232,7 +1232,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Instrument"
+                  "$ref": "#/components/schemas/InstrumentDetail"
                 }
               }
             }
@@ -1271,7 +1271,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/InstrumentListResponse"
+                  "$ref": "#/components/schemas/InstrumentsSearchResponse"
                 }
               }
             }
@@ -1330,7 +1330,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HistoricalPricesResponse"
+                  "$ref": "#/components/schemas/OHLCResponse"
                 }
               }
             }
@@ -1361,7 +1361,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HistoricalPricesResponse"
+                  "$ref": "#/components/schemas/IntradayPricesResponse"
                 }
               }
             }
@@ -1520,7 +1520,7 @@
           "trade_volume"
         ]
       },
-      "BondOHLCResponse": {
+      "OHLCResponse": {
         "type": "object",
         "properties": {
           "ticker": {
@@ -1803,6 +1803,53 @@
             "example": 105.04013888888889
           }
         }
+      },
+      "CashflowDataPoint": {
+        "type": "object",
+        "properties": {
+          "issue_date": { "type": "string", "format": "date", "description": "Fecha de emisión" },
+          "payment_date": { "type": "string", "format": "date", "description": "Fecha de pago" },
+          "capital": { "type": "number", "format": "float", "description": "Capital pagado en la fecha" },
+          "interest_rate": { "type": "number", "format": "float", "description": "Tasa de interés para el período (decimal)" },
+          "interest_amount": { "type": "number", "format": "float", "description": "Interés pagado en la fecha" },
+          "residual_value": { "type": "number", "format": "float", "description": "Capital remanente luego del pago" },
+          "cash_flow": { "type": "number", "format": "float", "description": "Flujo total (capital + interés)" },
+          "adj_interest_amount": { "type": "number", "format": "float", "description": "Interés ajustado" },
+          "adj_capital": { "type": "number", "format": "float", "description": "Capital ajustado" }
+        },
+        "required": [
+          "issue_date",
+          "payment_date",
+          "capital",
+          "interest_rate",
+          "interest_amount",
+          "residual_value",
+          "cash_flow",
+          "adj_interest_amount",
+          "adj_capital"
+        ]
+      },
+      "CashflowMetadata": {
+        "type": "object",
+        "properties": {
+          "subasset_class": { "type": "string", "description": "Clase de subactivo" },
+          "nominal_units": { "type": "number", "format": "float", "description": "Unidades nominales usadas" },
+          "total_records": { "type": "integer", "description": "Cantidad de registros" }
+        },
+        "required": ["subasset_class", "nominal_units", "total_records"]
+      },
+      "CashflowResponse": {
+        "type": "object",
+        "properties": {
+          "ticker": { "type": "string", "description": "Símbolo del bono", "example": "AL30" },
+          "data": {
+            "type": "array",
+            "description": "Eventos del flujo de caja",
+            "items": { "$ref": "#/components/schemas/CashflowDataPoint" }
+          },
+          "metadata": { "$ref": "#/components/schemas/CashflowMetadata" }
+        },
+        "required": ["ticker", "data", "metadata"]
       },
       "BondPayment": {
         "required": [
@@ -2133,8 +2180,7 @@
           },
           "asset_class": {
             "type": "string",
-            "description": "Clase de activo",
-            "example": "BOND"
+            "description": "Clase de activo"
           },
           "sub_asset_class": {
             "type": "string",
@@ -2211,8 +2257,7 @@
           },
           "asset_class": {
             "type": "string",
-            "description": "Clase de activo",
-            "example": "BOND"
+            "description": "Clase de activo"
           },
           "sub_asset_class": {
             "type": "string",
