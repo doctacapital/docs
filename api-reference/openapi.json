@@ -1426,59 +1426,159 @@
       "IntradayYieldsDataPoint": {
         "type": "object",
         "properties": {
-          "tir": { "type": "number", "format": "float" },
-          "tna": { "type": "number", "format": "float", "nullable": true },
-          "tna_30_360": { "type": "number", "format": "float", "nullable": true },
-          "tem": { "type": "number", "format": "float", "nullable": true },
-          "duration": { "type": "number", "format": "float", "nullable": true },
-          "dtm": { "type": "integer", "nullable": true },
-          "margen": { "type": "number", "format": "float", "nullable": true }
+          "tir": {
+            "type": "number",
+            "format": "float"
+          },
+          "tna": {
+            "type": "number",
+            "format": "float",
+            "nullable": true
+          },
+          "tna_30_360": {
+            "type": "number",
+            "format": "float",
+            "nullable": true
+          },
+          "tem": {
+            "type": "number",
+            "format": "float",
+            "nullable": true
+          },
+          "duration": {
+            "type": "number",
+            "format": "float",
+            "nullable": true
+          },
+          "dtm": {
+            "type": "integer",
+            "nullable": true
+          },
+          "margen": {
+            "type": "number",
+            "format": "float",
+            "nullable": true
+          }
         },
-        "required": ["tir"]
+        "required": [
+          "tir"
+        ]
       },
       "IntradayYieldsMetadata": {
         "type": "object",
         "properties": {
-          "total_records": { "type": "integer" },
-          "sub_asset_class": { "type": "string" },
-          "pricing_source": { "type": "string" }
+          "total_records": {
+            "type": "integer"
+          },
+          "sub_asset_class": {
+            "type": "string"
+          },
+          "pricing_source": {
+            "type": "string"
+          }
         },
-        "required": ["total_records", "sub_asset_class", "pricing_source"]
+        "required": [
+          "total_records",
+          "sub_asset_class",
+          "pricing_source"
+        ]
       },
       "IntradayYieldsPricesResponse": {
         "type": "object",
         "properties": {
-          "ticker": { "type": "string" },
-          "data": { "type": "array", "items": { "$ref": "#/components/schemas/IntradayYieldsDataPoint" } },
-          "metadata": { "$ref": "#/components/schemas/IntradayYieldsMetadata" }
+          "ticker": {
+            "type": "string"
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/IntradayYieldsDataPoint"
+            }
+          },
+          "metadata": {
+            "$ref": "#/components/schemas/IntradayYieldsMetadata"
+          }
         },
-        "required": ["ticker", "data", "metadata"]
+        "required": [
+          "ticker",
+          "data",
+          "metadata"
+        ]
       },
       "HistoricalYieldsDataPoint": {
         "type": "object",
         "properties": {
-          "date": { "type": "string", "format": "date", "description": "Fecha del dato (YYYY-MM-DD)" },
-          "tir": { "type": "number", "format": "float", "description": "Tasa Interna de Retorno (decimal)" },
-          "tna": { "type": "number", "format": "float", "description": "Tasa Nominal Anual (decimal)" },
-          "tea": { "type": "number", "format": "float", "description": "Tasa Efectiva Anual (decimal)" },
-          "tem": { "type": "number", "format": "float", "description": "Tasa Efectiva Mensual (decimal)" }
+          "date": {
+            "type": "string",
+            "format": "date",
+            "description": "Fecha del dato (YYYY-MM-DD)"
+          },
+          "tir": {
+            "type": "number",
+            "format": "float",
+            "description": "Tasa Interna de Retorno (decimal)"
+          },
+          "tna": {
+            "type": "number",
+            "format": "float",
+            "description": "Tasa Nominal Anual (decimal)"
+          },
+          "tea": {
+            "type": "number",
+            "format": "float",
+            "description": "Tasa Efectiva Anual (decimal)"
+          },
+          "tem": {
+            "type": "number",
+            "format": "float",
+            "description": "Tasa Efectiva Mensual (decimal)"
+          }
         },
-        "required": ["date", "tir", "tna", "tea", "tem"]
+        "required": [
+          "date",
+          "tir",
+          "tna",
+          "tea",
+          "tem"
+        ]
       },
       "HistoricalYieldsResponse": {
         "type": "object",
         "properties": {
-          "ticker": { "type": "string", "description": "Símbolo del bono", "example": "AL30" },
+          "ticker": {
+            "type": "string",
+            "description": "Símbolo del bono"
+          },
           "data": {
             "type": "array",
             "description": "Serie histórica de rendimientos",
-            "items": { "$ref": "#/components/schemas/HistoricalYieldsDataPoint" }
+            "items": {
+              "$ref": "#/components/schemas/HistoricalYieldsDataPoint"
+            }
           },
-          "from_date": { "type": "string", "format": "date", "description": "Fecha inicio del rango", "example": "2025-01-01" },
-          "to_date": { "type": "string", "format": "date", "description": "Fecha fin del rango", "example": "2025-02-01" },
-          "metadata": { "$ref": "#/components/schemas/Metadata" }
+          "from_date": {
+            "type": "string",
+            "format": "date",
+            "description": "Fecha inicio del rango",
+            "example": "2025-01-01"
+          },
+          "to_date": {
+            "type": "string",
+            "format": "date",
+            "description": "Fecha fin del rango",
+            "example": "2025-02-01"
+          },
+          "metadata": {
+            "$ref": "#/components/schemas/Metadata"
+          }
         },
-        "required": ["ticker", "data", "from_date", "to_date", "metadata"]
+        "required": [
+          "ticker",
+          "data",
+          "from_date",
+          "to_date",
+          "metadata"
+        ]
       },
       "Error": {
         "required": [
