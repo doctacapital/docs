@@ -1,7 +1,7 @@
 {
   "$schema": "https://mintlify.com/docs.json",
   "theme": "willow",
-  "name": "Docta Capital API",
+  "name": "Docta API",
   "colors": {
     "primary": "#005FCC",
     "light": "#07C983",
@@ -100,20 +100,20 @@
     "metatags": {
       "charset": "UTF-8",
       "viewport": "width=device-width, initial-scale=1.0",
-      "description": "Documentación de la API de Docta Capital - Acceso a datos de mercado y servicios financieros",
-      "keywords": "API, Docta Capital, datos de mercado, servicios financieros, bonos, precios históricos, Argentina",
-      "author": "Docta Capital",
+      "description": "Documentación de la API de Docta - Acceso a datos de mercado y servicios financieros",
+      "keywords": "API, Docta, datos de mercado, servicios financieros, bonos, precios históricos, Argentina",
+      "author": "Docta",
       "robots": "index, follow",
       "language": "es",
-      "copyright": "Copyright 2024 Docta Capital",
-      "og:title": "API de Docta Capital - Documentación",
+      "copyright": "Copyright 2024 Docta",
+      "og:title": "API de Docta - Documentación",
       "og:type": "website",
-      "og:description": "Documentación completa de la API de Docta Capital para acceder a datos de mercado y servicios financieros",
-      "og:site_name": "Docta Capital API",
+      "og:description": "Documentación completa de la API de Docta para acceder a datos de mercado y servicios financieros",
+      "og:site_name": "Docta API",
       "og:locale": "es_AR",
       "twitter:card": "summary_large_image",
-      "twitter:title": "API de Docta Capital - Documentación",
-      "twitter:description": "Documentación completa de la API de Docta Capital para acceder a datos de mercado y servicios financieros"
+      "twitter:title": "API de Docta - Documentación",
+      "twitter:description": "Documentación completa de la API de Docta para acceder a datos de mercado y servicios financieros"
     }
   }
 }

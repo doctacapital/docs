@@ -1,8 +1,8 @@
 {
   "openapi": "3.1.0",
   "info": {
-    "title": "API de Docta Capital",
-    "description": "API para acceder a datos de mercado y servicios financieros de Docta Capital",
+    "title": "API de Docta",
+    "description": "API para acceder a datos de mercado y servicios financieros de Docta",
     "license": {
       "name": "MIT"
     },
@@ -1287,11 +1287,11 @@
             ]
           },
           "client_id": {
-            "description": "Tu identificador de cliente proporcionado por Docta Capital",
+            "description": "Tu identificador de cliente proporcionado por Docta",
             "type": "string"
           },
           "client_secret": {
-            "description": "Tu secreto de cliente proporcionado por Docta Capital",
+            "description": "Tu secreto de cliente proporcionado por Docta",
             "type": "string"
           }
         }
