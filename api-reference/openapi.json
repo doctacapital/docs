@@ -1326,6 +1326,106 @@
           }
         }
       },
+      "CashflowResponse": {
+        "type": "object",
+        "properties": {
+          "ticker": {
+            "type": "string",
+            "description": "Símbolo del bono"
+          },
+          "data": {
+            "type": "array",
+            "description": "Lista de flujos de caja del bono",
+            "items": {
+              "$ref": "#/components/schemas/CashflowDataPoint"
+            }
+          },
+          "metadata": {
+            "$ref": "#/components/schemas/CashflowMetadata"
+          }
+        },
+        "required": [
+          "ticker",
+          "data",
+          "metadata"
+        ]
+      },
+      "CashflowDataPoint": {
+        "type": "object",
+        "properties": {
+          "issue_date": {
+            "type": "string",
+            "format": "date",
+            "description": "Fecha de emisión del bono"
+          },
+          "payment_date": {
+            "type": "string",
+            "format": "date",
+            "description": "Fecha de pago del flujo de caja"
+          },
+          "capital": {
+            "type": "number",
+            "description": "Monto de capital amortizado"
+          },
+          "interest_rate": {
+            "type": "number",
+            "description": "Tasa de interés aplicable al período"
+          },
+          "interest_amount": {
+            "type": "number",
+            "description": "Monto de intereses devengados"
+          },
+          "residual_value": {
+            "type": "number",
+            "description": "Valor residual del bono después del pago"
+          },
+          "cash_flow": {
+            "type": "number",
+            "description": "Flujo de caja total (capital + interés)"
+          },
+          "adj_interest_amount": {
+            "type": "number",
+            "description": "Monto de intereses ajustado"
+          },
+          "adj_capital": {
+            "type": "number",
+            "description": "Monto de capital ajustado"
+          }
+        },
+        "required": [
+          "issue_date",
+          "payment_date",
+          "capital",
+          "interest_rate",
+          "interest_amount",
+          "residual_value",
+          "cash_flow",
+          "adj_interest_amount",
+          "adj_capital"
+        ]
+      },
+      "CashflowMetadata": {
+        "type": "object",
+        "properties": {
+          "subasset_class": {
+            "type": "string",
+            "description": "Clase de subactivo del bono (ej. HARD_DOLLAR)"
+          },
+          "nominal_units": {
+            "type": "number",
+            "description": "Unidades nominales utilizadas en el cálculo"
+          },
+          "total_records": {
+            "type": "integer",
+            "description": "Número total de registros de flujo de caja"
+          }
+        },
+        "required": [
+          "subasset_class",
+          "nominal_units",
+          "total_records"
+        ]
+      },
       "OHLCResponse": {
         "type": "object",
         "properties": {
@@ -1363,6 +1463,55 @@
           "metadata"
         ]
       },
+      "BondOHLCDataPoint": {
+        "type": "object",
+        "properties": {
+          "opening_price": {
+            "type": "number",
+            "format": "float",
+            "description": "Precio de apertura"
+          },
+          "high_price": {
+            "type": "number",
+            "format": "float",
+            "description": "Precio más alto del período"
+          },
+          "low_price": {
+            "type": "number",
+            "format": "float",
+            "description": "Precio más bajo del período"
+          },
+          "last_price": {
+            "type": "number",
+            "format": "float",
+            "description": "Último precio negociado"
+          },
+          "last_size": {
+            "type": "number",
+            "format": "float",
+            "description": "Tamaño de la última operación"
+          },
+          "effective_volume": {
+            "type": "number",
+            "format": "float",
+            "description": "Volumen efectivo negociado"
+          },
+          "trade_volume": {
+            "type": "number",
+            "format": "float",
+            "description": "Volumen total de operaciones"
+          }
+        },
+        "required": [
+          "opening_price",
+          "high_price",
+          "low_price",
+          "last_price",
+          "last_size",
+          "effective_volume",
+          "trade_volume"
+        ]
+      },
       "IntradayDataPoint": {
         "type": "object",
         "properties": {
@@ -1378,7 +1527,11 @@
             "type": "number",
             "format": "float"
           },
-          "closing_price": {
+          "last_size": {
+            "type": "number",
+            "format": "float"
+          },
+          "last_price": {
             "type": "number",
             "format": "float"
           },
@@ -1395,7 +1548,8 @@
           "opening_price",
           "high_price",
           "low_price",
-          "closing_price",
+          "last_size",
+          "last_price",
           "effective_volume",
           "trade_volume"
         ]
