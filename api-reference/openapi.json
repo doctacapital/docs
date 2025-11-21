@@ -298,7 +298,7 @@
     },
     "/api/v1/analytics/bonds/pricer": {
       "post": {
-        "description": "Calcular métricas de pricing y análisis de un bono específico basado en parámetros de precio objetivo",
+        "description": "Calcula TIR, TNA, TEM, TNA_30_360, VT, VR, Precio Dirty, Intereses Corridos, de un bono en función de un precio clean objetivo, una fecha de concertación y un plazo de liquidación (CI, 24hs, 48hs)",
         "tags": [
           "Bonds"
         ],
@@ -1536,8 +1536,8 @@
         "properties": {
           "ticker": {
             "type": "string",
-            "description": "El símbolo del bono (ej., \"PR17\", \"AL30\", \"GD30\")",
-            "example": "PR17"
+            "description": "El símbolo del bono (ej., \"AL30\", \"GD30\")",
+            "example": "AL30"
           },
           "target": {
             "type": "string",
@@ -1550,7 +1550,7 @@
           "value": {
             "type": "number",
             "description": "El precio objetivo del bono",
-            "example": 617
+            "example": 95000
           },
           "settlement_entry": {
             "type": "string",

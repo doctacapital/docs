@@ -1,5 +1,5 @@
 ---
-title: 'Pricer de Bonos'
+title: 'Calculadora'
 openapi: 'POST /api/v1/analytics/bonds/pricer'
 ---
 
@@ -10,7 +10,7 @@ openapi: 'POST /api/v1/analytics/bonds/pricer'
 ## Cuerpo de la Solicitud
 
 <ParamField body="ticker" type="string" required>
-  El símbolo del bono (ej., "PR17", "AL30", "GD30").
+  El símbolo del bono (ej., "AL30", "GD30").
 </ParamField>
 
 <ParamField body="target" type="string" required>
@@ -37,9 +37,9 @@ curl -X POST "https://api.doctacapital.com.ar/api/v1/analytics/bonds/pricer" \
   -H "Authorization: Bearer YOUR_ACCESS_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
-    "ticker": "PR17",
+    "ticker": "AL30",
     "target": "price",
-    "value": 617,
+    "value": 95000,
     "settlement_entry": "24hs",
     "operation_date": "2025-11-16"
   }'
@@ -122,7 +122,7 @@ curl -X POST "https://api.doctacapital.com.ar/api/v1/analytics/bonds/pricer" \
 ```json Success
 {
   "clean_price": 615.3099315068494,
-  "dirty_price": 617.0,
+  "dirty_price": 95000.0,
   "residual_value": 100.0,
   "tv": 101.69006849315069,
   "accured_interest": 1.690068493150685,
