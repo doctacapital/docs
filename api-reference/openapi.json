@@ -1537,7 +1537,7 @@
           "ticker": {
             "type": "string",
             "description": "El símbolo del bono (ej., \"AL30\", \"GD30\")",
-            "example": "AL30"
+            "example": "AL30D"
           },
           "target": {
             "type": "string",
@@ -1550,7 +1550,7 @@
           "value": {
             "type": "number",
             "description": "El precio objetivo del bono",
-            "example": 95000
+            "example": 65
           },
           "settlement_entry": {
             "type": "string",
@@ -1566,7 +1566,7 @@
             "type": "string",
             "format": "date",
             "description": "La fecha de operación en formato YYYY-MM-DD",
-            "example": "2025-11-16"
+            "example": "2025-11-19"
           }
         }
       },
