@@ -296,6 +296,104 @@
         }
       }
     },
+    "/api/v1/analytics/bonds/pricer": {
+      "post": {
+        "description": "Calcular métricas de pricing y análisis de un bono específico basado en parámetros de precio objetivo",
+        "tags": [
+          "Bonds"
+        ],
+        "requestBody": {
+          "description": "Parámetros para el cálculo de pricing del bono",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BondPricerRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Métricas de pricing calculadas exitosamente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BondPricerResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Solicitud incorrecta - parámetros inválidos o faltantes",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "type": "/errors/bad-request",
+                  "title": "Bad request",
+                  "status": 400,
+                  "detail": "Invalid request parameters",
+                  "correlation_id": "6cd1fd05-63e9-4863-832f-d873e58e9d67"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "No autorizado - token de acceso inválido o faltante",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "type": "/errors/authentication-required",
+                  "title": "Authorization header missing",
+                  "status": 401,
+                  "detail": "Authorization header missing",
+                  "correlation_id": "d6e20e07-0580-4e2d-9480-00a68c1ae493"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Ticker no encontrado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "type": "/errors/not-found",
+                  "title": "Resource not found",
+                  "status": 404,
+                  "detail": "Ticker not found"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Error interno del servidor",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "type": "/errors/internal-server-error",
+                  "title": "Internal server error",
+                  "status": 500,
+                  "detail": "Internal server error",
+                  "correlation_id": "6cd1fd05-63e9-4863-832f-d873e58e9d67"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/bonds/yields/{symbol}/historical": {
       "get": {
         "description": "Obtener datos intradiarios históricos de rendimiento de un bono específico",
@@ -1424,6 +1522,144 @@
           "subasset_class",
           "nominal_units",
           "total_records"
+        ]
+      },
+      "BondPricerRequest": {
+        "type": "object",
+        "required": [
+          "ticker",
+          "target",
+          "value",
+          "settlement_entry",
+          "operation_date"
+        ],
+        "properties": {
+          "ticker": {
+            "type": "string",
+            "description": "El símbolo del bono (ej., \"PR17\", \"AL30\", \"GD30\")",
+            "example": "PR17"
+          },
+          "target": {
+            "type": "string",
+            "description": "El objetivo del cálculo. Debe ser \"price\" para calcular métricas basadas en un precio objetivo",
+            "enum": [
+              "price"
+            ],
+            "example": "price"
+          },
+          "value": {
+            "type": "number",
+            "description": "El precio objetivo del bono",
+            "example": 617
+          },
+          "settlement_entry": {
+            "type": "string",
+            "description": "El tipo de liquidación. Puede ser \"24hs\" para liquidación en 24 horas o \"C.I\" para contado inmediato",
+            "enum": [
+              "24hs",
+              "C.I"
+            ],
+            "example": "24hs"
+          },
+          "operation_date": {
+            "type": "string",
+            "format": "date",
+            "description": "La fecha de operación en formato YYYY-MM-DD",
+            "example": "2025-11-16"
+          }
+        }
+      },
+      "BondPricerResponse": {
+        "type": "object",
+        "properties": {
+          "clean_price": {
+            "type": "number",
+            "description": "Precio limpio del bono (sin intereses devengados)"
+          },
+          "dirty_price": {
+            "type": "number",
+            "description": "Precio sucio del bono (incluyendo intereses devengados)"
+          },
+          "residual_value": {
+            "type": "number",
+            "description": "Valor residual del bono"
+          },
+          "tv": {
+            "type": "number",
+            "description": "Valor técnico del bono"
+          },
+          "accured_interest": {
+            "type": "number",
+            "description": "Interés devengado acumulado"
+          },
+          "days_to_maturity": {
+            "type": "integer",
+            "description": "Días hasta el vencimiento del bono"
+          },
+          "settlment_date": {
+            "type": "string",
+            "format": "date",
+            "description": "Fecha de liquidación en formato YYYY-MM-DD"
+          },
+          "price_variation": {
+            "type": "number",
+            "description": "Variación del precio respecto al valor técnico"
+          },
+          "parity_price": {
+            "type": "number",
+            "description": "Precio de paridad del bono"
+          },
+          "tir": {
+            "type": "number",
+            "description": "Tasa Interna de Retorno (TIR) del bono"
+          },
+          "tea": {
+            "type": "number",
+            "description": "Tasa Efectiva Anual (TEA) del bono"
+          },
+          "tem": {
+            "type": "number",
+            "description": "Tasa Efectiva Mensual (TEM) del bono"
+          },
+          "tna": {
+            "type": "number",
+            "description": "Tasa Nominal Anual (TNA) del bono"
+          },
+          "tna_30_360": {
+            "type": "number",
+            "description": "Tasa Nominal Anual calculada con base 30/360"
+          },
+          "margen": {
+            "type": "number",
+            "description": "Margen del bono"
+          },
+          "duration": {
+            "type": "number",
+            "description": "Duración del bono (medida de sensibilidad del precio a cambios en la tasa de interés)"
+          },
+          "badlar_last5": {
+            "type": "number",
+            "description": "Promedio de la tasa BADLAR de los últimos 5 días"
+          }
+        },
+        "required": [
+          "clean_price",
+          "dirty_price",
+          "residual_value",
+          "tv",
+          "accured_interest",
+          "days_to_maturity",
+          "settlment_date",
+          "price_variation",
+          "parity_price",
+          "tir",
+          "tea",
+          "tem",
+          "tna",
+          "tna_30_360",
+          "margen",
+          "duration",
+          "badlar_last5"
         ]
       },
       "OHLCResponse": {

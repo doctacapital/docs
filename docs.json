@@ -35,7 +35,8 @@
               "api-reference/endpoint/bonds-historical-prices",
               "api-reference/endpoint/bonds-yields-intraday",
               "api-reference/endpoint/bonds-yields-historical-curve",
-              "api-reference/endpoint/bonds-cashflow"
+              "api-reference/endpoint/bonds-cashflow",
+              "api-reference/endpoint/bonds-pricer"
             ]
           }
           ,

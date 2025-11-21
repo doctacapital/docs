@@ -1,0 +1,204 @@
+---
+title: 'Pricer de Bonos'
+openapi: 'POST /api/v1/analytics/bonds/pricer'
+---
+
+<Note>
+  Este endpoint calcula métricas de pricing y análisis de un bono específico basado en parámetros de precio objetivo.
+</Note>
+
+## Cuerpo de la Solicitud
+
+<ParamField body="ticker" type="string" required>
+  El símbolo del bono (ej., "PR17", "AL30", "GD30").
+</ParamField>
+
+<ParamField body="target" type="string" required>
+  El objetivo del cálculo. Debe ser `"price"` para calcular métricas basadas en un precio objetivo.
+</ParamField>
+
+<ParamField body="value" type="number" required>
+  El precio objetivo del bono.
+</ParamField>
+
+<ParamField body="settlement_entry" type="string" required>
+  El tipo de liquidación. Puede ser `"24hs"` para liquidación en 24 horas o `"C.I"` para contado inmediato.
+</ParamField>
+
+<ParamField body="operation_date" type="string" required>
+  La fecha de operación en formato YYYY-MM-DD (ej., "2025-11-16").
+</ParamField>
+
+## Ejemplo de Solicitud
+
+<RequestExample>
+```bash cURL
+curl -X POST "https://api.doctacapital.com.ar/api/v1/analytics/bonds/pricer" \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "ticker": "PR17",
+    "target": "price",
+    "value": 617,
+    "settlement_entry": "24hs",
+    "operation_date": "2025-11-16"
+  }'
+```
+</RequestExample>
+
+## Respuesta Exitosa
+
+<ResponseField name="clean_price" type="number">
+  Precio limpio del bono (sin intereses devengados).
+</ResponseField>
+
+<ResponseField name="dirty_price" type="number">
+  Precio sucio del bono (incluyendo intereses devengados).
+</ResponseField>
+
+<ResponseField name="residual_value" type="number">
+  Valor residual del bono.
+</ResponseField>
+
+<ResponseField name="tv" type="number">
+  Valor técnico del bono.
+</ResponseField>
+
+<ResponseField name="accured_interest" type="number">
+  Interés devengado acumulado.
+</ResponseField>
+
+<ResponseField name="days_to_maturity" type="integer">
+  Días hasta el vencimiento del bono.
+</ResponseField>
+
+<ResponseField name="settlment_date" type="string">
+  Fecha de liquidación en formato YYYY-MM-DD.
+</ResponseField>
+
+<ResponseField name="price_variation" type="number">
+  Variación del precio respecto al valor técnico.
+</ResponseField>
+
+<ResponseField name="parity_price" type="number">
+  Precio de paridad del bono.
+</ResponseField>
+
+<ResponseField name="tir" type="number">
+  Tasa Interna de Retorno (TIR) del bono.
+</ResponseField>
+
+<ResponseField name="tea" type="number">
+  Tasa Efectiva Anual (TEA) del bono.
+</ResponseField>
+
+<ResponseField name="tem" type="number">
+  Tasa Efectiva Mensual (TEM) del bono.
+</ResponseField>
+
+<ResponseField name="tna" type="number">
+  Tasa Nominal Anual (TNA) del bono.
+</ResponseField>
+
+<ResponseField name="tna_30_360" type="number">
+  Tasa Nominal Anual calculada con base 30/360.
+</ResponseField>
+
+<ResponseField name="margen" type="number">
+  Margen del bono.
+</ResponseField>
+
+<ResponseField name="duration" type="number">
+  Duración del bono (medida de sensibilidad del precio a cambios en la tasa de interés).
+</ResponseField>
+
+<ResponseField name="badlar_last5" type="number">
+  Promedio de la tasa BADLAR de los últimos 5 días.
+</ResponseField>
+
+## Ejemplo de Respuesta Exitosa
+
+<ResponseExample>
+```json Success
+{
+  "clean_price": 615.3099315068494,
+  "dirty_price": 617.0,
+  "residual_value": 100.0,
+  "tv": 101.69006849315069,
+  "accured_interest": 1.690068493150685,
+  "days_to_maturity": 1262,
+  "settlment_date": "2025-11-17",
+  "price_variation": -0.08592592592592592,
+  "parity_price": 6.067455840503814,
+  "tir": 0.573063659320398,
+  "tea": 0.573063659320398,
+  "tem": 0.038473754083647504,
+  "tna": 1.095906665601769,
+  "tna_30_360": 0.46168504900377005,
+  "margen": 0.784656665601769,
+  "duration": 1.4864921728017164,
+  "badlar_last5": 0.31125
+}
+```
+</ResponseExample>
+
+## Respuestas de Error
+
+### 400 Solicitud Incorrecta
+Parámetros inválidos o faltantes en el cuerpo de la solicitud.
+
+```json
+{
+  "type": "/errors/bad-request",
+  "title": "Bad request",
+  "status": 400,
+  "detail": "Invalid request parameters",
+  "correlation_id": "6cd1fd05-63e9-4863-832f-d873e58e9d67"
+}
+```
+
+### 401 No Autorizado
+Token de acceso inválido o faltante.
+
+```json
+{
+  "type": "/errors/authentication-required",
+  "title": "Authorization header missing",
+  "status": 401,
+  "detail": "Authorization header missing",
+  "correlation_id": "d6e20e07-0580-4e2d-9480-00a68c1ae493"
+}
+```
+
+### 404 No Encontrado
+Ticker no encontrado.
+
+```json
+{
+  "type": "/errors/not-found",
+  "title": "Resource not found",
+  "status": 404,
+  "detail": "Ticker not found"
+}
+```
+
+### 500 Error Interno del Servidor
+Error interno del servidor.
+
+```json
+{
+  "type": "/errors/internal-server-error",
+  "title": "Internal server error",
+  "status": 500,
+  "detail": "Internal server error",
+  "correlation_id": "6cd1fd05-63e9-4863-832f-d873e58e9d67"
+}
+```
+
+## Notas
+
+- El campo `target` debe ser `"price"` para calcular métricas basadas en un precio objetivo
+- El campo `value` representa el precio objetivo del bono
+- La fecha de liquidación se calcula automáticamente basándose en `settlement_entry` y `operation_date`
+- Todas las tasas están expresadas en formato decimal (ej., 0.573 = 57.3%)
+
