@@ -22,7 +22,7 @@ openapi: 'POST /api/v1/analytics/bonds/pricer'
 </ParamField>
 
 <ParamField body="settlement_entry" type="string" required>
-  El tipo de liquidación. Puede ser `"24hs"` para liquidación en 24 horas o `"C.I"` para contado inmediato.
+  El tipo de liquidación. Puede ser `"24hs"` para liquidación en 24 horas, `"48hs"` para liquidación en 48 horas o `"C.I"` para contado inmediato.
 </ParamField>
 
 <ParamField body="operation_date" type="string" required>
@@ -77,11 +77,11 @@ curl -X POST "https://api.doctacapital.com.ar/api/v1/analytics/bonds/pricer" \
 </ResponseField>
 
 <ResponseField name="price_variation" type="number">
-  Variación del precio respecto al valor técnico.
+  Variación del precio respecto al precio dirty del ultimo dia.
 </ResponseField>
 
 <ResponseField name="parity_price" type="number">
-  Precio de paridad del bono.
+  Paridad del bono.
 </ResponseField>
 
 <ResponseField name="tir" type="number">
@@ -109,7 +109,7 @@ curl -X POST "https://api.doctacapital.com.ar/api/v1/analytics/bonds/pricer" \
 </ResponseField>
 
 <ResponseField name="duration" type="number">
-  Duración del bono (medida de sensibilidad del precio a cambios en la tasa de interés).
+  Duración del bono.
 </ResponseField>
 
 <ResponseField name="badlar_last5" type="number">

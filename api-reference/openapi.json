@@ -298,7 +298,7 @@
     },
     "/api/v1/analytics/bonds/pricer": {
       "post": {
-        "description": "Calcula TIR, TNA, TEM, TNA_30_360, VT, VR, Precio Dirty, Intereses Corridos, de un bono en función de un precio clean objetivo, una fecha de concertación y un plazo de liquidación (CI, 24hs, 48hs)",
+        "description": "Calcula TIR, TNA, TEM, TNA_30_360, VT, VR, Precio Dirty, Intereses Corridos, de un bono en función de un precio  dirty objetivo, una fecha de concertación y un plazo de liquidación (CI, 24hs, 48hs)",
         "tags": [
           "Bonds"
         ],
@@ -1554,10 +1554,11 @@
           },
           "settlement_entry": {
             "type": "string",
-            "description": "El tipo de liquidación. Puede ser \"24hs\" para liquidación en 24 horas o \"C.I\" para contado inmediato",
+            "description": "El tipo de liquidación. Puede ser \"24hs\" para liquidación en 24 horas, \"48hs\" para liquidación en 48 horas o \"C.I\" para contado inmediato",
             "enum": [
+              "C.I",
               "24hs",
-              "C.I"
+              "48hs"
             ],
             "example": "24hs"
           },
