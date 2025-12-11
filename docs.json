@@ -20,44 +20,15 @@
             ]
           },
           {
-            "group": "Autenticación",
-            "pages": [
-              "api-reference/endpoint/auth-token"
-            ]
-          },
-          {
             "group": "Bonos",
             "pages": [
               "api-reference/endpoint/bonds-instruments",
               "api-reference/endpoint/bonds-instruments-detail",
               "api-reference/endpoint/bonds-instruments-search",
-              "api-reference/endpoint/bonds-marketdata-intraday",
-              "api-reference/endpoint/bonds-historical-prices",
               "api-reference/endpoint/bonds-yields-intraday",
               "api-reference/endpoint/bonds-yields-historical-curve",
               "api-reference/endpoint/bonds-cashflow",
               "api-reference/endpoint/bonds-calculadora"
-            ]
-          }
-          ,
-          {
-            "group": "Cedears",
-            "pages": [
-              "api-reference/endpoint/cedears-instruments",
-              "api-reference/endpoint/cedears-instruments-detail",
-              "api-reference/endpoint/cedears-instruments-search",
-              "api-reference/endpoint/cedears-marketdata-ohlc",
-              "api-reference/endpoint/cedears-marketdata-intraday"
-            ]
-          },
-          {
-            "group": "Acciones",
-            "pages": [
-              "api-reference/endpoint/stocks-instruments",
-              "api-reference/endpoint/stocks-instruments-detail",
-              "api-reference/endpoint/stocks-instruments-search",
-              "api-reference/endpoint/stocks-marketdata-ohlc",
-              "api-reference/endpoint/stocks-marketdata-intraday"
             ]
           }
         ]
@@ -101,20 +72,20 @@
     "metatags": {
       "charset": "UTF-8",
       "viewport": "width=device-width, initial-scale=1.0",
-      "description": "Documentación de la API de Docta - Acceso a datos de mercado y servicios financieros",
-      "keywords": "API, Docta, datos de mercado, servicios financieros, bonos, precios históricos, Argentina",
+      "description": "Documentación de la Bond API de Docta - Catálogo de bonos, cashflows y curvas de rendimiento en Argentina.",
+      "keywords": "Bond API, Docta, bonos, cashflows, curvas de rendimiento, yields intradiarios, Argentina",
       "author": "Docta",
       "robots": "index, follow",
       "language": "es",
       "copyright": "Copyright 2024 Docta",
-      "og:title": "API de Docta - Documentación",
+      "og:title": "Bond API de Docta - Documentación",
       "og:type": "website",
-      "og:description": "Documentación completa de la API de Docta para acceder a datos de mercado y servicios financieros",
+      "og:description": "Documentación completa de la Bond API de Docta para acceder a instrumentos, cashflows y curvas de bonos.",
       "og:site_name": "Docta API",
       "og:locale": "es_AR",
       "twitter:card": "summary_large_image",
-      "twitter:title": "API de Docta - Documentación",
-      "twitter:description": "Documentación completa de la API de Docta para acceder a datos de mercado y servicios financieros"
+      "twitter:title": "Bond API de Docta - Documentación",
+      "twitter:description": "Documentación completa de la Bond API de Docta para acceder a instrumentos, cashflows y curvas de bonos."
     }
   }
 }

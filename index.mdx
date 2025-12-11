@@ -1,36 +1,36 @@
----
-title: "Introducción"
-description: "Bienvenidos a la documentación API de Docta. Usa este documento para navegar nuestros diferentes endpoints"
----
-## Resumen de la API
+title: "Bond API de Docta"
+description: "Explora la Bond API de Docta: catálogo de bonos, detalle, flujos de fondos y curvas de rendimiento en tiempo real."
+## Resumen de la Bond API
+
+La Bond API de Docta se centra exclusivamente en datos de renta fija argentina: instrumentos, detalles completos, cashflows proyectados y curvas/yields intradiarios e históricos.
 
 <Columns cols={2}>
   <Card
-    title="Autenticación"
-    icon="key"
-    href="/api-reference/endpoint/auth-token"
-  >
-    Obtén un token de acceso usando credenciales de cliente para autenticarte en la API.
-  </Card>
-  <Card
-    title="Bonos"
+    title="Catálogo y búsqueda"
     icon="database"
     href="/api-reference/endpoint/bonds-instruments"
   >
-    Intradiario, cashflows, yields e historicos
+    Descubre el universo de bonos y encuéntralos por ticker, especie o identificadores.
   </Card>
   <Card
-    title="Cedears"
-    icon="money-bill"
-    href="/api-reference/endpoint/cedears-instruments"
+    title="Detalle y cashflows"
+    icon="money-bill-transfer"
+    href="/api-reference/endpoint/bonds-instruments-detail"
   >
-    Intradiario e historicos.
+    Accede a campos clave del instrumento y a flujos de fondos proyectados.
   </Card>
   <Card
-    title="Acciones"
+    title="Curvas e intradiario"
     icon="chart-line"
-    href="/api-reference/endpoint/stocks-instruments"
+    href="/api-reference/endpoint/bonds-yields-intraday"
   >
-    Obtén datos de acciones específicas.
+    Consulta yields intradiarios y curvas históricas para seguimiento de mercado.
+  </Card>
+  <Card
+    title="Calculadora de precios"
+    icon="calculator"
+    href="/api-reference/endpoint/bonds-calculadora"
+  >
+    Calcula precios teóricos y sensibilidades con inputs de tasa, paridades y días base.
   </Card>
 </Columns>

@@ -1,11 +1,9 @@
----
-title: 'Introducción'
-description: 'Documentación de la API de Docta'
----
+title: 'Bond API'
+description: 'Documentación de la Bond API de Docta: catálogo de bonos, detalle, cashflows y curvas de rendimiento.'
 
-## Bienvenido a la API de Docta
+## Bienvenido a la Bond API de Docta
 
-La API de Docta proporciona acceso a datos de mercado y servicios financieros. Esta API utiliza el flujo de credenciales de cliente OAuth 2.0 para la autenticación.
+La Bond API de Docta brinda datos especializados de renta fija argentina: catálogo de instrumentos, detalle enriquecido, flujos de fondos, yields intradiarios y curvas históricas. La autenticación sigue el flujo de credenciales de cliente OAuth 2.0.
 
 <Card
   title="URL Base"
@@ -14,25 +12,25 @@ La API de Docta proporciona acceso a datos de mercado y servicios financieros. E
   https://api.doctacapital.com.ar
 </Card>
 
-## Comenzando
+## Comenzando con bonos
 
-1. **Obtener Credenciales**: Contacta a Docta para obtener tu `client_id` y `client_secret`
-2. **Obtener Token de Acceso**: Usa el endpoint de autenticación para obtener un token de acceso
-3. **Realizar Llamadas a la API**: Incluye el token de acceso en el header Authorization para todas las solicitudes posteriores
+1. **Obtener Credenciales**: Contacta a Docta para recibir tu `client_id` y `client_secret`.
+2. **Obtener Token de Acceso**: Solicita un token OAuth2 con credenciales de cliente (grant_type `client_credentials`).
+3. **Realizar Llamadas a la API**: Envía `Authorization: Bearer {access_token}` en cada request.
 
 ## Autenticación
 
-La API utiliza el flujo de credenciales de cliente OAuth 2.0. Necesitas obtener un token de acceso antes de realizar cualquier llamada a la API.
+La API utiliza el flujo de credenciales de cliente OAuth 2.0. Necesitas obtener un token de acceso antes de consultar instrumentos, cashflows o curvas.
 
 <Steps>
   <Step title="Solicitar Token de Acceso">
-    Envía una solicitud POST a `/api/v1/auth/token` con tus credenciales de cliente
+    Envía una solicitud POST a `/api/v1/auth/token` con tus credenciales de cliente.
   </Step>
   <Step title="Usar el Token">
-    Incluye el token de acceso en el header Authorization: `Bearer {access_token}`
+    Incluye el token de acceso en el header Authorization: `Bearer {access_token}`.
   </Step>
   <Step title="Expiración del Token">
-    Los tokens expiran después de un cierto período. Necesitarás solicitar un nuevo token cuando el actual expire.
+    Los tokens expiran. Solicita uno nuevo al vencer para mantener el acceso a los datos de bonos.
   </Step>
 </Steps>
 
