@@ -1,26 +1,28 @@
+---
 title: "Bond API de Docta"
 description: "Explora la Bond API de Docta: catálogo de bonos, detalle, flujos de fondos y curvas de rendimiento en tiempo real."
+---
 ## Resumen de la Bond API
 
-La Bond API de Docta se centra exclusivamente en datos de renta fija argentina: instrumentos, detalles completos, cashflows proyectados y curvas/yields intradiarios e históricos.
+La Bond API de Docta se centra exclusivamente en bonos de argentina: instrumentos, detalles completos, cashflows proyectados y curvas/yields intradiarios e históricos.
 
 <Columns cols={2}>
   <Card
-    title="Catálogo y búsqueda"
+    title="Listado de bonos"
     icon="database"
     href="/api-reference/endpoint/bonds-instruments"
   >
-    Descubre el universo de bonos y encuéntralos por ticker, especie o identificadores.
+    Accede a la lista completa de bonos disponibles
   </Card>
   <Card
     title="Detalle y cashflows"
     icon="money-bill-transfer"
     href="/api-reference/endpoint/bonds-instruments-detail"
   >
-    Accede a campos clave del instrumento y a flujos de fondos proyectados.
+    Accede a campos clave del instrumento y a flujos de fondos.
   </Card>
   <Card
-    title="Curvas e intradiario"
+    title="Curvas de rendimiento"
     icon="chart-line"
     href="/api-reference/endpoint/bonds-yields-intraday"
   >
@@ -31,6 +33,6 @@ La Bond API de Docta se centra exclusivamente en datos de renta fija argentina: 
     icon="calculator"
     href="/api-reference/endpoint/bonds-calculadora"
   >
-    Calcula precios teóricos y sensibilidades con inputs de tasa, paridades y días base.
+    Calcula métricas de pricing y análisis de un bono específico basado en parámetros de precio objetivo.
   </Card>
 </Columns>
