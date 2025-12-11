@@ -1,7 +1,7 @@
 {
   "openapi": "3.1.0",
   "info": {
-    "title": "Bond API de Docta",
+    "title": "API de Bonos de Docta",
     "description": "API centrada en bonos de Argentina: instrumentos, detalle, cashflows y curvas/yields.",
     "license": {
       "name": "MIT"
