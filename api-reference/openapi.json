@@ -1,8 +1,8 @@
 {
   "openapi": "3.1.0",
   "info": {
-    "title": "API de Docta",
-    "description": "API para acceder a datos de mercado y servicios financieros de Docta",
+    "title": "Bond API de Docta",
+    "description": "API centrada en bonos de Argentina: instrumentos, detalle, cashflows y curvas/yields.",
     "license": {
       "name": "MIT"
     },
@@ -19,190 +19,6 @@
     }
   ],
   "paths": {
-    "/api/v1/auth/token": {
-      "post": {
-        "description": "Obtener un token de acceso usando credenciales de cliente para la autenticación de la API",
-        "tags": [
-          "Autenticación"
-        ],
-        "security": [],
-        "requestBody": {
-          "description": "Credenciales de cliente para autenticación",
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/AuthRequest"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "Token de acceso obtenido exitosamente",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/AuthResponse"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Credenciales de cliente inválidas",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Solicitud incorrecta - parámetros inválidos",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/v1/bonds/market-data/{symbol}/ohlc": {
-      "get": {
-        "description": "Obtener datos de precios históricos (ajustados por cupones, amortizaciones, splits y dividendos, o sin ajustar) para un ticker específico dentro de un rango de fechas",
-        "tags": [
-          "Bonds"
-        ],
-        "parameters": [
-          {
-            "name": "symbol",
-            "in": "path",
-            "description": "El símbolo ticker o identificador del instrumento financiero",
-            "required": true,
-            "schema": {
-              "type": "string"
-            },
-            "example": "PAGS"
-          },
-          {
-            "name": "from_date",
-            "in": "query",
-            "description": "Fecha de inicio para los datos históricos en formato YYYY-MM-DD",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "date",
-              "default": "2025-01-10"
-            },
-            "example": "2025-06-01"
-          },
-          {
-            "name": "to_date",
-            "in": "query",
-            "description": "Fecha de fin para los datos históricos en formato YYYY-MM-DD",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "date",
-              "default": "2025-10-10"
-            },
-            "example": "2025-06-15"
-          },
-          {
-            "name": "adjusted",
-            "in": "query",
-            "description": "Si devolver precios ajustados por eventos corporativos",
-            "required": false,
-            "schema": {
-              "type": "boolean"
-            },
-            "example": false
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Datos de precios históricos obtenidos exitosamente",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/OHLCResponse"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Error interno del servidor",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                },
-                "example": {
-                  "type": "/errors/internal-server-error",
-                  "title": "Internal server error",
-                  "status": 500,
-                  "detail": "Internal server error",
-                  "correlation_id": "6cd1fd05-63e9-4863-832f-d873e58e9d67"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "No autorizado - token de acceso inválido o faltante",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                },
-                "example": {
-                  "type": "/errors/authentication-required",
-                  "title": "Authorization header missing",
-                  "status": 401,
-                  "detail": "Authorization header missing",
-                  "correlation_id": "d6e20e07-0580-4e2d-9480-00a68c1ae493"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Ticker no encontrado",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                },
-                "example": {
-                  "type": "/errors/not-found",
-                  "title": "Resource not found",
-                  "status": 404,
-                  "detail": "Ticker not found"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Parámetros de fecha inválidos",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                },
-                "example": {
-                  "type": "/errors/http-error",
-                  "title": "Start date cannot be after end date",
-                  "status": 422,
-                  "detail": "Start date cannot be after end date"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "/api/v1/bonds/analytics/{symbol}/cashflow": {
       "get": {
         "description": "Obtener el flujo de caja de un bono específico, incluyendo todos los pagos de capital e intereses",
@@ -243,23 +59,6 @@
               }
             }
           },
-          "500": {
-            "description": "Error interno del servidor",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                },
-                "example": {
-                  "type": "/errors/internal-server-error",
-                  "title": "Internal server error",
-                  "status": 500,
-                  "detail": "Internal server error",
-                  "correlation_id": "6cd1fd05-63e9-4863-832f-d873e58e9d67"
-                }
-              }
-            }
-          },
           "401": {
             "description": "No autorizado - token de acceso inválido o faltante",
             "content": {
@@ -289,6 +88,23 @@
                   "title": "Resource not found",
                   "status": 404,
                   "detail": "Ticker not found"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Error interno del servidor",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "type": "/errors/internal-server-error",
+                  "title": "Internal server error",
+                  "status": 500,
+                  "detail": "Internal server error",
+                  "correlation_id": "6cd1fd05-63e9-4863-832f-d873e58e9d67"
                 }
               }
             }
@@ -447,40 +263,6 @@
               }
             }
           },
-          "500": {
-            "description": "Error interno del servidor",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                },
-                "example": {
-                  "type": "/errors/internal-server-error",
-                  "title": "Internal server error",
-                  "status": 500,
-                  "detail": "Internal server error",
-                  "correlation_id": "6cd1fd05-63e9-4863-832f-d873e58e9d67"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "No autorizado - token de acceso inválido o faltante",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                },
-                "example": {
-                  "type": "/errors/authentication-required",
-                  "title": "Authorization header missing",
-                  "status": 401,
-                  "detail": "Authorization header missing",
-                  "correlation_id": "d6e20e07-0580-4e2d-9480-00a68c1ae493"
-                }
-              }
-            }
-          },
           "400": {
             "description": "Bad Request - Invalid parameters or data",
             "content": {
@@ -509,6 +291,40 @@
                       "detail": "date: Value error, Historical date must be in the past"
                     }
                   }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "No autorizado - token de acceso inválido o faltante",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "type": "/errors/authentication-required",
+                  "title": "Authorization header missing",
+                  "status": 401,
+                  "detail": "Authorization header missing",
+                  "correlation_id": "d6e20e07-0580-4e2d-9480-00a68c1ae493"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Error interno del servidor",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "type": "/errors/internal-server-error",
+                  "title": "Internal server error",
+                  "status": 500,
+                  "detail": "Internal server error",
+                  "correlation_id": "6cd1fd05-63e9-4863-832f-d873e58e9d67"
                 }
               }
             }
@@ -541,88 +357,6 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/IntradayYieldsPricesResponse"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "No autorizado - token de acceso inválido o faltante",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                },
-                "example": {
-                  "type": "/errors/authentication-required",
-                  "title": "Authorization header missing",
-                  "status": 401,
-                  "detail": "Authorization header missing",
-                  "correlation_id": "d6e20e07-0580-4e2d-9480-00a68c1ae493"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Ticker no encontrado",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                },
-                "example": {
-                  "type": "/errors/not-found",
-                  "title": "Resource not found",
-                  "status": 404,
-                  "detail": "Ticker not found"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Error interno del servidor",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                },
-                "example": {
-                  "type": "/errors/internal-server-error",
-                  "title": "Internal server error",
-                  "status": 500,
-                  "detail": "Internal server error",
-                  "correlation_id": "6cd1fd05-63e9-4863-832f-d873e58e9d67"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/v1/bonds/market-data/{symbol}/intraday": {
-      "get": {
-        "description": "Obtener datos intradiarios para un bono específico",
-        "tags": [
-          "Bonds"
-        ],
-        "parameters": [
-          {
-            "name": "symbol",
-            "in": "path",
-            "description": "El símbolo del bono",
-            "required": true,
-            "schema": {
-              "type": "string"
-            },
-            "example": "AL30"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Datos intradiarios obtenidos exitosamente",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/IntradayPricesResponse"
                 }
               }
             }
@@ -745,6 +479,16 @@
               }
             }
           },
+          "400": {
+            "description": "Solicitud incorrecta - parámetros inválidos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
           "401": {
             "description": "No autorizado - token de acceso inválido o faltante",
             "content": {
@@ -758,16 +502,6 @@
                   "status": 401,
                   "detail": "Authorization header missing",
                   "correlation_id": "d6e20e07-0580-4e2d-9480-00a68c1ae493"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Solicitud incorrecta - parámetros inválidos",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
                 }
               }
             }
@@ -918,6 +652,16 @@
               }
             }
           },
+          "400": {
+            "description": "Solicitud incorrecta - parámetros inválidos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
           "401": {
             "description": "No autorizado - token de acceso inválido o faltante",
             "content": {
@@ -931,16 +675,6 @@
                   "status": 401,
                   "detail": "Authorization header missing",
                   "correlation_id": "d6e20e07-0580-4e2d-9480-00a68c1ae493"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Solicitud incorrecta - parámetros inválidos",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
                 }
               }
             }
@@ -964,466 +698,10 @@
           }
         }
       }
-    },
-    "/api/v1/cedears/instruments": {
-      "get": {
-        "description": "Listar instrumentos CEDEAR",
-        "tags": [
-          "CEDEARs"
-        ],
-        "parameters": [
-          {
-            "name": "limit",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "integer",
-              "default": 50
-            }
-          },
-          {
-            "name": "cursor",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "nullable": true
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Listado CEDEARs",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/InstrumentListResponse"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/v1/cedears/instruments/{symbol}": {
-      "get": {
-        "description": "Detalle de CEDEAR",
-        "tags": [
-          "CEDEARs"
-        ],
-        "parameters": [
-          {
-            "name": "symbol",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            },
-            "example": "AAPL"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Detalle CEDEAR",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/InstrumentDetailResponse"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/v1/cedears/instruments/search": {
-      "get": {
-        "description": "Buscar CEDEARs",
-        "tags": [
-          "CEDEARs"
-        ],
-        "parameters": [
-          {
-            "name": "query",
-            "in": "query",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "limit",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "integer",
-              "default": 10
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Resultados de búsqueda",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/InstrumentsSearchResponse"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/v1/cedears/market-data/{symbol}/ohlc": {
-      "get": {
-        "description": "OHLC histórico de CEDEAR",
-        "tags": [
-          "CEDEARs"
-        ],
-        "parameters": [
-          {
-            "name": "symbol",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            },
-            "example": "AAPL"
-          },
-          {
-            "name": "from_date",
-            "in": "query",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "date",
-              "default": "2025-01-10"
-            }
-          },
-          {
-            "name": "to_date",
-            "in": "query",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "date",
-              "default": "2025-10-10"
-            }
-          },
-          {
-            "name": "adjusted",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "boolean"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Datos OHLC",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/OHLCResponse"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/v1/cedears/market-data/{symbol}/intraday": {
-      "get": {
-        "description": "Intraday CEDEAR",
-        "tags": [
-          "CEDEARs"
-        ],
-        "parameters": [
-          {
-            "name": "symbol",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            },
-            "example": "AAPL"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Datos intradiarios",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/IntradayPricesResponse"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/v1/stocks/instruments": {
-      "get": {
-        "description": "Listar instrumentos de acciones",
-        "tags": [
-          "Stocks"
-        ],
-        "parameters": [
-          {
-            "name": "limit",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "integer",
-              "default": 50
-            }
-          },
-          {
-            "name": "cursor",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "nullable": true
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Listado acciones",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/InstrumentListResponse"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/v1/stocks/instruments/{symbol}": {
-      "get": {
-        "description": "Detalle de acción",
-        "tags": [
-          "Stocks"
-        ],
-        "parameters": [
-          {
-            "name": "symbol",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            },
-            "example": "GGAL"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Detalle acción",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/InstrumentDetail"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/v1/stocks/instruments/search": {
-      "get": {
-        "description": "Buscar acciones",
-        "tags": [
-          "Stocks"
-        ],
-        "parameters": [
-          {
-            "name": "query",
-            "in": "query",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "limit",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "integer",
-              "default": 10
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Resultados de búsqueda",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/InstrumentsSearchResponse"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/v1/stocks/market-data/{symbol}/ohlc": {
-      "get": {
-        "description": "OHLC histórico de acción",
-        "tags": [
-          "Stocks"
-        ],
-        "parameters": [
-          {
-            "name": "symbol",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            },
-            "example": "GGAL"
-          },
-          {
-            "name": "from_date",
-            "in": "query",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "date",
-              "default": "2025-01-10"
-            }
-          },
-          {
-            "name": "to_date",
-            "in": "query",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "date",
-              "default": "2025-10-10"
-            }
-          },
-          {
-            "name": "adjusted",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "boolean"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Datos OHLC",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/OHLCResponse"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/v1/stocks/market-data/{symbol}/intraday": {
-      "get": {
-        "description": "Intraday acción",
-        "tags": [
-          "Stocks"
-        ],
-        "parameters": [
-          {
-            "name": "symbol",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            },
-            "example": "GGAL"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Datos intradiarios",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/IntradayPricesResponse"
-                }
-              }
-            }
-          }
-        }
-      }
     }
   },
   "components": {
     "schemas": {
-      "AuthRequest": {
-        "required": [
-          "grant_type",
-          "client_id",
-          "client_secret"
-        ],
-        "type": "object",
-        "properties": {
-          "grant_type": {
-            "description": "El tipo de concesión OAuth 2.0. Debe establecerse en client_credentials",
-            "type": "string",
-            "default": "client_credentials",
-            "enum": [
-              "client_credentials"
-            ]
-          },
-          "client_id": {
-            "description": "Tu identificador de cliente proporcionado por Docta",
-            "type": "string"
-          },
-          "client_secret": {
-            "description": "Tu secreto de cliente proporcionado por Docta",
-            "type": "string"
-          }
-        }
-      },
-      "AuthResponse": {
-        "required": [
-          "access_token",
-          "token_type",
-          "expires_in",
-          "scope"
-        ],
-        "type": "object",
-        "properties": {
-          "access_token": {
-            "description": "El token de acceso a ser usado para solicitudes posteriores de la API",
-            "type": "string"
-          },
-          "token_type": {
-            "description": "El tipo de token. Será Bearer",
-            "type": "string",
-            "enum": [
-              "Bearer"
-            ]
-          },
-          "expires_in": {
-            "description": "El número de segundos hasta que el token expire",
-            "type": "integer"
-          },
-          "scope": {
-            "description": "El alcance de acceso otorgado por este token",
-            "type": "string"
-          }
-        }
-      },
       "CashflowResponse": {
         "type": "object",
         "properties": {
@@ -1446,82 +724,6 @@
           "ticker",
           "data",
           "metadata"
-        ]
-      },
-      "CashflowDataPoint": {
-        "type": "object",
-        "properties": {
-          "issue_date": {
-            "type": "string",
-            "format": "date",
-            "description": "Fecha de emisión del bono"
-          },
-          "payment_date": {
-            "type": "string",
-            "format": "date",
-            "description": "Fecha de pago del flujo de caja"
-          },
-          "capital": {
-            "type": "number",
-            "description": "Monto de capital amortizado"
-          },
-          "interest_rate": {
-            "type": "number",
-            "description": "Tasa de interés aplicable al período"
-          },
-          "interest_amount": {
-            "type": "number",
-            "description": "Monto de intereses devengados"
-          },
-          "residual_value": {
-            "type": "number",
-            "description": "Valor residual del bono después del pago"
-          },
-          "cash_flow": {
-            "type": "number",
-            "description": "Flujo de caja total (capital + interés)"
-          },
-          "adj_interest_amount": {
-            "type": "number",
-            "description": "Monto de intereses ajustado"
-          },
-          "adj_capital": {
-            "type": "number",
-            "description": "Monto de capital ajustado"
-          }
-        },
-        "required": [
-          "issue_date",
-          "payment_date",
-          "capital",
-          "interest_rate",
-          "interest_amount",
-          "residual_value",
-          "cash_flow",
-          "adj_interest_amount",
-          "adj_capital"
-        ]
-      },
-      "CashflowMetadata": {
-        "type": "object",
-        "properties": {
-          "subasset_class": {
-            "type": "string",
-            "description": "Clase de subactivo del bono (ej. HARD_DOLLAR)"
-          },
-          "nominal_units": {
-            "type": "number",
-            "description": "Unidades nominales utilizadas en el cálculo"
-          },
-          "total_records": {
-            "type": "integer",
-            "description": "Número total de registros de flujo de caja"
-          }
-        },
-        "required": [
-          "subasset_class",
-          "nominal_units",
-          "total_records"
         ]
       },
       "BondPricerRequest": {
@@ -1663,217 +865,6 @@
           "badlar_last5"
         ]
       },
-      "OHLCResponse": {
-        "type": "object",
-        "properties": {
-          "ticker": {
-            "type": "string",
-            "description": "Símbolo del bono"
-          },
-          "data": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/BondOHLCDataPoint"
-            }
-          },
-          "from_date": {
-            "type": "string",
-            "format": "date"
-          },
-          "to_date": {
-            "type": "string",
-            "format": "date"
-          },
-          "adjusted": {
-            "type": "boolean"
-          },
-          "metadata": {
-            "$ref": "#/components/schemas/Metadata"
-          }
-        },
-        "required": [
-          "ticker",
-          "data",
-          "from_date",
-          "to_date",
-          "adjusted",
-          "metadata"
-        ]
-      },
-      "BondOHLCDataPoint": {
-        "type": "object",
-        "properties": {
-          "opening_price": {
-            "type": "number",
-            "format": "float",
-            "description": "Precio de apertura"
-          },
-          "high_price": {
-            "type": "number",
-            "format": "float",
-            "description": "Precio más alto del período"
-          },
-          "low_price": {
-            "type": "number",
-            "format": "float",
-            "description": "Precio más bajo del período"
-          },
-          "last_price": {
-            "type": "number",
-            "format": "float",
-            "description": "Último precio negociado"
-          },
-          "last_size": {
-            "type": "number",
-            "format": "float",
-            "description": "Tamaño de la última operación"
-          },
-          "effective_volume": {
-            "type": "number",
-            "format": "float",
-            "description": "Volumen efectivo negociado"
-          },
-          "trade_volume": {
-            "type": "number",
-            "format": "float",
-            "description": "Volumen total de operaciones"
-          }
-        },
-        "required": [
-          "opening_price",
-          "high_price",
-          "low_price",
-          "last_price",
-          "last_size",
-          "effective_volume",
-          "trade_volume"
-        ]
-      },
-      "IntradayDataPoint": {
-        "type": "object",
-        "properties": {
-          "opening_price": {
-            "type": "number",
-            "format": "float"
-          },
-          "high_price": {
-            "type": "number",
-            "format": "float"
-          },
-          "low_price": {
-            "type": "number",
-            "format": "float"
-          },
-          "last_size": {
-            "type": "number",
-            "format": "float"
-          },
-          "last_price": {
-            "type": "number",
-            "format": "float"
-          },
-          "effective_volume": {
-            "type": "number",
-            "format": "float"
-          },
-          "trade_volume": {
-            "type": "number",
-            "format": "float"
-          }
-        },
-        "required": [
-          "opening_price",
-          "high_price",
-          "low_price",
-          "last_size",
-          "last_price",
-          "effective_volume",
-          "trade_volume"
-        ]
-      },
-      "IntradayPricesResponse": {
-        "type": "object",
-        "properties": {
-          "ticker": {
-            "type": "string",
-            "description": "Símbolo del bono"
-          },
-          "data": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/IntradayDataPoint"
-            }
-          },
-          "metadata": {
-            "$ref": "#/components/schemas/Metadata"
-          }
-        },
-        "required": [
-          "ticker",
-          "data",
-          "metadata"
-        ]
-      },
-      "IntradayYieldsDataPoint": {
-        "type": "object",
-        "properties": {
-          "tir": {
-            "type": "number",
-            "format": "float"
-          },
-          "tna": {
-            "type": "number",
-            "format": "float",
-            "nullable": true
-          },
-          "tna_30_360": {
-            "type": "number",
-            "format": "float",
-            "nullable": true
-          },
-          "tem": {
-            "type": "number",
-            "format": "float",
-            "nullable": true
-          },
-          "duration": {
-            "type": "number",
-            "format": "float",
-            "nullable": true
-          },
-          "dtm": {
-            "type": "integer",
-            "nullable": true
-          },
-          "margen": {
-            "type": "number",
-            "format": "float",
-            "nullable": true
-          }
-        },
-        "required": [
-          "tir"
-        ]
-      },
-      "IntradayYieldsMetadata": {
-        "type": "object",
-        "properties": {
-          "total_records": {
-            "type": "integer"
-          },
-          "sub_asset_class": {
-            "type": "string"
-          },
-          "pricing_source": {
-            "type": "string"
-          }
-        },
-        "required": [
-          "total_records",
-          "sub_asset_class",
-          "pricing_source"
-        ]
-      },
       "IntradayYieldsPricesResponse": {
         "type": "object",
         "properties": {
@@ -1894,43 +885,6 @@
           "ticker",
           "data",
           "metadata"
-        ]
-      },
-      "HistoricalYieldsDataPoint": {
-        "type": "object",
-        "properties": {
-          "date": {
-            "type": "string",
-            "format": "date",
-            "description": "Fecha del dato (YYYY-MM-DD)"
-          },
-          "tir": {
-            "type": "number",
-            "format": "float",
-            "description": "Tasa Interna de Retorno (decimal)"
-          },
-          "tna": {
-            "type": "number",
-            "format": "float",
-            "description": "Tasa Nominal Anual (decimal)"
-          },
-          "tea": {
-            "type": "number",
-            "format": "float",
-            "description": "Tasa Efectiva Anual (decimal)"
-          },
-          "tem": {
-            "type": "number",
-            "format": "float",
-            "description": "Tasa Efectiva Mensual (decimal)"
-          }
-        },
-        "required": [
-          "date",
-          "tir",
-          "tna",
-          "tea",
-          "tem"
         ]
       },
       "HistoricalYieldsResponse": {
@@ -2009,61 +963,6 @@
           }
         }
       },
-      "InstrumentDetail": {
-        "type": "object",
-        "properties": {
-          "ticker": {
-            "type": "string",
-            "description": "Símbolo del instrumento"
-          },
-          "name": {
-            "type": "string",
-            "description": "Nombre del instrumento"
-          },
-          "asset_class": {
-            "type": "string",
-            "description": "Clase de activo"
-          },
-          "sub_asset_class": {
-            "type": "string",
-            "description": "Sub-clase de activo",
-            "nullable": true
-          },
-          "sector": {
-            "type": "string",
-            "nullable": true
-          },
-          "issuer": {
-            "type": "string",
-            "nullable": true
-          },
-          "law": {
-            "type": "string",
-            "nullable": true
-          }
-        },
-        "required": [
-          "ticker",
-          "name",
-          "asset_class",
-          "sub_asset_class",
-          "sector",
-          "issuer",
-          "law"
-        ]
-      },
-      "InstrumentDetailFilters": {
-        "type": "object",
-        "properties": {
-          "ticker": {
-            "type": "string",
-            "description": "Ticker filtrado"
-          }
-        },
-        "required": [
-          "ticker"
-        ]
-      },
       "InstrumentDetailResponse": {
         "type": "object",
         "properties": {
@@ -2088,42 +987,6 @@
           "pagination",
           "filters",
           "metadata"
-        ]
-      },
-      "InstrumentSummary": {
-        "type": "object",
-        "properties": {
-          "ticker": {
-            "type": "string",
-            "description": "Símbolo del instrumento"
-          },
-          "asset_class": {
-            "type": "string",
-            "description": "Clase de activo"
-          },
-          "sub_asset_class": {
-            "type": "string",
-            "description": "Sub-clase de activo",
-            "nullable": true
-          }
-        },
-        "required": [
-          "ticker",
-          "asset_class",
-          "sub_asset_class"
-        ]
-      },
-      "InstrumentsFilters": {
-        "type": "object",
-        "properties": {
-          "sub_asset_class": {
-            "type": "string",
-            "nullable": true,
-            "description": "Filtro aplicado de sub-clase de activo"
-          }
-        },
-        "required": [
-          "sub_asset_class"
         ]
       },
       "InstrumentListResponse": {
