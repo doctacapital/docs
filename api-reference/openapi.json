@@ -13,11 +13,6 @@
       "url": "https://api.doctacapital.com.ar"
     }
   ],
-  "security": [
-    {
-      "bearerAuth": []
-    }
-  ],
   "paths": {
     "/api/v1/auth/token": {
       "post": {
@@ -76,6 +71,11 @@
         "description": "Obtener el flujo de caja de un bono específico, incluyendo todos los pagos de capital e intereses",
         "tags": [
           "Bonds"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
         ],
         "parameters": [
           {
@@ -166,6 +166,11 @@
     },
     "/api/v1/analytics/bonds/pricer": {
       "post": {
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "description": "Calcula TIR, TNA, TEM, TNA_30_360, VT, VR, Precio Dirty, Intereses Corridos, de un bono en función de un precio  dirty objetivo, una fecha de concertación y un plazo de liquidación (CI, 24hs, 48hs)",
         "tags": [
           "Bonds"
@@ -264,6 +269,11 @@
     },
     "/api/v1/bonds/yields/{symbol}/historical": {
       "get": {
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "description": "Obtener datos intradiarios históricos de rendimiento de un bono específico",
         "tags": [
           "Bonds"
@@ -386,6 +396,11 @@
     },
     "/api/v1/bonds/yields/{symbol}/intraday": {
       "get": {
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "description": "Obtener datos intradiarios de rendimiento de un bono específico",
         "tags": [
           "Bonds"
@@ -468,6 +483,11 @@
     },
     "/api/v1/bonds/instruments": {
       "get": {
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "description": "Listar instrumentos de bonos",
         "tags": [
           "Bonds"
@@ -580,6 +600,11 @@
     },
     "/api/v1/bonds/instruments/{symbol}": {
       "get": {
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "description": "Obtener detalle de un instrumento de bono",
         "tags": [
           "Bonds"
@@ -661,6 +686,11 @@
     },
     "/api/v1/bonds/instruments/search": {
       "get": {
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "description": "Buscar instrumentos de bonos",
         "tags": [
           "Bonds"
