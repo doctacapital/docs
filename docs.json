@@ -14,9 +14,15 @@
         "tab": "API reference",
         "groups": [
           {
-            "group": "Getting started",
+            "group": "Introducción",
             "pages": [
               "api-reference/introduction"
+            ]
+          },
+          {
+            "group": "Autenticación",
+            "pages": [
+              "api-reference/endpoint/auth-token"
             ]
           },
           {

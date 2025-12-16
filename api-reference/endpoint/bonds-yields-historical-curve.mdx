@@ -25,10 +25,12 @@ openapi: 'GET /api/v1/bonds/yields/{symbol}/historical'
 
 ## Ejemplo de Solicitud
 
-```bash
+<RequestExample>
+```bash cURL
 curl -X GET "https://api.doctacapital.com.ar/api/v1/bonds/yields/AL30/historical/?from_date=2025-01-01&to_date=2025-01-02" \
   -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
 ```
+</RequestExample>
 
 ## Respuesta Exitosa
 
@@ -78,7 +80,8 @@ curl -X GET "https://api.doctacapital.com.ar/api/v1/bonds/yields/AL30/historical
 
 ## Ejemplo de Respuesta Exitosa
 
-```json
+<ResponseExample>
+```json Success
 {
   "ticker": "AL30",
   "data": [
@@ -104,6 +107,7 @@ curl -X GET "https://api.doctacapital.com.ar/api/v1/bonds/yields/AL30/historical
   }
 }
 ```
+</ResponseExample>
 
 ## Respuestas de Error
 

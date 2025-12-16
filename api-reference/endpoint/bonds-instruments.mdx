@@ -44,11 +44,96 @@ Valores válidos para <code>sub_asset_class</code>:
   Cursor de paginación para obtener la siguiente página.
 </ParamField>
 
-## Ejemplo
+## Ejemplo de Solicitud
 
-```bash
+<RequestExample>
+```bash cURL
 curl -X GET "https://api.doctacapital.com.ar/api/v1/bonds/instruments/?limit=50" \
   -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
 ```
+</RequestExample>
+
+## Respuesta Exitosa
+
+<ResponseField name="data" type="array">
+  Lista de instrumentos de bonos.
+</ResponseField>
+
+<ResponseField name="data[].symbol" type="string">
+  Símbolo del bono (ej., "AL30").
+</ResponseField>
+
+<ResponseField name="data[].name" type="string">
+  Nombre completo del bono.
+</ResponseField>
+
+<ResponseField name="data[].sub_asset_class" type="string">
+  Subclase de activo del bono.
+</ResponseField>
+
+<ResponseField name="data[].currency" type="string">
+  Moneda del bono (ej., "USD", "ARS").
+</ResponseField>
+
+<ResponseField name="data[].maturity_date" type="string">
+  Fecha de vencimiento en formato YYYY-MM-DD.
+</ResponseField>
+
+<ResponseField name="data[].issue_date" type="string">
+  Fecha de emisión en formato YYYY-MM-DD.
+</ResponseField>
+
+<ResponseField name="pagination" type="object">
+  Información de paginación.
+</ResponseField>
+
+<ResponseField name="pagination.next_cursor" type="string | null">
+  Cursor para obtener la siguiente página. Es null si no hay más páginas.
+</ResponseField>
+
+<ResponseField name="pagination.has_more" type="boolean">
+  Indica si hay más páginas disponibles.
+</ResponseField>
+
+<ResponseField name="filters" type="object">
+  Filtros aplicados en la solicitud.
+</ResponseField>
+
+<ResponseField name="metadata" type="object">
+  Metadatos de la respuesta.
+</ResponseField>
+
+<ResponseField name="metadata.total_records" type="integer">
+  Número total de registros disponibles.
+</ResponseField>
+
+## Ejemplo de Respuesta Exitosa
+
+<ResponseExample>
+```json Success
+{
+  "data": [
+    {
+      "symbol": "AL30",
+      "name": "BONO AL30",
+      "sub_asset_class": "HARD_DOLLAR",
+      "currency": "USD",
+      "maturity_date": "2030-07-09",
+      "issue_date": "2020-09-04"
+    }
+  ],
+  "pagination": {
+    "next_cursor": "eyJvZmZzZXQiOjUwfQ==",
+    "has_more": true
+  },
+  "filters": {
+    "sub_asset_class": null
+  },
+  "metadata": {
+    "total_records": 150
+  }
+}
+```
+</ResponseExample>
 
 

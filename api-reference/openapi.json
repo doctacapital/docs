@@ -19,6 +19,58 @@
     }
   ],
   "paths": {
+    "/api/v1/auth/token": {
+      "post": {
+        "description": "Obtener un token de acceso usando credenciales de cliente para la autenticación de la API",
+        "tags": [
+          "Autenticación"
+        ],
+        "security": [],
+        "requestBody": {
+          "description": "Credenciales de cliente para autenticación",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AuthRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Token de acceso obtenido exitosamente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Credenciales de cliente inválidas",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Solicitud incorrecta - parámetros inválidos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/bonds/analytics/{symbol}/cashflow": {
       "get": {
         "description": "Obtener el flujo de caja de un bono específico, incluyendo todos los pagos de capital e intereses",
@@ -702,6 +754,62 @@
   },
   "components": {
     "schemas": {
+      "AuthRequest": {
+        "required": [
+          "grant_type",
+          "client_id",
+          "client_secret"
+        ],
+        "type": "object",
+        "properties": {
+          "grant_type": {
+            "description": "El tipo de concesión OAuth 2.0. Debe establecerse en client_credentials",
+            "type": "string",
+            "default": "client_credentials",
+            "enum": [
+              "client_credentials"
+            ]
+          },
+          "client_id": {
+            "description": "Tu identificador de cliente proporcionado por Docta",
+            "type": "string"
+          },
+          "client_secret": {
+            "description": "Tu secreto de cliente proporcionado por Docta",
+            "type": "string"
+          }
+        }
+      },
+      "AuthResponse": {
+        "required": [
+          "access_token",
+          "token_type",
+          "expires_in",
+          "scope"
+        ],
+        "type": "object",
+        "properties": {
+          "access_token": {
+            "description": "El token de acceso a ser usado para solicitudes posteriores de la API",
+            "type": "string"
+          },
+          "token_type": {
+            "description": "El tipo de token. Será Bearer",
+            "type": "string",
+            "enum": [
+              "Bearer"
+            ]
+          },
+          "expires_in": {
+            "description": "El número de segundos hasta que el token expire",
+            "type": "integer"
+          },
+          "scope": {
+            "description": "El alcance de acceso otorgado por este token",
+            "type": "string"
+          }
+        }
+      },
       "CashflowResponse": {
         "type": "object",
         "properties": {

@@ -1,0 +1,105 @@
+---
+title: 'Obtener Token de Acceso'
+openapi: 'POST /api/v1/auth/token'
+---
+
+<Note>
+  Este endpoint se utiliza para obtener un token de acceso usando credenciales de cliente para la autenticación de la API.
+</Note>
+
+## Cuerpo de la Solicitud
+
+El cuerpo de la solicitud debe contener los siguientes campos requeridos:
+
+<ParamField body="grant_type" type="string" required>
+  El tipo de concesión OAuth 2.0. Debe establecerse en `client_credentials`.
+</ParamField>
+
+<ParamField body="client_id" type="string" required>
+  Tu identificador de cliente proporcionado por Docta.
+</ParamField>
+
+<ParamField body="client_secret" type="string" required>
+  Tu secreto de cliente proporcionado por Docta.
+</ParamField>
+
+## Ejemplo de Solicitud
+
+```bash
+curl -X POST https://api.doctacapital.com.ar/api/v1/auth/token/ \
+  -H "Content-Type: application/json" \
+  -d '{
+    "grant_type": "client_credentials",
+    "client_id": "your-client-id",
+    "client_secret": "your-client-secret",
+    "scope": "bonds:read cedears:read stocks:read"
+  }'
+```
+
+## Respuesta Exitosa
+
+<ResponseField name="access_token" type="string">
+  El token de acceso a ser usado para solicitudes posteriores de la API.
+</ResponseField>
+
+<ResponseField name="token_type" type="string">
+  El tipo de token. Será `Bearer`.
+</ResponseField>
+
+<ResponseField name="expires_in" type="integer">
+  El número de segundos hasta que el token expire.
+</ResponseField>
+
+<ResponseField name="scope" type="string">
+  El alcance de acceso otorgado por este token.
+</ResponseField>
+
+<ResponseField name="plan" type="string">
+  El plan asociado al token. Puede ser `basic`, `professional` o `enterprise`.
+</ResponseField>
+
+## Ejemplo de Respuesta Exitosa
+
+```json
+{
+    "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJwcm9kLWJhc3Rpb24tMDAxIiwiY2xpZW50X2lkIjoicHJvZC1iYXN0aW9uLTAwMSIsInNjb3BlcyI6WyJtYXJrZXRfZGF0YTpyZWFkIl0sInBsYW4iOiJlbnRlcnByaXNlIiwidG9rZW5fdHlwZSI6ImJlYXJlciIsImV4cCI6MTc1NzQ1Njg5OSwiaWF0IjoxNzU3NDUzMjk5fQ.zbvaoJLRwXFgW0aYG3DiZQM3p_4BZ3SNWj1mZEtN9wU",
+    "token_type": "bearer",
+    "expires_in": 3600,
+    "scope": "bonds:read cedears:read stocks:read",
+    "plan": "enterprise"
+}
+```
+
+## Respuesta de Error
+
+<ResponseField name="type" type="string">
+  El identificador del tipo de error.
+</ResponseField>
+
+<ResponseField name="title" type="string">
+  Una breve descripción del error.
+</ResponseField>
+
+<ResponseField name="status" type="integer">
+  El código de estado HTTP.
+</ResponseField>
+
+<ResponseField name="detail" type="string">
+  Una descripción detallada del error.
+</ResponseField>
+
+<ResponseField name="correlation_id" type="string">
+  Un identificador único para rastrear esta solicitud de error.
+</ResponseField>
+
+## Ejemplo de Respuesta de Error
+
+```json
+{
+  "type": "/errors/authentication-required",
+  "title": "Invalid client credentials",
+  "status": 401,
+  "detail": "Invalid client credentials",
+  "correlation_id": "2eb07802-94de-468a-b70f-75a49f3e9516"
+}
+```

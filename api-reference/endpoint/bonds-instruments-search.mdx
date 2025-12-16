@@ -10,7 +10,7 @@ openapi: 'GET /api/v1/bonds/instruments/search'
 ## Parámetros de consulta
 
 <ParamField query="query" type="string" required>
-  Texto de búsqueda (ticker o nombre).
+  Ticker del bono (ej., "AL30").
 </ParamField>
 
 <ParamField query="limit" type="integer">
@@ -21,11 +21,78 @@ openapi: 'GET /api/v1/bonds/instruments/search'
   Cursor de paginación.
 </ParamField>
 
-## Ejemplo
+## Ejemplo de Solicitud
 
-```bash
+<RequestExample>
+```bash cURL
 curl -X GET "https://api.doctacapital.com.ar/api/v1/bonds/instruments/search/?query=AL30&limit=10" \
   -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
 ```
+</RequestExample>
+
+## Respuesta Exitosa
+
+<ResponseField name="data" type="array">
+  Lista de instrumentos encontrados.
+</ResponseField>
+
+<ResponseField name="data[].ticker" type="string">
+  Ticker del bono (ej., "AL30").
+</ResponseField>
+
+<ResponseField name="data[].asset_class" type="string">
+  Clase de activo del bono.
+</ResponseField>
+
+<ResponseField name="data[].sub_asset_class" type="string">
+  Subclase de activo del bono.
+</ResponseField>
+
+<ResponseField name="query" type="string">
+  Consulta de búsqueda utilizada.
+</ResponseField>
+
+<ResponseField name="pagination" type="object">
+  Información de paginación.
+</ResponseField>
+
+<ResponseField name="pagination.next_cursor" type="string | null">
+  Cursor para obtener la siguiente página. Es null si no hay más páginas.
+</ResponseField>
+
+<ResponseField name="pagination.has_more" type="boolean">
+  Indica si hay más páginas disponibles.
+</ResponseField>
+
+<ResponseField name="metadata" type="object">
+  Metadatos de la respuesta.
+</ResponseField>
+
+<ResponseField name="metadata.total_records" type="integer">
+  Número total de registros encontrados.
+</ResponseField>
+
+## Ejemplo de Respuesta Exitosa
+
+<ResponseExample>
+```json Success
+{
+  "data": [
+    {
+      "ticker": "AL30",
+      "asset_class": "BONO AL30",
+      "sub_asset_class": "HARD_DOLLAR",
+    }
+  ],
+  "pagination": {
+    "next_cursor": null,
+    "has_more": false
+  },
+  "metadata": {
+    "total_records": 1
+  }
+}
+```
+</ResponseExample>
 
 

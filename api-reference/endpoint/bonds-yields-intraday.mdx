@@ -13,11 +13,73 @@ openapi: 'GET /api/v1/bonds/yields/{symbol}/intraday'
   Ticker del bono (ej., "AL30").
  </ParamField>
 
-## Ejemplo
+## Ejemplo de Solicitud
 
-```bash
+<RequestExample>
+```bash cURL
 curl -X GET "https://api.doctacapital.com.ar/api/v1/bonds/yields/AL30/intraday" \
   -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
 ```
+</RequestExample>
+
+## Respuesta Exitosa
+
+<ResponseField name="ticker" type="string">
+  Ticker del bono solicitado (ej., "AL30").
+</ResponseField>
+
+<ResponseField name="data" type="array">
+  Serie de datos intradiarios de rendimiento.
+</ResponseField>
+
+<ResponseField name="data[].timestamp" type="string">
+  Marca de tiempo del dato en formato ISO 8601.
+</ResponseField>
+
+<ResponseField name="data[].tir" type="number">
+  Tasa Interna de Retorno (TIR) expresada como decimal.
+</ResponseField>
+
+<ResponseField name="data[].tna" type="number">
+  Tasa Nominal Anual (TNA) expresada como decimal.
+</ResponseField>
+
+<ResponseField name="data[].tea" type="number">
+  Tasa Efectiva Anual (TEA) expresada como decimal.
+</ResponseField>
+
+<ResponseField name="data[].tem" type="number">
+  Tasa Efectiva Mensual (TEM) expresada como decimal.
+</ResponseField>
+
+<ResponseField name="metadata" type="object">
+  Metadatos de la respuesta.
+</ResponseField>
+
+<ResponseField name="metadata.total_records" type="integer">
+  Número total de registros intradiarios disponibles.
+</ResponseField>
+
+## Ejemplo de Respuesta Exitosa
+
+<ResponseExample>
+```json Success
+{
+  "ticker": "AL30",
+  "data": [
+    {
+      "timestamp": "2025-01-15T10:30:00Z",
+      "tir": 0.107148,
+      "tna": 0.136547,
+      "tea": 0.107148,
+      "tem": 0.008518
+    }
+  ],
+  "metadata": {
+    "total_records": 1
+  }
+}
+```
+</ResponseExample>
 
 
