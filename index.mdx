@@ -6,6 +6,57 @@ description: "Explora la API de Bonos de Docta: catálogo de bonos, detalle, flu
 
 La API de Bonos de Docta se centra exclusivamente en bonos de argentina: instrumentos, detalles completos, cashflows proyectados y curvas/yields intradiarios e históricos.
 
+## Planes
+
+<CardGroup cols={2}>
+  <Card
+    title="Basic (Gratuito)"
+    icon="leaf"
+    href="https://www.doctacapital.com.ar/dashboard/account/api"
+  >
+    - **RPM**: 10
+    - **Límite diario**: 10 requests por día
+  </Card>
+  <Card
+    title="Pro"
+    icon="rocket"
+    href="https://www.doctacapital.com.ar/contacto"
+  >
+    - **RPM**: 120
+    - **Límite diario**: requests ilimitadas
+  </Card>
+</CardGroup>
+
+<Note>
+RPM significa **requests por minuto**.
+</Note>
+
+## Credenciales (API key)
+
+Generás tus credenciales creando una cuenta en [doctacapital.com.ar](https://www.doctacapital.com.ar).
+
+<Steps>
+  <Step title="Creá tu cuenta">
+    Registrate e iniciá sesión en [doctacapital.com.ar](https://www.doctacapital.com.ar).
+  </Step>
+  <Step title="Generá tu API key">
+    En tu perfil, buscá la sección de [API](https://www.doctacapital.com.ar/dashboard/account/api) y genera tus **credenciales**.
+
+    <Warning>
+    Tratá tu client_secret como un secreto. No la publiques en repositorios ni la incluyas en el frontend.
+    </Warning>
+  </Step>
+  <Step title="Usá la API key en tus requests">
+    <Card
+      title="Ver autenticación"
+      icon="key"
+      href="/api-reference/endpoint/auth-token"
+    >
+      Formato de credenciales, headers y ejemplos.
+    </Card>
+  </Step>
+</Steps>
+
 <Columns cols={2}>
   <Card
     title="Listado de bonos"
