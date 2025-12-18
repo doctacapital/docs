@@ -76,6 +76,7 @@
   },
   "seo": {
     "metatags": {
+      "canonical": "https://docs.doctacapital.com.ar",
       "charset": "UTF-8",
       "viewport": "width=device-width, initial-scale=1.0",
       "description": "Documentación de la API de Bonos de Docta - Catálogo de bonos, cashflows y curvas de rendimiento en Argentina.",
