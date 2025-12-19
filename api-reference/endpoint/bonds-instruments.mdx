@@ -59,44 +59,44 @@ curl -X GET "https://api.doctacapital.com.ar/api/v1/bonds/instruments/?limit=50"
   Lista de instrumentos de bonos.
 </ResponseField>
 
-<ResponseField name="data[].symbol" type="string">
-  Símbolo del bono (ej., "AL30").
+<ResponseField name="data[].ticker" type="string">
+  Ticker del bono (ej., "S30N6").
 </ResponseField>
 
-<ResponseField name="data[].name" type="string">
-  Nombre completo del bono.
+<ResponseField name="data[].asset_class" type="string">
+  Clase de activo del bono (ej., "BOND").
 </ResponseField>
 
 <ResponseField name="data[].sub_asset_class" type="string">
-  Subclase de activo del bono.
-</ResponseField>
-
-<ResponseField name="data[].currency" type="string">
-  Moneda del bono (ej., "USD", "ARS").
-</ResponseField>
-
-<ResponseField name="data[].maturity_date" type="string">
-  Fecha de vencimiento en formato YYYY-MM-DD.
-</ResponseField>
-
-<ResponseField name="data[].issue_date" type="string">
-  Fecha de emisión en formato YYYY-MM-DD.
+  Subclase de activo del bono (ej., "FIXED_RATE").
 </ResponseField>
 
 <ResponseField name="pagination" type="object">
   Información de paginación.
 </ResponseField>
 
+<ResponseField name="pagination.limit" type="integer">
+  Límite de elementos por página.
+</ResponseField>
+
+<ResponseField name="pagination.has_next" type="boolean">
+  Indica si hay más páginas disponibles.
+</ResponseField>
+
 <ResponseField name="pagination.next_cursor" type="string | null">
   Cursor para obtener la siguiente página. Es null si no hay más páginas.
 </ResponseField>
 
-<ResponseField name="pagination.has_more" type="boolean">
-  Indica si hay más páginas disponibles.
+<ResponseField name="pagination.total_items" type="integer">
+  Número total de elementos disponibles.
 </ResponseField>
 
 <ResponseField name="filters" type="object">
   Filtros aplicados en la solicitud.
+</ResponseField>
+
+<ResponseField name="filters.sub_asset_class" type="string">
+  Subclase de activo utilizada como filtro.
 </ResponseField>
 
 <ResponseField name="metadata" type="object">
@@ -114,23 +114,32 @@ curl -X GET "https://api.doctacapital.com.ar/api/v1/bonds/instruments/?limit=50"
 {
   "data": [
     {
-      "symbol": "AL30",
-      "name": "BONO AL30",
-      "sub_asset_class": "HARD_DOLLAR",
-      "currency": "USD",
-      "maturity_date": "2030-07-09",
-      "issue_date": "2020-09-04"
+      "ticker": "S30N6",
+      "asset_class": "BOND",
+      "sub_asset_class": "FIXED_RATE"
+    },
+    {
+      "ticker": "S16E6",
+      "asset_class": "BOND",
+      "sub_asset_class": "FIXED_RATE"
+    },
+    {
+      "ticker": "S30O6",
+      "asset_class": "BOND",
+      "sub_asset_class": "FIXED_RATE"
     }
   ],
   "pagination": {
-    "next_cursor": "eyJvZmZzZXQiOjUwfQ==",
-    "has_more": true
+    "limit": 50,
+    "has_next": false,
+    "next_cursor": null,
+    "total_items": 20
   },
   "filters": {
-    "sub_asset_class": null
+    "sub_asset_class": "FIXED_RATE"
   },
   "metadata": {
-    "total_records": 150
+    "total_records": 20
   }
 }
 ```

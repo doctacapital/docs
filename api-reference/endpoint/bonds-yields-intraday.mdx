@@ -32,10 +32,6 @@ curl -X GET "https://api.doctacapital.com.ar/api/v1/bonds/yields/AL30/intraday" 
   Serie de datos intradiarios de rendimiento.
 </ResponseField>
 
-<ResponseField name="data[].timestamp" type="string">
-  Marca de tiempo del dato en formato ISO 8601.
-</ResponseField>
-
 <ResponseField name="data[].tir" type="number">
   Tasa Interna de Retorno (TIR) expresada como decimal.
 </ResponseField>
@@ -44,12 +40,24 @@ curl -X GET "https://api.doctacapital.com.ar/api/v1/bonds/yields/AL30/intraday" 
   Tasa Nominal Anual (TNA) expresada como decimal.
 </ResponseField>
 
-<ResponseField name="data[].tea" type="number">
-  Tasa Efectiva Anual (TEA) expresada como decimal.
+<ResponseField name="data[].tna_30_360" type="number">
+  Tasa Nominal Anual calculada con base 30/360 expresada como decimal.
 </ResponseField>
 
 <ResponseField name="data[].tem" type="number">
   Tasa Efectiva Mensual (TEM) expresada como decimal.
+</ResponseField>
+
+<ResponseField name="data[].duration" type="number">
+  Duración del bono en años.
+</ResponseField>
+
+<ResponseField name="data[].dtm" type="integer">
+  Días hasta el vencimiento (Days to Maturity).
+</ResponseField>
+
+<ResponseField name="data[].margen" type="number | null">
+  Margen del bono. Puede ser null.
 </ResponseField>
 
 <ResponseField name="metadata" type="object">
@@ -60,6 +68,10 @@ curl -X GET "https://api.doctacapital.com.ar/api/v1/bonds/yields/AL30/intraday" 
   Número total de registros intradiarios disponibles.
 </ResponseField>
 
+<ResponseField name="metadata.sub_asset_class" type="string">
+  Subclase de activo del bono (ej., "HARD_DOLLAR").
+</ResponseField>
+
 ## Ejemplo de Respuesta Exitosa
 
 <ResponseExample>
@@ -68,15 +80,18 @@ curl -X GET "https://api.doctacapital.com.ar/api/v1/bonds/yields/AL30/intraday" 
   "ticker": "AL30",
   "data": [
     {
-      "timestamp": "2025-01-15T10:30:00Z",
-      "tir": 0.107148,
-      "tna": 0.136547,
-      "tea": 0.107148,
-      "tem": 0.008518
+      "tir": 0.09887070513854544,
+      "tna": 0.1177734104315629,
+      "tna_30_360": 0.09465437970685375,
+      "tem": 0.007887864975571146,
+      "duration": 2.107751399163522,
+      "dtm": 1663,
+      "margen": null
     }
   ],
   "metadata": {
-    "total_records": 1
+    "total_records": 1,
+    "sub_asset_class": "HARD_DOLLAR"
   }
 }
 ```

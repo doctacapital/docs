@@ -28,44 +28,32 @@ curl -X GET "https://api.doctacapital.com.ar/api/v1/bonds/instruments/AL30/" \
   Lista con el detalle del instrumento solicitado.
 </ResponseField>
 
-<ResponseField name="data[].symbol" type="string">
-  Símbolo del bono (ej., "AL30").
+<ResponseField name="data[].ticker" type="string">
+  Ticker del bono (ej., "GD30").
 </ResponseField>
 
 <ResponseField name="data[].name" type="string">
   Nombre completo del bono.
 </ResponseField>
 
+<ResponseField name="data[].asset_class" type="string">
+  Clase de activo del bono (ej., "BOND").
+</ResponseField>
+
 <ResponseField name="data[].sub_asset_class" type="string">
-  Subclase de activo del bono.
+  Subclase de activo del bono (ej., "HARD_DOLLAR").
 </ResponseField>
 
-<ResponseField name="data[].currency" type="string">
-  Moneda del bono (ej., "USD", "ARS").
+<ResponseField name="data[].sector" type="string | null">
+  Sector del bono. Puede ser null.
 </ResponseField>
 
-<ResponseField name="data[].maturity_date" type="string">
-  Fecha de vencimiento en formato YYYY-MM-DD.
+<ResponseField name="data[].issuer" type="string | null">
+  Emisor del bono. Puede ser null.
 </ResponseField>
 
-<ResponseField name="data[].issue_date" type="string">
-  Fecha de emisión en formato YYYY-MM-DD.
-</ResponseField>
-
-<ResponseField name="data[].coupon_rate" type="number">
-  Tasa de cupón del bono (expresada como decimal).
-</ResponseField>
-
-<ResponseField name="data[].payment_frequency" type="string">
-  Frecuencia de pago del cupón (ej., "SEMIANNUAL", "QUARTERLY").
-</ResponseField>
-
-<ResponseField name="pagination" type="object">
-  Información de paginación.
-</ResponseField>
-
-<ResponseField name="filters" type="object">
-  Filtros aplicados en la solicitud.
+<ResponseField name="data[].law" type="string | null">
+  Ley aplicable al bono. Puede ser null.
 </ResponseField>
 
 <ResponseField name="metadata" type="object">
@@ -79,23 +67,15 @@ curl -X GET "https://api.doctacapital.com.ar/api/v1/bonds/instruments/AL30/" \
 {
   "data": [
     {
-      "symbol": "AL30",
-      "name": "BONO AL30",
+      "ticker": "GD30",
+      "name": "Soberano HD 2030 U$S 1.75% (GD30)",
+      "asset_class": "BOND",
       "sub_asset_class": "HARD_DOLLAR",
-      "currency": "USD",
-      "maturity_date": "2030-07-09",
-      "issue_date": "2020-09-04",
-      "coupon_rate": 0.75,
-      "payment_frequency": "SEMIANNUAL"
+      "sector": null,
+      "issuer": null,
+      "law": null
     }
   ],
-  "pagination": {
-    "next_cursor": null,
-    "has_more": false
-  },
-  "filters": {
-    "symbol": "AL30"
-  },
   "metadata": {
     "total_records": 1
   }
