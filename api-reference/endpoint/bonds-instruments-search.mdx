@@ -60,7 +60,7 @@ curl -X GET "https://api.doctacapital.com.ar/api/v1/bonds/instruments/search/?qu
   Cursor para obtener la siguiente página. Es null si no hay más páginas.
 </ResponseField>
 
-<ResponseField name="pagination.has_more" type="boolean">
+<ResponseField name="pagination.has_next" type="boolean">
   Indica si hay más páginas disponibles.
 </ResponseField>
 
@@ -86,7 +86,7 @@ curl -X GET "https://api.doctacapital.com.ar/api/v1/bonds/instruments/search/?qu
   ],
   "pagination": {
     "next_cursor": null,
-    "has_more": false
+    "has_next": false
   },
   "metadata": {
     "total_records": 1
