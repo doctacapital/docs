@@ -942,10 +942,6 @@
             "format": "date",
             "description": "Fecha de liquidación en formato YYYY-MM-DD"
           },
-          "price_variation": {
-            "type": "number",
-            "description": "Variación del precio respecto al valor técnico"
-          },
           "parity_price": {
             "type": "number",
             "description": "Precio de paridad del bono"
@@ -991,7 +987,6 @@
           "accured_interest",
           "days_to_maturity",
           "settlment_date",
-          "price_variation",
           "parity_price",
           "tir",
           "tea",

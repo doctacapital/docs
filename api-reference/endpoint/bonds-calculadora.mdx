@@ -76,10 +76,6 @@ curl -X POST "https://api.doctacapital.com.ar/api/v1/analytics/bonds/pricer" \
   Fecha de liquidación en formato YYYY-MM-DD.
 </ResponseField>
 
-<ResponseField name="price_variation" type="number">
-  Variación del precio respecto al precio dirty del ultimo dia.
-</ResponseField>
-
 <ResponseField name="parity_price" type="number">
   Paridad del bono.
 </ResponseField>
@@ -128,7 +124,6 @@ curl -X POST "https://api.doctacapital.com.ar/api/v1/analytics/bonds/pricer" \
   "accured_interest": 0.2153424657534247,
   "days_to_maturity": 1692,
   "settlment_date": "2025-11-20",
-  "price_variation": -0.0030674846625767306,
   "parity_price": 0.810318799396146,
   "tir": 0.11069396742091445,
   "tea": 0.11069396742091445,
