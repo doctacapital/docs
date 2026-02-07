@@ -2,6 +2,7 @@
 title: "API de Bonos de Docta"
 description: "Explora la API de Bonos de Docta: catálogo de bonos, detalle, flujos de fondos y curvas de rendimiento en tiempo real."
 ---
+
 ## Resumen de la API de Bonos
 
 La API de Bonos de Docta se centra exclusivamente en bonos de argentina: instrumentos, detalles completos, cashflows proyectados y curvas/yields intradiarios e históricos.
@@ -13,24 +14,27 @@ Todos los datos intradiarios tienen un delay de ~20 minutos.
   <Card
     title="Basic (Gratuito)"
     icon="leaf"
-    href="https://www.doctacapital.com.ar/dashboard/account/api"
+    href="https://www.doctacapital.com.ar/pricing#api"
   >
-    - **RPM**: 10
-    - **Límite diario**: 15 requests por día
+    - **RPM**: 10 - **Límite diario**: 15 requests por día
+  </Card>
+  <Card
+    title="Intermedio"
+    icon="bolt"
+    href="https://www.doctacapital.com.ar/pricing#api"
+  >
+    - **RPM**: 60 - **Límite diario**: 100 requests por día
   </Card>
   <Card
     title="Pro"
     icon="rocket"
-    href="https://www.doctacapital.com.ar/contacto"
+    href="https://www.doctacapital.com.ar/pricing#api"
   >
-    - **RPM**: 120
-    - **Límite diario**: requests ilimitadas
+    - **RPM**: 120 - **Límite diario**: requests ilimitadas
   </Card>
 </CardGroup>
 
-<Note>
-RPM significa **requests por minuto**.
-</Note>
+<Note>RPM significa **requests por minuto**.</Note>
 
 ## Credenciales (API key)
 
@@ -46,6 +50,7 @@ Generás tus credenciales creando una cuenta en [doctacapital.com.ar](https://ww
     <Warning>
     Tratá tu client_secret como un secreto. No la publiques en repositorios ni la incluyas en el frontend.
     </Warning>
+
   </Step>
   <Step title="Usá la API key en tus requests">
     <Card
@@ -78,13 +83,15 @@ Generás tus credenciales creando una cuenta en [doctacapital.com.ar](https://ww
     icon="chart-line"
     href="/api-reference/endpoint/bonds-yields-intraday"
   >
-    Consulta yields intradiarios y curvas históricas para seguimiento de mercado.
+    Consulta yields intradiarios y curvas históricas para seguimiento de
+    mercado.
   </Card>
   <Card
     title="Calculadora de precios"
     icon="calculator"
     href="/api-reference/endpoint/bonds-calculadora"
   >
-    Calcula métricas de pricing y análisis de un bono específico basado en parámetros de precio objetivo.
+    Calcula métricas de pricing y análisis de un bono específico basado en
+    parámetros de precio objetivo.
   </Card>
 </Columns>
