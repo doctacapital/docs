@@ -230,10 +230,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/ResidualValueDataPoint"
-                  }
+                  "$ref": "#/components/schemas/ResidualValueResponse"
                 }
               }
             }
@@ -1124,6 +1121,13 @@
           "duration",
           "badlar_last5"
         ]
+      },
+      "ResidualValueResponse": {
+        "type": "array",
+        "description": "Serie de valores residuales históricos",
+        "items": {
+          "$ref": "#/components/schemas/ResidualValueDataPoint"
+        }
       },
       "ResidualValueDataPoint": {
         "type": "object",
