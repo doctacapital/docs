@@ -211,14 +211,15 @@
           {
             "name": "settlement_entry",
             "in": "query",
-            "description": "Plazo de liquidación: CI (contado inmediato), 24hs o 48hs",
+            "description": "Plazo de liquidación: CI (contado inmediato), 24hs, 48hs o 72hs",
             "required": true,
             "schema": {
               "type": "string",
               "enum": [
                 "CI",
                 "24hs",
-                "48hs"
+                "48hs",
+                "72hs"
               ]
             },
             "example": "24hs"
