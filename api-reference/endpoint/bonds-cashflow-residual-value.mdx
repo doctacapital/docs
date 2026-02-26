@@ -1,0 +1,154 @@
+---
+title: 'Valor Residual Histórico'
+openapi: 'GET /api/v1/bonds/analytics/{symbol}/cashflows/residual-value'
+---
+
+<Note>
+  Este endpoint obtiene la serie histórica de valor residual de un bono específico, filtrada por rango de fechas y plazo de liquidación.
+</Note>
+
+## Parámetros de Ruta
+
+<ParamField path="symbol" type="string" required default="AL30">
+  El símbolo del bono (ej., "AL30", "GD30").
+</ParamField>
+
+## Parámetros de Consulta
+
+<ParamField query="from_date" type="string" required>
+  Fecha de inicio del rango en formato YYYY-MM-DD.
+</ParamField>
+
+<ParamField query="to_date" type="string" required>
+  Fecha de fin del rango en formato YYYY-MM-DD.
+</ParamField>
+
+<ParamField query="settlement_entry" type="string" required>
+  Plazo de liquidación. Valores posibles: `CI` (contado inmediato), `24hs` (24 horas), `48hs` (48 horas).
+</ParamField>
+
+## Ejemplo de Solicitud
+
+<RequestExample>
+```bash cURL
+curl -X GET "https://api.doctacapital.com.ar/api/v1/bonds/analytics/AL30/cashflows/residual-value?from_date=2025-01-01&to_date=2025-01-10&settlement_entry=24hs" \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
+```
+</RequestExample>
+
+## Respuesta Exitosa
+
+La respuesta es un array de objetos con los valores residuales para cada día hábil del rango solicitado.
+
+<ResponseField name="[].operation_date" type="string">
+  Fecha de operación en formato YYYY-MM-DD.
+</ResponseField>
+
+<ResponseField name="[].settlement_entry" type="string">
+  Plazo de liquidación utilizado (ej., "24hs").
+</ResponseField>
+
+<ResponseField name="[].settlement_date" type="string">
+  Fecha de liquidación correspondiente en formato YYYY-MM-DD.
+</ResponseField>
+
+<ResponseField name="[].residual_value" type="number">
+  Valor residual del bono en la fecha de liquidación.
+</ResponseField>
+
+## Ejemplo de Respuesta Exitosa
+
+<ResponseExample>
+```json Success
+[
+  {
+    "operation_date": "2025-01-02",
+    "settlement_entry": "24hs",
+    "settlement_date": "2025-01-03",
+    "residual_value": 96.0
+  },
+  {
+    "operation_date": "2025-01-03",
+    "settlement_entry": "24hs",
+    "settlement_date": "2025-01-06",
+    "residual_value": 96.0
+  },
+  {
+    "operation_date": "2025-01-06",
+    "settlement_entry": "24hs",
+    "settlement_date": "2025-01-07",
+    "residual_value": 96.0
+  },
+  {
+    "operation_date": "2025-01-07",
+    "settlement_entry": "24hs",
+    "settlement_date": "2025-01-08",
+    "residual_value": 96.0
+  },
+  {
+    "operation_date": "2025-01-08",
+    "settlement_entry": "24hs",
+    "settlement_date": "2025-01-09",
+    "residual_value": 96.0
+  },
+  {
+    "operation_date": "2025-01-09",
+    "settlement_entry": "24hs",
+    "settlement_date": "2025-01-10",
+    "residual_value": 88.0
+  },
+  {
+    "operation_date": "2025-01-10",
+    "settlement_entry": "24hs",
+    "settlement_date": "2025-01-13",
+    "residual_value": 88.0
+  }
+]
+```
+</ResponseExample>
+
+## Respuestas de Error
+
+### 500 Error Interno del Servidor
+Error interno del servidor.
+
+```json
+{
+  "type": "/errors/internal-server-error",
+  "title": "Internal server error",
+  "status": 500,
+  "detail": "Internal server error",
+  "correlation_id": "6cd1fd05-63e9-4863-832f-d873e58e9d67"
+}
+```
+
+### 401 No Autorizado
+Token de acceso inválido o faltante.
+
+```json
+{
+  "type": "/errors/authentication-required",
+  "title": "Authorization header missing",
+  "status": 401,
+  "detail": "Authorization header missing",
+  "correlation_id": "d6e20e07-0580-4e2d-9480-00a68c1ae493"
+}
+```
+
+### 404 No Encontrado
+Ticker no encontrado.
+
+```json
+{
+  "type": "/errors/not-found",
+  "title": "Resource not found",
+  "status": 404,
+  "detail": "Ticker not found"
+}
+```
+
+## Notas
+
+- Los datos están disponibles solo para días hábiles (excluyendo fines de semana y feriados)
+- El valor residual refleja el capital remanente del bono luego de cada amortización
+- La fecha de liquidación (`settlement_date`) se calcula automáticamente según el plazo de liquidación y el calendario de días hábiles

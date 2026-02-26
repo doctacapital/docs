@@ -164,6 +164,133 @@
         }
       }
     },
+    "/api/v1/bonds/analytics/{symbol}/cashflows/residual-value": {
+      "get": {
+        "description": "Obtener la serie histórica de valor residual de un bono específico, filtrada por rango de fechas y plazo de liquidación",
+        "tags": [
+          "Bonds"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "symbol",
+            "in": "path",
+            "description": "El símbolo del bono",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "AL30"
+          },
+          {
+            "name": "from_date",
+            "in": "query",
+            "description": "Fecha de inicio del rango (YYYY-MM-DD)",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            },
+            "example": "2025-01-01"
+          },
+          {
+            "name": "to_date",
+            "in": "query",
+            "description": "Fecha de fin del rango (YYYY-MM-DD)",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            },
+            "example": "2025-01-10"
+          },
+          {
+            "name": "settlement_entry",
+            "in": "query",
+            "description": "Plazo de liquidación: CI (contado inmediato), 24hs o 48hs",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "CI",
+                "24hs",
+                "48hs"
+              ]
+            },
+            "example": "24hs"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Serie de valores residuales obtenida exitosamente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ResidualValueDataPoint"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "No autorizado - token de acceso inválido o faltante",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "type": "/errors/authentication-required",
+                  "title": "Authorization header missing",
+                  "status": 401,
+                  "detail": "Authorization header missing",
+                  "correlation_id": "d6e20e07-0580-4e2d-9480-00a68c1ae493"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Ticker no encontrado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "type": "/errors/not-found",
+                  "title": "Resource not found",
+                  "status": 404,
+                  "detail": "Ticker not found"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Error interno del servidor",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "type": "/errors/internal-server-error",
+                  "title": "Internal server error",
+                  "status": 500,
+                  "detail": "Internal server error",
+                  "correlation_id": "6cd1fd05-63e9-4863-832f-d873e58e9d67"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/analytics/bonds/pricer": {
       "post": {
         "security": [
@@ -996,6 +1123,35 @@
           "margen",
           "duration",
           "badlar_last5"
+        ]
+      },
+      "ResidualValueDataPoint": {
+        "type": "object",
+        "properties": {
+          "operation_date": {
+            "type": "string",
+            "format": "date",
+            "description": "Fecha de operación"
+          },
+          "settlement_entry": {
+            "type": "string",
+            "description": "Plazo de liquidación"
+          },
+          "settlement_date": {
+            "type": "string",
+            "format": "date",
+            "description": "Fecha de liquidación"
+          },
+          "residual_value": {
+            "type": "number",
+            "description": "Valor residual del bono"
+          }
+        },
+        "required": [
+          "operation_date",
+          "settlement_entry",
+          "settlement_date",
+          "residual_value"
         ]
       },
       "IntradayYieldsPricesResponse": {
