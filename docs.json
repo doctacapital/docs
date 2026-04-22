@@ -7,6 +7,14 @@
     "light": "#07C983",
     "dark": "#15803D"
   },
+  "fonts": {
+    "heading": {
+      "family": "Merriweather"
+    },
+    "body": {
+      "family": "Merriweather Sans"
+    }
+  },
   "favicon": "/favicon.svg",
   "navigation": {
     "tabs": [
@@ -56,7 +64,7 @@
     "primary": {
       "type": "button",
       "label": "Página principal",
-      "href": "https://doctacapital.com.ar"
+      "href": "https://app.doctacapital.com.ar"
     }
   },
   "contextual": {
