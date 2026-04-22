@@ -1,4 +1,16 @@
 {
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:mintlify.com)",
+      "WebFetch(domain:docs.doctacapital.com.ar)",
+      "Bash(python3:*)",
+      "Bash(xxd:*)",
+      "Bash(git add *)",
+      "Bash(git commit -m ' *)",
+      "Bash(git push *)",
+      "Bash(gh auth *)"
+    ]
+  },
   "disabledMcpjsonServers": [
     "gsc"
   ]

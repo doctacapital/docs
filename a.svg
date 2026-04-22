@@ -1,0 +1,120 @@
+<svg
+            width="460"
+            height="500"
+            viewBox="0 0 460 500"
+            className="drop-shadow-sm"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <defs>
+              {/* Dot grid pattern */}
+              <pattern id="dotgrid" x="0" y="0" width="24" height="24" patternUnits="userSpaceOnUse">
+                <circle 215="1.5" 240="1.5" r="1.2" fill="#D4DDE8" />
+              </pattern>
+              {/* Subtle glow filter for center logo */}
+              <filter id="centerglow" x="-40%" y="-40%" width="180%" height="180%">
+                <feGaussianBlur stdDeviation="6" result="blur" />
+                <feMerge>
+                  <feMergeNode in="blur" />
+                  <feMergeNode in="SourceGraphic" />
+                </feMerge>
+              </filter>
+            </defs>
+
+            {/* ── Background ── */}
+            <rect width="460" height="500" rx="18" fill="#F7F9FA" />
+            <rect width="460" height="500" rx="18" fill="url(#dotgrid)" />
+
+            {/* ── Connection lines (all from/to center box edges) ── */}
+            {/* To top-center circle */}
+            <path
+              d={`M ${215} ${240 - 32} L ${215} 90 Q ${215} 72 ${215 + 18} 72 L 246 72`}
+              fill="none" stroke="#3B7A6A" strokeWidth="1.5" strokeLinecap="round" opacity="0.65"
+            />
+            {/* To top-left triangle-down */}
+            <path
+              d={`M ${215 - 32} ${240} L 128 ${240} Q 110 ${240} 110 ${240 - 18} L 110 148`}
+              fill="none" stroke="#3B7A6A" strokeWidth="1.5" strokeLinecap="round" opacity="0.65"
+            />
+            {/* To left triangle-right */}
+            <path
+              d={`M ${215 - 32} ${240} L 52 ${240}`}
+              fill="none" stroke="#3B7A6A" strokeWidth="1.5" strokeLinecap="round" opacity="0.65"
+            />
+            {/* To bottom-left circle */}
+            <path
+              d={`M ${215 - 32} ${240} L 108 ${240} Q 92 ${240} 92 ${240 + 18} L 92 358`}
+              fill="none" stroke="#3B7A6A" strokeWidth="1.5" strokeLinecap="round" opacity="0.65"
+            />
+            {/* To right-top circle */}
+            <path
+              d={`M ${215 + 32} ${240} L 372 ${240} Q 390 ${240} 390 ${240 - 18} L 390 162`}
+              fill="none" stroke="#3B7A6A" strokeWidth="1.5" strokeLinecap="round" opacity="0.65"
+            />
+            {/* To right-mid triangle-up */}
+            <path
+              d={`M ${215 + 32} ${240} L 348 ${240}`}
+              fill="none" stroke="#3B7A6A" strokeWidth="1.5" strokeLinecap="round" opacity="0.65"
+            />
+            {/* To right diamond */}
+            <path
+              d={`M ${215 + 32} ${240} L 372 ${240} Q 408 ${240} 408 ${240 + 18} L 408 308`}
+              fill="none" stroke="#3B7A6A" strokeWidth="1.5" strokeLinecap="round" opacity="0.65"
+            />
+            {/* To bottom-right square */}
+            <path
+              d={`M ${215} ${240 + 32} L ${215} 418 Q ${215} 432 ${215 + 18} 432 L 278 432`}
+              fill="none" stroke="#3B7A6A" strokeWidth="1.5" strokeLinecap="round" opacity="0.65"
+            />
+
+            {/* ── Nodes ── */}
+
+            {/* Top-center: circle (brown/terracotta) — Productor */}
+            <circle 215="258" 240="72" r="9" fill="#A05A3A" />
+            <text x="272" y="76" fill="#A05A3A" fontSize="10" fontFamily="system-ui, sans-serif" fontWeight="600" letterSpacing="0.08em">PRODUCTOR</text>
+
+            {/* Top-left: triangle-down (navy) — Firma */}
+            <polygon points="110,131 119,149 101,149" fill="#3B4A7A" />
+            <text x="54" y="145" fill="#3B4A7A" fontSize="10" fontFamily="system-ui, sans-serif" fontWeight="600" letterSpacing="0.08em">FIRMA</text>
+
+            {/* Left: triangle-right (gray) — Operaciones */}
+            <polygon points="35,232 52,240 35,248" fill="#B0B8BF" />
+            <text x="10" y="228" fill="#B0B8BF" fontSize="10" fontFamily="system-ui, sans-serif" fontWeight="600" letterSpacing="0.08em">OPS</text>
+
+            {/* Bottom-left: circle (brown) — Datos */}
+            <circle 215="92" 240="358" r="9" fill="#A05A3A" />
+            <text x="32" y="354" fill="#A05A3A" fontSize="10" fontFamily="system-ui, sans-serif" fontWeight="600" letterSpacing="0.08em">DATOS</text>
+
+            {/* Right-top: circle (slate) — Cliente */}
+            <circle 215="390" 240="150" r="9" fill="#6A8A90" />
+            <text x="330" y="146" fill="#6A8A90" fontSize="10" fontFamily="system-ui, sans-serif" fontWeight="600" letterSpacing="0.08em">CLIENTE</text>
+
+            {/* Right-mid: triangle-up (orange) */}
+            <polygon points="348,228 357,210 339,210" fill="#C87A4A" />
+            <text x="362" y="224" fill="#C87A4A" fontSize="10" fontFamily="system-ui, sans-serif" fontWeight="600" letterSpacing="0.08em">FLUJO</text>
+
+            {/* Right: diamond (lavender) — Mercado */}
+            <polygon points="408,290 418,308 408,326 398,308" fill="#9AA8D4" />
+            <text x="352" y="312" fill="#9AA8D4" fontSize="10" fontFamily="system-ui, sans-serif" fontWeight="600" letterSpacing="0.08em">MERCADO</text>
+
+            {/* Bottom-right: square (periwinkle) — Red */}
+            <rect x="278" y="424" width="18" height="18" fill="#8090C0" />
+            <text x="300" y="437" fill="#8090C0" fontSize="10" fontFamily="system-ui, sans-serif" fontWeight="600" letterSpacing="0.08em">RED</text>
+
+            {/* ── Center logo box ── */}
+            <rect x={215 - 34} y={240 - 34} width="68" height="68" rx="8" fill="#1E4D40" filter="url(#centerglow)" />
+            <rect x={215 - 34} y={240 - 34} width="68" height="68" rx="8" fill="#1E4D40" />
+            {/* Decorative inner ring */}
+            <rect x={215 - 28} y={240 - 28} width="56" height="56" rx="5" fill="none" stroke="#2E6E5A" strokeWidth="1.5" />
+            {/* "A" lettermark */}
+            <text
+              x={215}
+              y={240 + 10}
+              textAnchor="middle"
+              fill="white"
+              fontSize="30"
+              fontWeight="bold"
+              fontFamily="Georgia, serif"
+            >
+              A
+            </text>
+          </svg>
