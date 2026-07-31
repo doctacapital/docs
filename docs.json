@@ -25,7 +25,7 @@
             "group": "Introducción",
             "pages": [
               "api-reference/introduction",
-              "mcp"
+              "servidor-mcp"
             ]
           },
           {
@@ -74,7 +74,6 @@
       "view",
       "chatgpt",
       "claude",
-      "mcp",
       "perplexity"
     ]
   },
