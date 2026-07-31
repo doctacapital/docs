@@ -24,7 +24,8 @@
           {
             "group": "Introducción",
             "pages": [
-              "api-reference/introduction"
+              "api-reference/introduction",
+              "mcp"
             ]
           },
           {

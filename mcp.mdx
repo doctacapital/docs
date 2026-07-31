@@ -1,0 +1,77 @@
+---
+title: "Servidor MCP"
+description: "Conectá Claude, ChatGPT o tu editor a los datos de mercado de Docta"
+---
+
+Docta expone un servidor remoto [MCP (Model Context Protocol)](https://modelcontextprotocol.io) para que asistentes de IA consulten datos del mercado argentino — bonos, acciones y CEDEARs — directamente desde la conversación.
+
+<Card title="URL del servidor" icon="plug">
+  `https://mcp.docta.com.ar/mcp`
+</Card>
+
+## Conectar con tu cuenta Docta (OAuth)
+
+La forma recomendada: iniciás sesión con tu cuenta de Docta y autorizás el acceso. No hay claves para copiar.
+
+<Steps>
+  <Step title="Agregá el conector">
+    - **Claude (claude.ai / Desktop):** Configuración → Conectores → *Agregar conector personalizado* → pegá `https://mcp.docta.com.ar/mcp`.
+    - **ChatGPT:** Settings → Connectors (modo desarrollador) → *Add connector* con la misma URL.
+    - **Claude Code:** `claude mcp add --transport http docta https://mcp.docta.com.ar/mcp`
+    - **Cursor:** agregá el servidor con transporte HTTP en la configuración de MCP.
+  </Step>
+  <Step title="Autorizá el acceso">
+    Se abre `app.docta.com.ar`: iniciá sesión (o creá tu cuenta) y aceptá los permisos. Si nunca generaste credenciales de API, se crean automáticamente en el plan gratuito.
+  </Step>
+  <Step title="Listo">
+    Preguntale a tu asistente, por ejemplo: *"¿Cómo está la curva CER hoy?"* o *"Analizá el AL30"*.
+  </Step>
+</Steps>
+
+## Herramientas disponibles
+
+El servidor expone hasta 13 herramientas según los scopes de tus credenciales:
+
+| Herramienta | Qué hace |
+| --- | --- |
+| `search_instruments` / `list_instruments` | Buscar y listar instrumentos por mercado |
+| `get_instrument` | Ficha completa de un instrumento |
+| `get_quote` | Cotización intradiaria (con métricas de rendimiento para bonos) |
+| `get_history` | Series históricas: precios OHLC, rendimientos o analíticas |
+| `get_bond_cashflow` | Flujo de fondos proyectado |
+| `get_bond_residual_value` | Valor residual histórico |
+| `get_bond_risk_metrics` | Duration, convexidad, YTM, spread |
+| `price_bond` | Calculadora: métricas desde un precio o una TIR objetivo |
+| `get_bond_target_price` | Retorno implícito de un precio objetivo |
+| `get_yield_curve` | Curva de rendimientos (actual o histórica) |
+| `compare_bonds` | Comparación de 2–5 bonos en una tabla |
+| `get_my_usage` | Tu plan y cuota restante (no consume requests) |
+
+## Cuotas y caché
+
+- Cada llamada a una herramienta consume requests de tu [plan de API](https://app.docta.com.ar/pricing#api), con una excepción importante: las respuestas se cachean del lado del servidor (catálogos ~1 h, datos intradiarios ~5 min) y **los hits de caché no consumen tu cuota**.
+- Cada respuesta incluye `_quota` (requests restantes) y `_cached`. La herramienta `get_my_usage` muestra tu estado sin gastar requests.
+- Los datos intradiarios tienen ~20 minutos de demora y las tasas son decimales (0.1046 = 10,46%).
+
+## Alternativa: autenticación por headers
+
+Para clientes CLI o entornos donde OAuth no aplica, podés enviar tus [credenciales de API](https://app.docta.com.ar/dashboard/account/api) como headers en cada request:
+
+```json
+{
+  "mcpServers": {
+    "docta": {
+      "url": "https://mcp.docta.com.ar/mcp",
+      "headers": {
+        "X-Docta-Client-Id": "docta-api-...",
+        "X-Docta-Client-Secret": "tu-client-secret"
+      }
+    }
+  }
+}
+```
+
+<Note>
+  Rotar tu client secret no afecta las conexiones OAuth: solo invalida los headers.
+  Las conexiones OAuth se revocan desde tu cuenta.
+</Note>
