@@ -112,6 +112,47 @@ curl -X POST "https://api.doctacapital.com.ar/api/v1/analytics/bonds/pricer" \
   Promedio de la tasa BADLAR de los últimos 5 días.
 </ResponseField>
 
+<ResponseField name="price_variation" type="number">
+  Variación de precio.
+</ResponseField>
+
+<ResponseField name="market_price" type="number">
+  Precio sucio implícito. Se devuelve **en lugar de** `clean_price`, `dirty_price` y `tir`
+  cuando se consulta con `target: "tir"`.
+</ResponseField>
+
+<ResponseField name="cer_settlment_date" type="number | null">
+  Valor del índice CER a la fecha de liquidación. Solo en bonos ajustados por CER.
+</ResponseField>
+
+<ResponseField name="cer_issue_date" type="number | null">
+  Valor del índice CER a la fecha de emisión. Solo en bonos ajustados por CER.
+</ResponseField>
+
+<ResponseField name="uva_settlment_date" type="number | null">
+  Valor UVA a la fecha de liquidación. Solo en bonos ajustados por UVA.
+</ResponseField>
+
+<ResponseField name="uva_issue_date" type="number | null">
+  Valor UVA a la fecha de emisión. Solo en bonos ajustados por UVA.
+</ResponseField>
+
+<ResponseField name="tc_oficial" type="number | null">
+  Tipo de cambio oficial aplicado. Solo en bonos dollar-linked.
+</ResponseField>
+
+<ResponseField name="dolar_mep" type="number | null">
+  Dólar MEP aplicado. Solo en bonos en dólares.
+</ResponseField>
+
+<Note>
+  La forma de la respuesta depende de `target`: con `target: "price"` se devuelven
+  `clean_price`, `dirty_price` y `tir`; con `target: "tir"` se devuelve `market_price` en su
+  lugar. Los campos `margen` y `badlar_last5` solo aparecen en bonos de tasa variable
+  (BADLAR/TAMAR), y los campos CER, UVA, `tc_oficial` y `dolar_mep` solo cuando aplica el
+  ajuste correspondiente al bono.
+</Note>
+
 ## Ejemplo de Respuesta Exitosa
 
 <ResponseExample>

@@ -1102,6 +1102,42 @@
           "badlar_last5": {
             "type": "number",
             "description": "Promedio de la tasa BADLAR de los últimos 5 días"
+          },
+          "price_variation": {
+            "type": "number",
+            "description": "Variación de precio"
+          },
+          "cer_settlment_date": {
+            "type": "number",
+            "description": "Valor del índice CER a la fecha de liquidación (solo bonos CER)"
+          },
+          "cer_issue_date": {
+            "type": "number",
+            "description": "Valor del índice CER a la fecha de emisión (solo bonos CER)"
+          },
+          "uva_settlment_date": {
+            "type": "number",
+            "nullable": true,
+            "description": "Valor UVA a la fecha de liquidación (solo bonos UVA)"
+          },
+          "uva_issue_date": {
+            "type": "number",
+            "nullable": true,
+            "description": "Valor UVA a la fecha de emisión (solo bonos UVA)"
+          },
+          "tc_oficial": {
+            "type": "number",
+            "nullable": true,
+            "description": "Tipo de cambio oficial aplicado (solo dollar-linked)"
+          },
+          "dolar_mep": {
+            "type": "number",
+            "nullable": true,
+            "description": "Dólar MEP aplicado (solo bonos en dólares)"
+          },
+          "market_price": {
+            "type": "number",
+            "description": "Precio sucio implícito. Se devuelve en lugar de clean_price/dirty_price/tir cuando target='tir'."
           }
         },
         "required": [
@@ -1121,7 +1157,8 @@
           "margen",
           "duration",
           "badlar_last5"
-        ]
+        ],
+        "description": "La forma de la respuesta depende de `target`: con target='price' se devuelven clean_price, dirty_price y tir; con target='tir' se devuelve market_price en su lugar. margen y badlar_last5 solo aparecen en bonos de tasa variable (BADLAR/TAMAR); los campos CER, UVA, tc_oficial y dolar_mep solo cuando aplica el ajuste del bono."
       },
       "ResidualValueResponse": {
         "type": "array",
