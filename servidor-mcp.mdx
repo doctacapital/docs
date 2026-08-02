@@ -3,7 +3,7 @@ title: "Servidor MCP"
 description: "Conectá Claude, ChatGPT o tu editor a los datos de mercado de Docta"
 ---
 
-Docta expone un servidor remoto [MCP (Model Context Protocol)](https://modelcontextprotocol.io) para que asistentes de IA consulten datos del mercado argentino — bonos, acciones y CEDEARs — directamente desde la conversación.
+Docta expone un servidor remoto [MCP (Model Context Protocol)](https://modelcontextprotocol.io) para que asistentes de IA consulten datos de bonos argentinos — rendimientos, duration, flujos de fondos y paridad — directamente desde la conversación.
 
 <Card title="URL del servidor" icon="plug">
   `https://mcp.docta.com.ar/mcp`
@@ -30,22 +30,26 @@ La forma recomendada: iniciás sesión con tu cuenta de Docta y autorizás el ac
 
 ## Herramientas disponibles
 
-El servidor expone hasta 13 herramientas según los scopes de tus credenciales:
+El servidor expone 10 herramientas, una por cada endpoint documentado de la API de bonos:
 
-| Herramienta | Qué hace |
-| --- | --- |
-| `search_instruments` / `list_instruments` | Buscar y listar instrumentos por mercado |
-| `get_instrument` | Ficha completa de un instrumento |
-| `get_quote` | Cotización intradiaria (con métricas de rendimiento para bonos) |
-| `get_history` | Serie histórica de rendimientos diarios (TIR/TNA/TEA/TEM) |
-| `get_bond_cashflow` | Flujo de fondos proyectado |
-| `get_bond_residual_value` | Valor residual histórico |
-| `get_bond_risk_metrics` | Duration, convexidad, YTM, spread |
-| `price_bond` | Calculadora: métricas desde un precio o una TIR objetivo |
-| `get_bond_target_price` | Retorno implícito de un precio objetivo |
-| `get_yield_curve` | Curva de rendimientos (actual o histórica) |
-| `compare_bonds` | Comparación de 2–5 bonos en una tabla |
-| `get_my_usage` | Tu plan y cuota restante (no consume requests) |
+| Herramienta | Endpoint | Qué hace |
+| --- | --- | --- |
+| `search_instruments` | `/bonds/instruments/search` | Buscar bonos por texto libre y resolver el ticker exacto |
+| `list_instruments` | `/bonds/instruments` | Listar el catálogo, opcionalmente filtrado por `sub_asset_class` |
+| `get_instrument` | `/bonds/instruments/{symbol}` | Ficha del bono: nombre, sector, emisor, ley, ISIN |
+| `get_intraday_yields` | `/bonds/yields/{symbol}/intraday` | TIR, TNA, TNA 30/360, TEM, duration, DTM y margen |
+| `get_history` | `/bonds/yields/{symbol}/historical` | Serie diaria de TIR/TNA/TEA/TEM en un rango de fechas |
+| `get_bond_cashflow` | `/bonds/analytics/{symbol}/cashflow` | Cronograma de pagos, con montos ajustados por CER/UVA |
+| `get_bond_residual_value` | `.../cashflows/residual-value` | Serie diaria de valor residual por plazo de liquidación |
+| `price_bond` | `/analytics/bonds/pricer` | Calculadora: de precio a TIR y viceversa |
+| `compare_bonds` | (agrupa `yields/intraday`) | Comparación de 2–5 bonos en una tabla |
+| `get_my_usage` | — | Tu plan y cuota restante (no consume requests) |
+
+<Note>
+  El alcance es **renta fija argentina**. La API no cubre acciones, CEDEARs ni futuros, y no
+  expone precios, OHLC ni volumen operado: donde dice "intradiario" se trata de
+  **rendimientos** intradiarios, no de cotizaciones.
+</Note>
 
 ## Cuotas y caché
 
