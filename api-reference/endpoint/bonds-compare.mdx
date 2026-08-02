@@ -1,0 +1,86 @@
+---
+title: 'Comparar bonos'
+openapi: 'GET /api/v1/bonds/compare'
+---
+
+<Note>
+  Compará las métricas de rendimiento intradiario de 2 a 20 bonos en una sola solicitud: una fila por bono con TIR, TNA, TEM, duration y días al vencimiento. Requiere el scope `bonds:read`.
+</Note>
+
+## Parámetros de consulta
+
+<ParamField query="tickers" type="string[]" required>
+  Tickers de los bonos a comparar (2 a 20). Repetí el parámetro: `?tickers=AL30&tickers=GD30`.
+</ParamField>
+
+<Info>
+  Los tickers que no existen se informan por ticker en `errors` sin hacer fallar la comparación. Un bono sin datos de pricing en la rueda actual vuelve con `no_data: true` y métricas en null.
+</Info>
+
+## Ejemplo de Solicitud
+
+<RequestExample>
+```bash cURL
+curl -G 'https://api.doctacapital.com.ar/api/v1/bonds/compare' \
+  --header 'Authorization: Bearer $DOCTA_TOKEN' \
+  --data-urlencode 'tickers=AL30' \
+  --data-urlencode 'tickers=GD30' \
+  --data-urlencode 'tickers=AL35'
+```
+</RequestExample>
+
+## Respuesta Exitosa
+
+<ResponseField name="tickers_requested" type="string[]">
+  Tickers solicitados, normalizados a mayúsculas.
+</ResponseField>
+
+<ResponseField name="rows" type="object[]">
+  Una fila por bono resuelto: `ticker`, `sub_asset_class`, `no_data` y las métricas intradiarias `tir`, `tna`, `tna_30_360`, `tem` (todas decimales, 0.0742 = 7,42%), `duration` (años), `dtm` (días al vencimiento) y `margen` (solo bonos TAMAR/BADLAR; null en el resto).
+</ResponseField>
+
+<ResponseField name="errors" type="object[]">
+  Tickers que no pudieron resolverse: `ticker` y `detail` con el motivo.
+</ResponseField>
+
+<ResponseField name="metadata" type="object">
+  `total_records`: cantidad de filas devueltas.
+</ResponseField>
+
+## Ejemplo de Respuesta Exitosa
+
+<ResponseExample>
+```json 200
+{
+  "tickers_requested": ["AL30", "GD30", "AL35"],
+  "rows": [
+    {
+      "ticker": "AL30",
+      "sub_asset_class": "HARD_DOLLAR",
+      "no_data": false,
+      "tir": 0.0742,
+      "tna": 0.0826,
+      "tna_30_360": 0.0718,
+      "tem": 0.006,
+      "duration": 2.09,
+      "dtm": 1436,
+      "margen": null
+    },
+    {
+      "ticker": "GD30",
+      "sub_asset_class": "HARD_DOLLAR",
+      "no_data": false,
+      "tir": 0.0591,
+      "tna": 0.0644,
+      "tna_30_360": 0.0576,
+      "tem": 0.0048,
+      "duration": 2.1,
+      "dtm": 1436,
+      "margen": null
+    }
+  ],
+  "errors": [],
+  "metadata": { "total_records": 2 }
+}
+```
+</ResponseExample>

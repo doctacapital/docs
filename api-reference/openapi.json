@@ -3883,6 +3883,127 @@
           }
         }
       }
+    },
+    "/api/v1/bonds/compare": {
+      "get": {
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "description": "Comparar métricas de rendimiento intradiario de 2 a 20 bonos en una sola solicitud: TIR, TNA, TNA 30/360, TEM, duration, DTM y margen (solo bonos TAMAR/BADLAR) por bono. Los tickers no encontrados se informan por ticker en errors sin fallar la comparación.",
+        "tags": [
+          "Bonos"
+        ],
+        "parameters": [
+          {
+            "name": "tickers",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "minItems": 2,
+              "maxItems": 20
+            },
+            "style": "form",
+            "explode": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Comparación de bonos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "example": {
+                  "tickers_requested": [
+                    "AL30",
+                    "GD30",
+                    "AL35"
+                  ],
+                  "rows": [
+                    {
+                      "ticker": "AL30",
+                      "sub_asset_class": "HARD_DOLLAR",
+                      "no_data": false,
+                      "tir": 0.0742,
+                      "tna": 0.0826,
+                      "tna_30_360": 0.0718,
+                      "tem": 0.006,
+                      "duration": 2.09,
+                      "dtm": 1436,
+                      "margen": null
+                    },
+                    {
+                      "ticker": "GD30",
+                      "sub_asset_class": "HARD_DOLLAR",
+                      "no_data": false,
+                      "tir": 0.0591,
+                      "tna": 0.0644,
+                      "tna_30_360": 0.0576,
+                      "tem": 0.0048,
+                      "duration": 2.1,
+                      "dtm": 1436,
+                      "margen": null
+                    },
+                    {
+                      "ticker": "AL35",
+                      "sub_asset_class": "HARD_DOLLAR",
+                      "no_data": false,
+                      "tir": 0.0926,
+                      "tna": 0.1351,
+                      "tna_30_360": 0.0889,
+                      "tem": 0.0074,
+                      "duration": 5.93,
+                      "dtm": 3262,
+                      "margen": null
+                    }
+                  ],
+                  "errors": [],
+                  "metadata": {
+                    "total_records": 3
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Autenticación requerida",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Permisos insuficientes: requiere el scope bonds:read",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Parámetros inválidos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
