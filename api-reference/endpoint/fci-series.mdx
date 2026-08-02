@@ -1,0 +1,200 @@
+---
+title: 'Serie de FCI'
+openapi: 'GET /api/v1/fci/instruments/{fund_name}/series'
+---
+
+<Note>
+  Devuelve la serie diaria de un fondo: VCP (valor de cuotaparte), AUM, flujo neto, retorno diario y acumulado, con flags de interpolación, outliers y calidad de datos por punto. Requiere el scope `fci:read`.
+</Note>
+
+## Parámetros de ruta
+
+<ParamField path="fund_name" type="string" required>
+  Nombre del fondo. Va URL-encodeado, ya que los nombres contienen espacios (ej., `Premier%20Abierto%20Pymes%20-%20Clase%20A`).
+</ParamField>
+
+## Parámetros de consulta
+
+<ParamField query="interval" type="string">
+  Intervalo de fechas, mutuamente excluyente con `date_from`/`date_to`. Ejemplos: `1 week`, `1 month`, `3 months`, `ytd`, `1 year`, `max` (también se aceptan los alias cortos `1W`, `1M`, `3M`, `YTD`, `1Y`).
+</ParamField>
+
+<ParamField query="date_from" type="string">
+  Fecha de inicio en formato YYYY-MM-DD. Mutuamente excluyente con `interval`.
+</ParamField>
+
+<ParamField query="date_to" type="string">
+  Fecha de fin en formato YYYY-MM-DD. Predeterminado: última fecha disponible. Mutuamente excluyente con `interval`.
+</ParamField>
+
+<ParamField query="fx" type="string" default="none">
+  Conversión de moneda. Con `none` los valores quedan en la moneda nativa del fondo. Valores: `none`, `mep`, `ccl`, `a3500`, `oficial_minorista`.
+</ParamField>
+
+## Ejemplo de Solicitud
+
+<RequestExample>
+```bash cURL
+curl -X GET "https://api.doctacapital.com.ar/api/v1/fci/instruments/Premier%20Abierto%20Pymes%20-%20Clase%20A/series?interval=1%20week" \
+  -H "Authorization: Bearer $DOCTA_TOKEN"
+```
+</RequestExample>
+
+## Respuesta Exitosa
+
+<ResponseField name="fund_name" type="string">
+  Nombre del fondo.
+</ResponseField>
+
+<ResponseField name="currency" type="string">
+  Moneda nativa del fondo.
+</ResponseField>
+
+<ResponseField name="fx" type="string">
+  Conversión de moneda solicitada.
+</ResponseField>
+
+<ResponseField name="output_currency" type="string">
+  Moneda de salida de los valores.
+</ResponseField>
+
+<ResponseField name="requested_range" type="object">
+  Rango solicitado, con `from` y `to`.
+</ResponseField>
+
+<ResponseField name="effective_range" type="object">
+  Rango efectivo con datos disponibles, con `from` y `to`.
+</ResponseField>
+
+<ResponseField name="fund_inactive_in_range" type="boolean">
+  Indica si el fondo estuvo inactivo en el rango solicitado.
+</ResponseField>
+
+<ResponseField name="series" type="array">
+  Puntos diarios de la serie.
+</ResponseField>
+
+<ResponseField name="series[].date" type="string">
+  Fecha del punto (YYYY-MM-DD).
+</ResponseField>
+
+<ResponseField name="series[].vcp" type="number">
+  Valor de cuotaparte.
+</ResponseField>
+
+<ResponseField name="series[].aum" type="number">
+  Patrimonio administrado.
+</ResponseField>
+
+<ResponseField name="series[].flow" type="number | null">
+  Flujo neto del día (suscripciones menos rescates). Es null cuando no se puede calcular.
+</ResponseField>
+
+<ResponseField name="series[].daily_return" type="number | null">
+  Retorno diario en decimal. Es null en el primer punto de la serie.
+</ResponseField>
+
+<ResponseField name="series[].cumulative_return" type="number">
+  Retorno acumulado desde el inicio del rango, en decimal.
+</ResponseField>
+
+<ResponseField name="series[].interpolated" type="boolean">
+  Indica si el punto fue interpolado. `interpolation_method` detalla el método usado (null si no hubo interpolación).
+</ResponseField>
+
+<ResponseField name="series[].data_missing" type="boolean">
+  Indica si faltan datos originales en la fecha.
+</ResponseField>
+
+<ResponseField name="series[].aum_estimated" type="boolean">
+  Indica si el AUM del punto es estimado.
+</ResponseField>
+
+<ResponseField name="series[].outlier_suspected" type="boolean">
+  Indica si el retorno diario del punto se sospecha atípico.
+</ResponseField>
+
+<ResponseField name="series[].flow_undefined" type="boolean">
+  Indica si el flujo del punto no está definido.
+</ResponseField>
+
+<ResponseField name="data_quality" type="object">
+  Calidad de los datos del rango: `real_data_pct`, `last_real_data_date`, `gap_count`, `long_gaps_detected`, `interpolated_days`, `missing_days`, `aum_estimated_days`, `fx_carried_forward_days` y `total_days`.
+</ResponseField>
+
+## Ejemplo de Respuesta Exitosa
+
+<ResponseExample>
+```json Success
+{
+  "fund_name": "Premier Abierto Pymes - Clase A",
+  "currency": "ARS",
+  "fx": "none",
+  "output_currency": "ARS",
+  "requested_range": {
+    "from": "2026-07-23",
+    "to": "2026-07-30"
+  },
+  "effective_range": {
+    "from": "2026-07-23",
+    "to": "2026-07-30"
+  },
+  "fund_inactive_in_range": false,
+  "series": [
+    {
+      "date": "2026-07-23",
+      "vcp": 128517.476,
+      "aum": 17808478350.92,
+      "flow": null,
+      "daily_return": null,
+      "cumulative_return": 0.0,
+      "interpolated": false,
+      "interpolation_method": null,
+      "data_missing": false,
+      "aum_estimated": false,
+      "outlier_suspected": false,
+      "flow_undefined": true
+    },
+    {
+      "date": "2026-07-24",
+      "vcp": 128724.617,
+      "aum": 17837181587.2,
+      "flow": 11.404281616210938,
+      "daily_return": 0.001611773016768625,
+      "cumulative_return": 0.001611773016768625,
+      "interpolated": false,
+      "interpolation_method": null,
+      "data_missing": false,
+      "aum_estimated": false,
+      "outlier_suspected": false,
+      "flow_undefined": false
+    },
+    {
+      "date": "2026-07-27",
+      "vcp": 129597.201,
+      "aum": 17956094292.57,
+      "flow": -1999981.1139335632,
+      "daily_return": 0.006778687871333844,
+      "cumulative_return": 0.008401386594302673,
+      "interpolated": false,
+      "interpolation_method": null,
+      "data_missing": false,
+      "aum_estimated": false,
+      "outlier_suspected": false,
+      "flow_undefined": false
+    }
+  ],
+  "data_quality": {
+    "real_data_pct": 1.0,
+    "last_real_data_date": "2026-07-30",
+    "gap_count": 0,
+    "long_gaps_detected": [],
+    "interpolated_days": 0,
+    "missing_days": 0,
+    "aum_estimated_days": 0,
+    "fx_carried_forward_days": 0,
+    "total_days": 6
+  }
+}
+```
+</ResponseExample>

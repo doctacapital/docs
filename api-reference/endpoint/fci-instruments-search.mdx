@@ -1,0 +1,168 @@
+---
+title: 'Buscar FCI'
+openapi: 'GET /api/v1/fci/instruments/search'
+---
+
+<Note>
+  Busca fondos por texto sobre un campo elegido, con matching insensible a mayúsculas y acentos y puntaje por tipo de coincidencia (exacta > prefijo > prefijo de token > contiene > fuzzy). Requiere el scope `fci:read`.
+</Note>
+
+## Parámetros de consulta
+
+<ParamField query="query" type="string" required>
+  Texto de búsqueda (insensible a mayúsculas y acentos).
+</ParamField>
+
+<ParamField query="field" type="string" default="fund_name">
+  Campo contra el que se busca.
+</ParamField>
+
+<Info>
+Valores válidos para <code>field</code>:
+
+- <code>fund_name</code>
+- <code>manager_name</code>
+- <code>depositary_name</code>
+- <code>rent_type</code>
+- <code>horizon</code>
+</Info>
+
+<ParamField query="limit" type="integer" default="20">
+  Máximo de resultados por página (1-100).
+</ParamField>
+
+<ParamField query="offset" type="integer" default="0">
+  Desplazamiento de paginación.
+</ParamField>
+
+## Ejemplo de Solicitud
+
+<RequestExample>
+```bash cURL
+curl -X GET "https://api.doctacapital.com.ar/api/v1/fci/instruments/search?query=premier&field=fund_name&limit=3" \
+  -H "Authorization: Bearer $DOCTA_TOKEN"
+```
+</RequestExample>
+
+## Respuesta Exitosa
+
+<ResponseField name="query" type="string">
+  Texto de búsqueda utilizado.
+</ResponseField>
+
+<ResponseField name="field" type="string">
+  Campo contra el que se buscó.
+</ResponseField>
+
+<ResponseField name="total_matches" type="integer">
+  Cantidad total de coincidencias.
+</ResponseField>
+
+<ResponseField name="limit" type="integer">
+  Límite aplicado.
+</ResponseField>
+
+<ResponseField name="offset" type="integer">
+  Desplazamiento aplicado.
+</ResponseField>
+
+<ResponseField name="no_matches" type="boolean">
+  Indica si la búsqueda no arrojó resultados.
+</ResponseField>
+
+<ResponseField name="results" type="array">
+  Lista de fondos encontrados, ordenados por puntaje.
+</ResponseField>
+
+<ResponseField name="results[].fund_name" type="string">
+  Nombre del fondo.
+</ResponseField>
+
+<ResponseField name="results[].manager_name" type="string">
+  Sociedad gerente.
+</ResponseField>
+
+<ResponseField name="results[].depositary_name" type="string">
+  Sociedad depositaria.
+</ResponseField>
+
+<ResponseField name="results[].currency" type="string">
+  Moneda del fondo.
+</ResponseField>
+
+<ResponseField name="results[].rent_type" type="string">
+  Tipo de renta / categoría.
+</ResponseField>
+
+<ResponseField name="results[].class_type" type="string">
+  Clase de cuotaparte.
+</ResponseField>
+
+<ResponseField name="results[].fund_type" type="string">
+  Tipo de fondo (Abierto / Cerrado).
+</ResponseField>
+
+<ResponseField name="results[].horizon" type="string">
+  Horizonte de inversión.
+</ResponseField>
+
+<ResponseField name="results[].matched_value" type="string">
+  Valor del campo que produjo la coincidencia.
+</ResponseField>
+
+<ResponseField name="results[].score" type="integer">
+  Puntaje de la coincidencia (mayor es mejor).
+</ResponseField>
+
+## Ejemplo de Respuesta Exitosa
+
+<ResponseExample>
+```json Success
+{
+  "query": "premier",
+  "field": "fund_name",
+  "total_matches": 74,
+  "limit": 3,
+  "offset": 0,
+  "no_matches": false,
+  "results": [
+    {
+      "fund_name": "Premier Abierto Pymes - Clase A",
+      "manager_name": "Supervielle Asset Management S.A.",
+      "depositary_name": "Banco Supervielle S.A.",
+      "currency": "ARS",
+      "rent_type": "PyMes",
+      "class_type": "Mayorista",
+      "fund_type": "Abierto",
+      "horizon": "Mediano Plazo",
+      "matched_value": "Premier Abierto Pymes - Clase A",
+      "score": 4
+    },
+    {
+      "fund_name": "Premier Abierto Pymes - Clase B",
+      "manager_name": "Supervielle Asset Management S.A.",
+      "depositary_name": "Banco Supervielle S.A.",
+      "currency": "ARS",
+      "rent_type": "PyMes",
+      "class_type": "Minorista",
+      "fund_type": "Abierto",
+      "horizon": "Mediano Plazo",
+      "matched_value": "Premier Abierto Pymes - Clase B",
+      "score": 4
+    },
+    {
+      "fund_name": "Premier Abierto Pymes - Clase C",
+      "manager_name": "Supervielle Asset Management S.A.",
+      "depositary_name": "Banco Supervielle S.A.",
+      "currency": "ARS",
+      "rent_type": "PyMes",
+      "class_type": "No Registrada",
+      "fund_type": "Abierto",
+      "horizon": "Mediano Plazo",
+      "matched_value": "Premier Abierto Pymes - Clase C",
+      "score": 4
+    }
+  ]
+}
+```
+</ResponseExample>

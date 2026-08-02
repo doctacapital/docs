@@ -1,11 +1,11 @@
 ---
-title: 'API de Bonos'
-description: 'Documentación de la API de Bonos de Docta: catálogo de bonos, detalle, cashflows y curvas de rendimiento.'
+title: 'API de Docta'
+description: 'Documentación de la API de Docta: bonos (catálogo, cashflows, curvas de rendimiento) y FCI (screener, series, performance y analytics de industria).'
 ---
 
-## Bienvenido a la API de Bonos de Docta
+## Bienvenido a la API de Docta
 
-La API de Bonos de Docta brinda datos especializados de renta fija argentina: catálogo de instrumentos, detalle enriquecido, flujos de fondos, yields intradiarios y curvas históricas. La autenticación sigue el flujo de credenciales de cliente OAuth 2.0.
+La API de Docta brinda datos especializados del mercado argentino. Bonos: catálogo de instrumentos, detalle enriquecido, flujos de fondos, yields intradiarios y curvas históricas. FCI: screener del universo de fondos, detalle con composición y fees, series diarias, performance, comparaciones y analytics de la industria (AUM, gestoras, flujos). La autenticación sigue el flujo de credenciales de cliente OAuth 2.0.
 
 <Card
   title="URL Base"
@@ -21,7 +21,11 @@ La API de Bonos de Docta brinda datos especializados de renta fija argentina: ca
 
 ## Autenticación
 
-La API utiliza el flujo de credenciales de cliente OAuth 2.0. Necesitas obtener un token de acceso antes de consultar instrumentos, cashflows o curvas.
+La API utiliza el flujo de credenciales de cliente OAuth 2.0. Necesitas obtener un token de acceso antes de consultar instrumentos, cashflows, curvas o datos de FCI.
+
+<Note>
+  El acceso por dominio se controla con scopes: `bonds:read` para los endpoints de bonos y `fci:read` para los de FCI. Si tu cliente no tiene el scope necesario, la API responde 403.
+</Note>
 
 <Steps>
   <Step title="Solicitar Token de Acceso">
@@ -31,7 +35,7 @@ La API utiliza el flujo de credenciales de cliente OAuth 2.0. Necesitas obtener 
     Incluye el token de acceso en el header Authorization: `Bearer {access_token}`.
   </Step>
   <Step title="Expiración del Token">
-    Los tokens expiran. Solicita uno nuevo al vencer para mantener el acceso a los datos de bonos.
+    Los tokens expiran. Solicita uno nuevo al vencer para mantener el acceso a los datos.
   </Step>
 </Steps>
 

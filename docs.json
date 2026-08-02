@@ -46,6 +46,32 @@
               "api-reference/endpoint/bonds-cashflow-residual-value",
               "api-reference/endpoint/bonds-calculadora"
             ]
+          },
+          {
+            "group": "FCI",
+            "pages": [
+              "api-reference/endpoint/fci-instruments",
+              "api-reference/endpoint/fci-instruments-search",
+              "api-reference/endpoint/fci-instruments-detail",
+              "api-reference/endpoint/fci-series",
+              "api-reference/endpoint/fci-performance",
+              "api-reference/endpoint/fci-catalog",
+              "api-reference/endpoint/fci-benchmarks",
+              "api-reference/endpoint/fci-benchmark-series",
+              "api-reference/endpoint/fci-compare-table",
+              "api-reference/endpoint/fci-compare-series",
+              {
+                "group": "Mercado",
+                "pages": [
+                  "api-reference/endpoint/fci-market-kpis",
+                  "api-reference/endpoint/fci-market-aum-distribution",
+                  "api-reference/endpoint/fci-market-top-managers",
+                  "api-reference/endpoint/fci-market-top-managers-by-flow",
+                  "api-reference/endpoint/fci-market-flows-by-category",
+                  "api-reference/endpoint/fci-market-series"
+                ]
+              }
+            ]
           }
         ]
       }

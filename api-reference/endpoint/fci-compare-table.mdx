@@ -1,0 +1,162 @@
+---
+title: 'Comparar FCI (tabla)'
+openapi: 'GET /api/v1/fci/compare/table'
+---
+
+<Note>
+  Compara hasta 30 fondos lado a lado: AUM al cierre del rango, retornos preestablecidos (1D/1W/1M/YTD/1Y como decimales), retorno del rango y TNA proporcional. Requiere el scope `fci:read`.
+</Note>
+
+## Parámetros de consulta
+
+<ParamField query="fund_names" type="string[]" required>
+  Nombres exactos de los fondos a comparar. Se repite el parámetro por cada fondo (`?fund_names=A&fund_names=B`). Máximo 30 fondos.
+</ParamField>
+
+<ParamField query="interval" type="string">
+  Intervalo de fechas, mutuamente excluyente con `date_from`/`date_to`. Ejemplos: `1 week`, `1 month`, `3 months`, `ytd`, `1 year`, `max` (también acepta los alias cortos `1W`, `1M`, `3M`, `YTD`, `1Y`).
+</ParamField>
+
+<ParamField query="date_from" type="string">
+  Inicio del rango en formato YYYY-MM-DD. Mutuamente excluyente con `interval`.
+</ParamField>
+
+<ParamField query="date_to" type="string">
+  Fin del rango en formato YYYY-MM-DD. Mutuamente excluyente con `interval`.
+</ParamField>
+
+<ParamField query="target_currency" type="string">
+  Moneda de salida: `ARS` o `USD` (predeterminado `ARS`).
+</ParamField>
+
+<ParamField query="fx_kind" type="string">
+  Tipo de cambio usado para la conversión de moneda (predeterminado `mep`).
+</ParamField>
+
+<Info>
+Valores válidos para <code>fx_kind</code>:
+
+- <code>mep</code>
+- <code>ccl</code>
+- <code>a3500</code>
+- <code>oficial_minorista</code>
+</Info>
+
+## Ejemplo de Solicitud
+
+<RequestExample>
+```bash cURL
+curl -G "https://api.doctacapital.com.ar/api/v1/fci/compare/table" \
+  -H "Authorization: Bearer $DOCTA_TOKEN" \
+  --data-urlencode "fund_names=Premier Abierto Pymes - Clase A" \
+  --data-urlencode "fund_names=Mercado Fondo - Clase A" \
+  --data-urlencode "date_from=2026-06-30" \
+  --data-urlencode "date_to=2026-07-30"
+```
+</RequestExample>
+
+## Respuesta Exitosa
+
+<ResponseField name="requested_range" type="object">
+  Rango solicitado, con `from` y `to` en formato YYYY-MM-DD (null si se usó `interval` sin fechas explícitas).
+</ResponseField>
+
+<ResponseField name="effective_range" type="object">
+  Rango efectivo con datos disponibles, con `from` y `to` en formato YYYY-MM-DD.
+</ResponseField>
+
+<ResponseField name="target_currency" type="string">
+  Moneda de salida aplicada.
+</ResponseField>
+
+<ResponseField name="fx_kind" type="string">
+  Tipo de cambio aplicado.
+</ResponseField>
+
+<ResponseField name="fund_count" type="integer">
+  Cantidad de fondos comparados.
+</ResponseField>
+
+<ResponseField name="rows" type="array">
+  Una fila por fondo comparado.
+</ResponseField>
+
+<ResponseField name="rows[].fund_name" type="string">
+  Nombre del fondo.
+</ResponseField>
+
+<ResponseField name="rows[].native_currency" type="string">
+  Moneda nativa del fondo.
+</ResponseField>
+
+<ResponseField name="rows[].aum_at_end" type="number">
+  AUM al cierre del rango, expresado en `target_currency`.
+</ResponseField>
+
+<ResponseField name="rows[].performance" type="object">
+  Retornos preestablecidos `1D`, `1W`, `1M`, `YTD` y `1Y`, expresados como decimales (ej., 0.0165 = 1.65%).
+</ResponseField>
+
+<ResponseField name="rows[].range_return" type="number">
+  Retorno acumulado sobre el rango solicitado, expresado como decimal.
+</ResponseField>
+
+<ResponseField name="rows[].tna_range" type="number">
+  TNA proporcional sobre el rango solicitado, expresada como decimal.
+</ResponseField>
+
+<ResponseField name="rows[].fund_inactive_in_range" type="boolean">
+  Indica si el fondo estuvo inactivo dentro del rango.
+</ResponseField>
+
+## Ejemplo de Respuesta Exitosa
+
+<ResponseExample>
+```json Success
+{
+  "requested_range": {
+    "from": "2026-06-30",
+    "to": "2026-07-30"
+  },
+  "effective_range": {
+    "from": "2026-06-30",
+    "to": "2026-07-30"
+  },
+  "target_currency": "ARS",
+  "fx_kind": "mep",
+  "fund_count": 2,
+  "rows": [
+    {
+      "fund_name": "Premier Abierto Pymes - Clase A",
+      "native_currency": "ARS",
+      "aum_at_end": 17918632369.3,
+      "performance": {
+        "1D": 0.0008049373324414688,
+        "1W": 0.007252803501992311,
+        "1M": 0.016567519671488284,
+        "YTD": 0.18136974439941578,
+        "1Y": 0.4372903452209189
+      },
+      "range_return": 0.016567519671488284,
+      "tna_range": 0.20157148933644078,
+      "fund_inactive_in_range": false
+    },
+    {
+      "fund_name": "Mercado Fondo - Clase A",
+      "native_currency": "ARS",
+      "aum_at_end": 7882693319912.59,
+      "performance": {
+        "1D": 0.0004767150468019121,
+        "1W": 0.003353703949822595,
+        "1M": 0.014343980399997402,
+        "YTD": 0.12882713824396963,
+        "1Y": 0.28174540134475756
+      },
+      "range_return": 0.014343980399997402,
+      "tna_range": 0.17451842819996838,
+      "fund_inactive_in_range": false
+    }
+  ]
+}
+```
+</ResponseExample>

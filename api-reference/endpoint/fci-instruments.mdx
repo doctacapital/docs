@@ -1,0 +1,317 @@
+---
+title: 'Screener de FCI'
+openapi: 'GET /api/v1/fci/instruments'
+---
+
+<Note>
+  Lista el universo de fondos comunes de inversión con metadatos, AUM y retornos preestablecidos (1D/1W/1M/YTD/1Y), con filtros por gerente, depositaria, categoría, región, horizonte, rango de AUM y umbrales de retorno. Requiere el scope `fci:read`.
+</Note>
+
+## Parámetros de consulta
+
+<ParamField query="date" type="string">
+  Fecha de referencia en formato YYYY-MM-DD. Predeterminado: último cierre disponible.
+</ParamField>
+
+<ParamField query="native_currency_filter" type="string">
+  Devuelve solo fondos cuya moneda nativa coincide. Valores: `ARS`, `USD`.
+</ParamField>
+
+<ParamField query="target_currency" type="string" default="ARS">
+  Moneda de salida para AUM y retornos. Valores: `ARS`, `USD`.
+</ParamField>
+
+<ParamField query="fx_kind" type="string" default="mep">
+  Tipo de cambio usado para la conversión de moneda.
+</ParamField>
+
+<Info>
+Valores válidos para <code>fx_kind</code>:
+
+- <code>mep</code>
+- <code>ccl</code>
+- <code>a3500</code>
+- <code>oficial_minorista</code>
+</Info>
+
+<ParamField query="fund_names" type="string[]">
+  Nombres exactos de fondos. Repetí el parámetro para incluir varios (ej., `fund_names=A&fund_names=B`).
+</ParamField>
+
+<ParamField query="gerente" type="string">
+  Sociedad gerente (coincidencia exacta).
+</ParamField>
+
+<ParamField query="depositaria" type="string">
+  Sociedad depositaria (coincidencia exacta).
+</ParamField>
+
+<ParamField query="rent_type" type="string">
+  Tipo de renta / categoría del fondo (coincidencia exacta). Por ejemplo, money market es `Mercado de Dinero`.
+</ParamField>
+
+<ParamField query="region" type="string">
+  Región (ej., "Argentina", "Latinoamerica").
+</ParamField>
+
+<ParamField query="benchmark" type="string">
+  Benchmark declarado del fondo.
+</ParamField>
+
+<ParamField query="horizon" type="string">
+  Horizonte de inversión (ej., "Corto Plazo").
+</ParamField>
+
+<ParamField query="duration" type="string">
+  Bucket de duration.
+</ParamField>
+
+<ParamField query="fund_type" type="string">
+  Tipo de fondo: `Abierto` o `Cerrado`.
+</ParamField>
+
+<ParamField query="class_type" type="string">
+  Clase de cuotaparte (ej., "Mayorista", "Minorista").
+</ParamField>
+
+<Info>
+Los filtros categóricos (<code>gerente</code>, <code>depositaria</code>, <code>rent_type</code>, <code>region</code>, <code>horizon</code>, <code>fund_type</code>, <code>class_type</code>, etc.) usan coincidencia exacta. Obtené los valores válidos de <code>GET /api/v1/fci/catalog</code> y usalos textualmente.
+</Info>
+
+<ParamField query="aum_min" type="number">
+  AUM mínimo, expresado en `target_currency`.
+</ParamField>
+
+<ParamField query="aum_max" type="number">
+  AUM máximo, expresado en `target_currency`.
+</ParamField>
+
+<ParamField query="return_period" type="string">
+  Período al que aplican los filtros `min_return`/`max_return`. Valores: `1D`, `1W`, `1M`, `YTD`, `1Y`.
+</ParamField>
+
+<ParamField query="min_return" type="number">
+  Retorno mínimo para `return_period`, en decimal (ej., 0.05 = 5%).
+</ParamField>
+
+<ParamField query="max_return" type="number">
+  Retorno máximo para `return_period`, en decimal.
+</ParamField>
+
+<ParamField query="exclude_outliers" type="boolean" default="false">
+  Excluye fondos marcados con retornos diarios atípicos (mayores al 20%).
+</ParamField>
+
+<ParamField query="order_by" type="string" default="aum">
+  Criterio de ordenamiento.
+</ParamField>
+
+<Info>
+Valores válidos para <code>order_by</code>:
+
+- <code>aum</code>
+- <code>age_days</code>
+- <code>return_1d</code>
+- <code>return_1w</code>
+- <code>return_1m</code>
+- <code>return_ytd</code>
+- <code>return_1y</code>
+</Info>
+
+<ParamField query="order_dir" type="string" default="desc">
+  Dirección del ordenamiento: `asc` o `desc`. Los valores nulos van siempre al final.
+</ParamField>
+
+<ParamField query="limit" type="integer" default="50">
+  Máximo de resultados por página (1-500).
+</ParamField>
+
+<ParamField query="offset" type="integer" default="0">
+  Desplazamiento de paginación.
+</ParamField>
+
+## Ejemplo de Solicitud
+
+<RequestExample>
+```bash cURL
+curl -X GET "https://api.doctacapital.com.ar/api/v1/fci/instruments?rent_type=Mercado%20de%20Dinero&order_by=aum&limit=2" \
+  -H "Authorization: Bearer $DOCTA_TOKEN"
+```
+</RequestExample>
+
+## Respuesta Exitosa
+
+<ResponseField name="reference_date" type="string">
+  Fecha de referencia utilizada (YYYY-MM-DD).
+</ResponseField>
+
+<ResponseField name="native_currency_filter" type="string | null">
+  Filtro de moneda nativa aplicado, si se especificó.
+</ResponseField>
+
+<ResponseField name="target_currency" type="string">
+  Moneda de salida de AUM y retornos.
+</ResponseField>
+
+<ResponseField name="fx_kind" type="string">
+  Tipo de cambio usado para la conversión.
+</ResponseField>
+
+<ResponseField name="filters_applied" type="object">
+  Filtros aplicados en la solicitud.
+</ResponseField>
+
+<ResponseField name="ordering" type="object">
+  Ordenamiento aplicado, con `by` y `dir`.
+</ResponseField>
+
+<ResponseField name="pagination" type="object">
+  Paginación aplicada, con `limit` y `offset`.
+</ResponseField>
+
+<ResponseField name="total_matches" type="integer">
+  Cantidad total de fondos que cumplen los filtros.
+</ResponseField>
+
+<ResponseField name="page_size" type="integer">
+  Cantidad de fondos en esta página.
+</ResponseField>
+
+<ResponseField name="funds" type="array">
+  Lista de fondos de la página.
+</ResponseField>
+
+<ResponseField name="funds[].fund_name" type="string">
+  Nombre del fondo.
+</ResponseField>
+
+<ResponseField name="funds[].manager_name" type="string">
+  Sociedad gerente.
+</ResponseField>
+
+<ResponseField name="funds[].depositary_name" type="string">
+  Sociedad depositaria.
+</ResponseField>
+
+<ResponseField name="funds[].native_currency" type="string">
+  Moneda nativa del fondo.
+</ResponseField>
+
+<ResponseField name="funds[].rent_type" type="string">
+  Tipo de renta / categoría.
+</ResponseField>
+
+<ResponseField name="funds[].class_type" type="string">
+  Clase de cuotaparte.
+</ResponseField>
+
+<ResponseField name="funds[].fund_type" type="string">
+  Tipo de fondo (Abierto / Cerrado).
+</ResponseField>
+
+<ResponseField name="funds[].region" type="string">
+  Región.
+</ResponseField>
+
+<ResponseField name="funds[].horizon" type="string">
+  Horizonte de inversión.
+</ResponseField>
+
+<ResponseField name="funds[].aum" type="number">
+  Patrimonio administrado en `target_currency`.
+</ResponseField>
+
+<ResponseField name="funds[].fx_rate_applied" type="number | null">
+  Tipo de cambio aplicado en la conversión. Es null si no hubo conversión.
+</ResponseField>
+
+<ResponseField name="funds[].age_days" type="integer">
+  Antigüedad del fondo en días dentro de la ventana de datos.
+</ResponseField>
+
+<ResponseField name="funds[].last_quote_date" type="string">
+  Última fecha con cotización disponible.
+</ResponseField>
+
+<ResponseField name="funds[].performance" type="object">
+  Retornos preestablecidos por período (`1D`, `1W`, `1M`, `YTD`, `1Y`). Cada período incluye `return` (decimal), `missing_days_in_window` e `insufficient_history`.
+</ResponseField>
+
+<ResponseField name="funds[].outlier_suspected" type="boolean | null">
+  Indica si el fondo tiene retornos diarios sospechados como atípicos.
+</ResponseField>
+
+<ResponseField name="data_quality" type="object">
+  Calidad de datos del universo: `funds_total`, `funds_with_real_data`, `funds_with_partial_data`, `funds_with_outliers`, `funds_excluded`, `funds_insufficient_history`, `fx_carried_forward_funds` y `reference_date`.
+</ResponseField>
+
+## Ejemplo de Respuesta Exitosa
+
+<ResponseExample>
+```json Success
+{
+  "reference_date": "2026-08-02",
+  "native_currency_filter": null,
+  "target_currency": "ARS",
+  "fx_kind": "mep",
+  "filters_applied": {
+    "native_currency_filter": null
+  },
+  "ordering": {
+    "by": "aum",
+    "dir": "desc"
+  },
+  "pagination": {
+    "limit": 2,
+    "offset": 0
+  },
+  "total_matches": 4047,
+  "page_size": 2,
+  "funds": [
+    {
+      "fund_name": "Mercado Fondo - Clase A",
+      "manager_name": "Mercado Pago Asset Managemet S.A.",
+      "depositary_name": "Banco Industrial S.A.",
+      "native_currency": "ARS",
+      "rent_type": "Mercado de Dinero",
+      "class_type": "Minorista",
+      "fund_type": "Abierto",
+      "region": "Argentina",
+      "horizon": "Corto Plazo",
+      "aum": 7882693319912.59,
+      "fx_rate_applied": null,
+      "age_days": 574,
+      "last_quote_date": "2026-07-30",
+      "performance": {
+        "1D": {
+          "return": 0.0004767150468019121,
+          "missing_days_in_window": 0,
+          "insufficient_history": false
+        },
+        "1W": {
+          "return": 0.003353703949822595,
+          "missing_days_in_window": 0,
+          "insufficient_history": false
+        },
+        "YTD": {
+          "return": 0.12882713824396963,
+          "missing_days_in_window": 0,
+          "insufficient_history": false
+        }
+      },
+      "outlier_suspected": null
+    }
+  ],
+  "data_quality": {
+    "funds_total": 4570,
+    "funds_with_real_data": 3478,
+    "funds_with_partial_data": 569,
+    "funds_with_outliers": 0,
+    "funds_excluded": 523,
+    "funds_insufficient_history": 569,
+    "fx_carried_forward_funds": 0,
+    "reference_date": "2026-08-02"
+  }
+}
+```
+</ResponseExample>

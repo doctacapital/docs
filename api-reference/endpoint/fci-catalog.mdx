@@ -1,0 +1,116 @@
+---
+title: 'Catálogo de FCI'
+openapi: 'GET /api/v1/fci/catalog'
+---
+
+<Note>
+  Devuelve el catálogo de facetas del universo FCI: los valores válidos de cada filtro categórico del screener. Usá estos valores textualmente en `GET /api/v1/fci/instruments`, ya que el matching es exacto (ej., money market es `Mercado de Dinero`). Requiere el scope `fci:read`.
+</Note>
+
+Este endpoint no recibe parámetros.
+
+## Ejemplo de Solicitud
+
+<RequestExample>
+```bash cURL
+curl -X GET "https://api.doctacapital.com.ar/api/v1/fci/catalog" \
+  -H "Authorization: Bearer $DOCTA_TOKEN"
+```
+</RequestExample>
+
+## Respuesta Exitosa
+
+<ResponseField name="reference_date" type="string">
+  Fecha de referencia del catálogo (YYYY-MM-DD).
+</ResponseField>
+
+<ResponseField name="total_funds" type="integer">
+  Cantidad total de fondos en el universo.
+</ResponseField>
+
+<ResponseField name="facets" type="object">
+  Valores válidos por filtro categórico. Cada clave es una lista de strings.
+</ResponseField>
+
+<ResponseField name="facets.rent_type" type="string[]">
+  Tipos de renta / categorías (ej., "Mercado de Dinero", "Renta Fija").
+</ResponseField>
+
+<ResponseField name="facets.class_type" type="string[]">
+  Clases de cuotaparte (ej., "Mayorista", "Minorista").
+</ResponseField>
+
+<ResponseField name="facets.fund_type" type="string[]">
+  Tipos de fondo ("Abierto", "Cerrado").
+</ResponseField>
+
+<ResponseField name="facets.manager_name" type="string[]">
+  Sociedades gerentes.
+</ResponseField>
+
+<ResponseField name="facets.depositary_name" type="string[]">
+  Sociedades depositarias.
+</ResponseField>
+
+<ResponseField name="facets.region" type="string[]">
+  Regiones.
+</ResponseField>
+
+<ResponseField name="facets.horizon" type="string[]">
+  Horizontes de inversión.
+</ResponseField>
+
+<ResponseField name="facets.native_currency" type="string[]">
+  Monedas nativas ("ARS", "USD").
+</ResponseField>
+
+## Ejemplo de Respuesta Exitosa
+
+<ResponseExample>
+```json Success
+{
+  "reference_date": "2026-08-02",
+  "total_funds": 4570,
+  "facets": {
+    "rent_type": [
+      "ASG",
+      "Mercado de Dinero",
+      "Renta Fija"
+    ],
+    "class_type": [
+      "General",
+      "Mayorista",
+      "Minorista"
+    ],
+    "fund_type": [
+      "Abierto",
+      "Cerrado"
+    ],
+    "manager_name": [
+      "Galicia Asset Management S.A.U.",
+      "Mercado Pago Asset Managemet S.A.",
+      "Supervielle Asset Management S.A."
+    ],
+    "depositary_name": [
+      "Banco Industrial S.A.",
+      "Banco Supervielle S.A.",
+      "Banco de Galicia y Buenos Aires S.A."
+    ],
+    "region": [
+      "Argentina",
+      "Global",
+      "Latinoamerica"
+    ],
+    "horizon": [
+      "Corto Plazo",
+      "Largo Plazo",
+      "Mediano Plazo"
+    ],
+    "native_currency": [
+      "ARS",
+      "USD"
+    ]
+  }
+}
+```
+</ResponseExample>
