@@ -1,0 +1,155 @@
+---
+title: 'Ranking de gestoras'
+openapi: 'GET /api/v1/fci/market/top-managers'
+---
+
+<Note>
+  Ranking de gestoras por AUM a una fecha de referencia, con participación sobre la industria y cantidad de fondos por gestora. Requiere el scope `fci:read`.
+</Note>
+
+## Parámetros de consulta
+
+<ParamField query="date" type="string">
+  Fecha de referencia en formato YYYY-MM-DD (predeterminado: último cierre).
+</ParamField>
+
+<ParamField query="target_currency" type="string">
+  Moneda de salida: `ARS` o `USD` (predeterminado `ARS`).
+</ParamField>
+
+<ParamField query="fx_kind" type="string">
+  Tipo de cambio usado para la conversión de moneda (predeterminado `mep`).
+</ParamField>
+
+<Info>
+Valores válidos para <code>fx_kind</code>:
+
+- <code>mep</code>
+- <code>ccl</code>
+- <code>a3500</code>
+- <code>oficial_minorista</code>
+</Info>
+
+<ParamField query="vigent_days_window" type="integer">
+  Días sin cotización antes de que un fondo deje de contarse como vigente (predeterminado 5, rango 1-60).
+</ParamField>
+
+<ParamField query="top" type="integer">
+  Máximo de gestoras por página (predeterminado 20, rango 1-100).
+</ParamField>
+
+<ParamField query="offset" type="integer">
+  Desplazamiento de paginación (predeterminado 0).
+</ParamField>
+
+## Ejemplo de Solicitud
+
+<RequestExample>
+```bash cURL
+curl -X GET "https://api.doctacapital.com.ar/api/v1/fci/market/top-managers?top=20&offset=0" \
+  -H "Authorization: Bearer $DOCTA_TOKEN"
+```
+</RequestExample>
+
+## Respuesta Exitosa
+
+<ResponseField name="reference_date" type="string">
+  Fecha de referencia efectiva (YYYY-MM-DD).
+</ResponseField>
+
+<ResponseField name="data_lag" type="boolean">
+  Indica si la fecha de referencia quedó rezagada respecto de la fecha solicitada por falta de datos más recientes.
+</ResponseField>
+
+<ResponseField name="target_currency" type="string">
+  Moneda de salida aplicada.
+</ResponseField>
+
+<ResponseField name="fx_kind" type="string">
+  Tipo de cambio aplicado.
+</ResponseField>
+
+<ResponseField name="vigent_days_window" type="integer">
+  Ventana de vigencia aplicada.
+</ResponseField>
+
+<ResponseField name="industry_total_aum" type="number">
+  AUM total de la industria, expresado en `target_currency`.
+</ResponseField>
+
+<ResponseField name="total_managers" type="integer">
+  Cantidad total de gestoras en el ranking.
+</ResponseField>
+
+<ResponseField name="top_returned" type="integer">
+  Cantidad de gestoras devueltas en esta página.
+</ResponseField>
+
+<ResponseField name="offset" type="integer">
+  Desplazamiento aplicado.
+</ResponseField>
+
+<ResponseField name="managers" type="array">
+  Una entrada por gestora, ordenada por AUM.
+</ResponseField>
+
+<ResponseField name="managers[].rank" type="integer">
+  Posición en el ranking.
+</ResponseField>
+
+<ResponseField name="managers[].manager_name" type="string">
+  Nombre de la gestora.
+</ResponseField>
+
+<ResponseField name="managers[].aum" type="number">
+  AUM de la gestora, expresado en `target_currency`.
+</ResponseField>
+
+<ResponseField name="managers[].share_pct" type="number">
+  Participación sobre la industria, expresada como porcentaje (ej., 14.9 = 14.9%).
+</ResponseField>
+
+<ResponseField name="managers[].fund_count" type="integer">
+  Cantidad de fondos de la gestora.
+</ResponseField>
+
+## Ejemplo de Respuesta Exitosa
+
+<ResponseExample>
+```json Success
+{
+  "reference_date": "2026-07-30",
+  "data_lag": true,
+  "target_currency": "ARS",
+  "fx_kind": "mep",
+  "vigent_days_window": 5,
+  "industry_total_aum": 105081584883559.95,
+  "total_managers": 57,
+  "top_returned": 3,
+  "offset": 0,
+  "managers": [
+    {
+      "rank": 1,
+      "manager_name": "Galicia Asset Management S.A.U.",
+      "aum": 15653530692515.19,
+      "share_pct": 14.896549866335512,
+      "fund_count": 59
+    },
+    {
+      "rank": 2,
+      "manager_name": "Santander Rio Asset Management G.F.C.I.S.A.",
+      "aum": 12136881301326.12,
+      "share_pct": 11.549960266372937,
+      "fund_count": 85
+    },
+    {
+      "rank": 3,
+      "manager_name": "Sin gestora",
+      "aum": 8093521631387.21,
+      "share_pct": 7.702131291943851,
+      "fund_count": 351
+    }
+  ]
+}
+```
+</ResponseExample>

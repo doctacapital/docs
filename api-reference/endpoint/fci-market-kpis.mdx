@@ -1,0 +1,118 @@
+---
+title: 'KPIs de mercado FCI'
+openapi: 'GET /api/v1/fci/market/kpis'
+---
+
+<Note>
+  KPIs de la industria de FCI a una fecha de referencia: fondos vigentes, AUM total en la moneda de salida, gestoras activas, tipo de cambio aplicado y último cierre. Requiere el scope `fci:read`.
+</Note>
+
+## Parámetros de consulta
+
+<ParamField query="date" type="string">
+  Fecha de referencia en formato YYYY-MM-DD (predeterminado: último cierre).
+</ParamField>
+
+<ParamField query="target_currency" type="string">
+  Moneda de salida: `ARS` o `USD` (predeterminado `ARS`).
+</ParamField>
+
+<ParamField query="fx_kind" type="string">
+  Tipo de cambio usado para la conversión de moneda (predeterminado `mep`).
+</ParamField>
+
+<Info>
+Valores válidos para <code>fx_kind</code>:
+
+- <code>mep</code>
+- <code>ccl</code>
+- <code>a3500</code>
+- <code>oficial_minorista</code>
+</Info>
+
+<ParamField query="vigent_days_window" type="integer">
+  Días sin cotización antes de que un fondo deje de contarse como vigente (predeterminado 5, rango 1-60).
+</ParamField>
+
+## Ejemplo de Solicitud
+
+<RequestExample>
+```bash cURL
+curl -X GET "https://api.doctacapital.com.ar/api/v1/fci/market/kpis?target_currency=ARS&fx_kind=mep" \
+  -H "Authorization: Bearer $DOCTA_TOKEN"
+```
+</RequestExample>
+
+## Respuesta Exitosa
+
+<ResponseField name="reference_date" type="string">
+  Fecha de referencia efectiva (YYYY-MM-DD).
+</ResponseField>
+
+<ResponseField name="data_lag" type="boolean">
+  Indica si la fecha de referencia quedó rezagada respecto de la fecha solicitada por falta de datos más recientes.
+</ResponseField>
+
+<ResponseField name="target_currency" type="string">
+  Moneda de salida aplicada.
+</ResponseField>
+
+<ResponseField name="fx_kind" type="string">
+  Tipo de cambio aplicado.
+</ResponseField>
+
+<ResponseField name="kpis" type="object">
+  KPIs de la industria.
+</ResponseField>
+
+<ResponseField name="kpis.vigent_funds" type="integer">
+  Cantidad de fondos vigentes a la fecha de referencia.
+</ResponseField>
+
+<ResponseField name="kpis.total_aum" type="number">
+  AUM total de la industria, expresado en `target_currency`.
+</ResponseField>
+
+<ResponseField name="kpis.active_managers" type="integer">
+  Cantidad de gestoras activas.
+</ResponseField>
+
+<ResponseField name="kpis.fx_rate" type="number">
+  Tipo de cambio aplicado a la conversión.
+</ResponseField>
+
+<ResponseField name="kpis.last_close_date" type="string">
+  Fecha del último cierre disponible (YYYY-MM-DD).
+</ResponseField>
+
+<ResponseField name="data_quality" type="object">
+  Metadatos de calidad: `funds_total`, `funds_with_real_data`, `funds_excluded`, `fx_carried_forward`, `vigent_threshold_days` y `reference_date`.
+</ResponseField>
+
+## Ejemplo de Respuesta Exitosa
+
+<ResponseExample>
+```json Success
+{
+  "reference_date": "2026-07-30",
+  "data_lag": true,
+  "target_currency": "ARS",
+  "fx_kind": "mep",
+  "kpis": {
+    "vigent_funds": 2431,
+    "total_aum": 105081584883560.12,
+    "active_managers": 57,
+    "fx_rate": 1508.42945874002,
+    "last_close_date": "2026-07-30"
+  },
+  "data_quality": {
+    "funds_total": 4672,
+    "funds_with_real_data": 4672,
+    "funds_excluded": 0,
+    "fx_carried_forward": false,
+    "vigent_threshold_days": 5,
+    "reference_date": "2026-07-30"
+  }
+}
+```
+</ResponseExample>

@@ -1,0 +1,73 @@
+---
+title: 'Benchmarks de FCI'
+openapi: 'GET /api/v1/fci/benchmarks'
+---
+
+<Note>
+  Lista los benchmarks disponibles para comparar contra fondos: BADLAR, TAMAR, CER, A3500, MEP, CCL y OFICIAL_MINORISTA. Cada entrada informa su tipo (`rate` o `quote`), su fuente y la unidad de tasa cuando aplica. Requiere el scope `fci:read`.
+</Note>
+
+Este endpoint no recibe parámetros.
+
+## Ejemplo de Solicitud
+
+<RequestExample>
+```bash cURL
+curl -X GET "https://api.doctacapital.com.ar/api/v1/fci/benchmarks" \
+  -H "Authorization: Bearer $DOCTA_TOKEN"
+```
+</RequestExample>
+
+## Respuesta Exitosa
+
+<ResponseField name="benchmarks" type="array">
+  Lista de benchmarks disponibles.
+</ResponseField>
+
+<ResponseField name="benchmarks[].name" type="string">
+  Nombre del benchmark (ej., "CER", "BADLAR").
+</ResponseField>
+
+<ResponseField name="benchmarks[].type" type="string">
+  Tipo de benchmark: `rate` (tasa) o `quote` (cotización).
+</ResponseField>
+
+<ResponseField name="benchmarks[].source" type="string">
+  Fuente de los datos (ej., "BCRA").
+</ResponseField>
+
+<ResponseField name="benchmarks[].rate_unit" type="string">
+  Unidad de la tasa para benchmarks de tipo `rate` (ej., "annual_pct"). Ausente en los de tipo `quote`.
+</ResponseField>
+
+<ResponseField name="total" type="integer">
+  Cantidad total de benchmarks.
+</ResponseField>
+
+## Ejemplo de Respuesta Exitosa
+
+<ResponseExample>
+```json Success
+{
+  "benchmarks": [
+    {
+      "name": "BADLAR",
+      "type": "rate",
+      "source": "BCRA",
+      "rate_unit": "annual_pct"
+    },
+    {
+      "name": "CER",
+      "type": "quote",
+      "source": "BCRA"
+    },
+    {
+      "name": "MEP",
+      "type": "quote",
+      "source": "DB"
+    }
+  ],
+  "total": 7
+}
+```
+</ResponseExample>

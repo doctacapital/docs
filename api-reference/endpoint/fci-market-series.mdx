@@ -1,0 +1,211 @@
+---
+title: 'Serie de mercado FCI'
+openapi: 'GET /api/v1/fci/market/series'
+---
+
+<Note>
+  Serie temporal de la industria de FCI para una métrica (`aum`, `funds_count` o `net_flow`), con apertura opcional por categoría o moneda, granularidad diaria/semanal/mensual y filtros por categoría o gestora. Requiere el scope `fci:read`.
+</Note>
+
+## Parámetros de consulta
+
+<ParamField query="metric" type="string" required>
+  Métrica a agregar.
+</ParamField>
+
+<Info>
+Valores válidos para <code>metric</code>:
+
+- <code>aum</code>: AUM total
+- <code>funds_count</code>: cantidad de fondos vigentes
+- <code>net_flow</code>: flujo neto de suscripciones y rescates
+</Info>
+
+<ParamField query="interval" type="string">
+  Intervalo de fechas, mutuamente excluyente con `date_from`/`date_to`. Ejemplos: `1 week`, `1 month`, `3 months`, `ytd`, `1 year`, `max` (también acepta los alias cortos `1W`, `1M`, `3M`, `YTD`, `1Y`).
+</ParamField>
+
+<ParamField query="date_from" type="string">
+  Inicio del rango en formato YYYY-MM-DD. Mutuamente excluyente con `interval`.
+</ParamField>
+
+<ParamField query="date_to" type="string">
+  Fin del rango en formato YYYY-MM-DD (predeterminado: último cierre). Mutuamente excluyente con `interval`.
+</ParamField>
+
+<ParamField query="breakdown" type="string">
+  Apertura de la serie en buckets (predeterminado `none`).
+</ParamField>
+
+<Info>
+Valores válidos para <code>breakdown</code>:
+
+- <code>none</code>: serie única para toda la industria
+- <code>category</code>: una serie por categoría
+- <code>currency</code>: una serie por moneda
+</Info>
+
+<ParamField query="target_currency" type="string">
+  Moneda de salida: `ARS` o `USD` (predeterminado `ARS`).
+</ParamField>
+
+<ParamField query="fx_kind" type="string">
+  Tipo de cambio usado para la conversión de moneda (predeterminado `mep`).
+</ParamField>
+
+<Info>
+Valores válidos para <code>fx_kind</code>:
+
+- <code>mep</code>
+- <code>ccl</code>
+- <code>a3500</code>
+- <code>oficial_minorista</code>
+</Info>
+
+<ParamField query="vigent_days_window" type="integer">
+  Días sin cotización antes de que un fondo deje de contarse como vigente (predeterminado 5, rango 1-60).
+</ParamField>
+
+<ParamField query="outlier_handling" type="string">
+  Tratamiento de los fondos con retornos diarios atípicos (predeterminado `exclude_fund`).
+</ParamField>
+
+<Info>
+Valores válidos para <code>outlier_handling</code>:
+
+- <code>exclude_fund</code>: excluye el fondo completo del cálculo
+- <code>skip_days</code>: omite solo los días atípicos
+- <code>include</code>: incluye todos los datos sin filtrar
+</Info>
+
+<ParamField query="report_outliers" type="boolean">
+  Incluye un reporte de outliers en la respuesta (predeterminado `false`).
+</ParamField>
+
+<ParamField query="category" type="string">
+  Filtra la serie a una categoría.
+</ParamField>
+
+<ParamField query="manager" type="string">
+  Filtra la serie a una gestora.
+</ParamField>
+
+<ParamField query="granularity" type="string">
+  Granularidad de muestreo (predeterminado `daily`).
+</ParamField>
+
+<Info>
+Valores válidos para <code>granularity</code>:
+
+- <code>daily</code>
+- <code>weekly</code>
+- <code>monthly</code>
+</Info>
+
+## Ejemplo de Solicitud
+
+<RequestExample>
+```bash cURL
+curl -G "https://api.doctacapital.com.ar/api/v1/fci/market/series" \
+  -H "Authorization: Bearer $DOCTA_TOKEN" \
+  --data-urlencode "metric=aum" \
+  --data-urlencode "interval=1 month" \
+  --data-urlencode "granularity=weekly"
+```
+</RequestExample>
+
+## Respuesta Exitosa
+
+<ResponseField name="metric" type="string">
+  Métrica agregada.
+</ResponseField>
+
+<ResponseField name="breakdown" type="string">
+  Apertura aplicada.
+</ResponseField>
+
+<ResponseField name="granularity" type="string">
+  Granularidad aplicada.
+</ResponseField>
+
+<ResponseField name="target_currency" type="string">
+  Moneda de salida aplicada.
+</ResponseField>
+
+<ResponseField name="fx_kind" type="string">
+  Tipo de cambio aplicado.
+</ResponseField>
+
+<ResponseField name="vigent_days_window" type="integer">
+  Ventana de vigencia aplicada.
+</ResponseField>
+
+<ResponseField name="outlier_handling" type="string">
+  Tratamiento de outliers aplicado.
+</ResponseField>
+
+<ResponseField name="filters_applied" type="object">
+  Filtros aplicados en la solicitud (`category`, `manager`).
+</ResponseField>
+
+<ResponseField name="requested_range" type="object">
+  Rango solicitado, con `from` y `to` en formato YYYY-MM-DD.
+</ResponseField>
+
+<ResponseField name="effective_range" type="object">
+  Rango efectivo con datos disponibles, con `from` y `to` en formato YYYY-MM-DD.
+</ResponseField>
+
+<ResponseField name="series" type="array">
+  Puntos de la serie. Con `breakdown=none` cada punto tiene `date` (YYYY-MM-DD) y `value` (en `target_currency` para `aum` y `net_flow`; entero para `funds_count`). Con apertura por categoría o moneda, los puntos se agrupan por bucket.
+</ResponseField>
+
+<ResponseField name="data_quality" type="object">
+  Metadatos de calidad: `funds_total`, `funds_total_universe`, `funds_with_real_data`, `funds_excluded_by_outliers` y `reference_date`.
+</ResponseField>
+
+## Ejemplo de Respuesta Exitosa
+
+<ResponseExample>
+```json Success
+{
+  "metric": "aum",
+  "breakdown": "none",
+  "granularity": "weekly",
+  "target_currency": "ARS",
+  "fx_kind": "mep",
+  "vigent_days_window": 5,
+  "outlier_handling": "exclude_fund",
+  "filters_applied": {},
+  "requested_range": {
+    "from": "2026-07-02",
+    "to": "2026-08-02"
+  },
+  "effective_range": {
+    "from": "2026-07-03",
+    "to": "2026-07-30"
+  },
+  "series": [
+    {
+      "date": "2026-07-03",
+      "value": 106422408976946.19
+    },
+    {
+      "date": "2026-07-08",
+      "value": 106186067544387.39
+    },
+    {
+      "date": "2026-07-17",
+      "value": 104155695727697.48
+    }
+  ],
+  "data_quality": {
+    "funds_total": 4672,
+    "funds_total_universe": 4672,
+    "funds_with_real_data": 2453,
+    "funds_excluded_by_outliers": 0,
+    "reference_date": "2026-07-30"
+  }
+}
+```
+</ResponseExample>

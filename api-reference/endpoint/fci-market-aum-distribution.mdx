@@ -1,0 +1,144 @@
+---
+title: 'Distribución de AUM'
+openapi: 'GET /api/v1/fci/market/aum-distribution'
+---
+
+<Note>
+  Distribución del AUM de la industria por categoría a una fecha de referencia: AUM, participación sobre la industria y cantidad de fondos por categoría. Requiere el scope `fci:read`.
+</Note>
+
+## Parámetros de consulta
+
+<ParamField query="date" type="string">
+  Fecha de referencia en formato YYYY-MM-DD (predeterminado: último cierre).
+</ParamField>
+
+<ParamField query="target_currency" type="string">
+  Moneda de salida: `ARS` o `USD` (predeterminado `ARS`).
+</ParamField>
+
+<ParamField query="fx_kind" type="string">
+  Tipo de cambio usado para la conversión de moneda (predeterminado `mep`).
+</ParamField>
+
+<Info>
+Valores válidos para <code>fx_kind</code>:
+
+- <code>mep</code>
+- <code>ccl</code>
+- <code>a3500</code>
+- <code>oficial_minorista</code>
+</Info>
+
+<ParamField query="breakdown" type="string">
+  Apertura de la distribución. Por ahora solo se admite `sub_category` (predeterminado).
+</ParamField>
+
+<ParamField query="vigent_days_window" type="integer">
+  Días sin cotización antes de que un fondo deje de contarse como vigente (predeterminado 5, rango 1-60).
+</ParamField>
+
+## Ejemplo de Solicitud
+
+<RequestExample>
+```bash cURL
+curl -X GET "https://api.doctacapital.com.ar/api/v1/fci/market/aum-distribution?target_currency=ARS" \
+  -H "Authorization: Bearer $DOCTA_TOKEN"
+```
+</RequestExample>
+
+## Respuesta Exitosa
+
+<ResponseField name="reference_date" type="string">
+  Fecha de referencia efectiva (YYYY-MM-DD).
+</ResponseField>
+
+<ResponseField name="data_lag" type="boolean">
+  Indica si la fecha de referencia quedó rezagada respecto de la fecha solicitada por falta de datos más recientes.
+</ResponseField>
+
+<ResponseField name="target_currency" type="string">
+  Moneda de salida aplicada.
+</ResponseField>
+
+<ResponseField name="fx_kind" type="string">
+  Tipo de cambio aplicado.
+</ResponseField>
+
+<ResponseField name="breakdown" type="string">
+  Apertura aplicada (`sub_category`).
+</ResponseField>
+
+<ResponseField name="vigent_days_window" type="integer">
+  Ventana de vigencia aplicada.
+</ResponseField>
+
+<ResponseField name="total_aum" type="number">
+  AUM total de la industria, expresado en `target_currency`.
+</ResponseField>
+
+<ResponseField name="categories" type="array">
+  Una entrada por categoría.
+</ResponseField>
+
+<ResponseField name="categories[].category" type="string">
+  Nombre de la categoría (ej., "Mercado de Dinero").
+</ResponseField>
+
+<ResponseField name="categories[].aum" type="number">
+  AUM de la categoría, expresado en `target_currency`.
+</ResponseField>
+
+<ResponseField name="categories[].share_pct" type="number">
+  Participación de la categoría sobre la industria, expresada como porcentaje (ej., 53.66 = 53.66%).
+</ResponseField>
+
+<ResponseField name="categories[].fund_count" type="integer">
+  Cantidad de fondos en la categoría.
+</ResponseField>
+
+<ResponseField name="data_quality" type="object">
+  Metadatos de calidad: `funds_total`, `funds_with_real_data`, `fx_carried_forward` y `reference_date`.
+</ResponseField>
+
+## Ejemplo de Respuesta Exitosa
+
+<ResponseExample>
+```json Success
+{
+  "reference_date": "2026-07-30",
+  "data_lag": true,
+  "target_currency": "ARS",
+  "fx_kind": "mep",
+  "breakdown": "sub_category",
+  "vigent_days_window": 5,
+  "total_aum": 105081584883560.0,
+  "categories": [
+    {
+      "category": "Mercado de Dinero",
+      "aum": 56385165799267.4,
+      "share_pct": 53.658465336002806,
+      "fund_count": 242
+    },
+    {
+      "category": "Renta Fija",
+      "aum": 27111005010171.2,
+      "share_pct": 25.79995823265577,
+      "fund_count": 992
+    },
+    {
+      "category": "Sin clasificar",
+      "aum": 8380970595105.71,
+      "share_pct": 7.975679662990038,
+      "fund_count": 357
+    }
+  ],
+  "data_quality": {
+    "funds_total": 4672,
+    "funds_with_real_data": 2431,
+    "fx_carried_forward": false,
+    "reference_date": "2026-07-30"
+  }
+}
+```
+</ResponseExample>

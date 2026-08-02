@@ -1,0 +1,211 @@
+---
+title: 'Gestoras por flujo'
+openapi: 'GET /api/v1/fci/market/top-managers-by-flow'
+---
+
+<Note>
+  Ranking de gestoras por flujo neto de suscripciones y rescates sobre un rango de fechas, con AUM y cantidad de fondos al cierre del rango. Requiere el scope `fci:read`.
+</Note>
+
+## Parámetros de consulta
+
+<ParamField query="interval" type="string">
+  Intervalo de fechas, mutuamente excluyente con `date_from`/`date_to`. Ejemplos: `1 week`, `1 month`, `3 months`, `ytd`, `1 year`, `max` (también acepta los alias cortos `1W`, `1M`, `3M`, `YTD`, `1Y`).
+</ParamField>
+
+<ParamField query="date_from" type="string">
+  Inicio del rango en formato YYYY-MM-DD. Mutuamente excluyente con `interval`.
+</ParamField>
+
+<ParamField query="date_to" type="string">
+  Fin del rango en formato YYYY-MM-DD (predeterminado: último cierre). Mutuamente excluyente con `interval`.
+</ParamField>
+
+<ParamField query="target_currency" type="string">
+  Moneda de salida: `ARS` o `USD` (predeterminado `ARS`).
+</ParamField>
+
+<ParamField query="fx_kind" type="string">
+  Tipo de cambio usado para la conversión de moneda (predeterminado `mep`).
+</ParamField>
+
+<Info>
+Valores válidos para <code>fx_kind</code>:
+
+- <code>mep</code>
+- <code>ccl</code>
+- <code>a3500</code>
+- <code>oficial_minorista</code>
+</Info>
+
+<ParamField query="vigent_days_window" type="integer">
+  Días sin cotización antes de que un fondo deje de contarse como vigente (predeterminado 5, rango 1-60).
+</ParamField>
+
+<ParamField query="top" type="integer">
+  Máximo de gestoras por página (predeterminado 20, rango 1-100).
+</ParamField>
+
+<ParamField query="offset" type="integer">
+  Desplazamiento de paginación (predeterminado 0).
+</ParamField>
+
+<ParamField query="outlier_handling" type="string">
+  Tratamiento de los fondos con retornos diarios atípicos (predeterminado `exclude_fund`).
+</ParamField>
+
+<Info>
+Valores válidos para <code>outlier_handling</code>:
+
+- <code>exclude_fund</code>: excluye el fondo completo del cálculo
+- <code>skip_days</code>: omite solo los días atípicos
+- <code>include</code>: incluye todos los datos sin filtrar
+</Info>
+
+<ParamField query="report_outliers" type="boolean">
+  Incluye un reporte de outliers en la respuesta (predeterminado `false`).
+</ParamField>
+
+## Ejemplo de Solicitud
+
+<RequestExample>
+```bash cURL
+curl -G "https://api.doctacapital.com.ar/api/v1/fci/market/top-managers-by-flow" \
+  -H "Authorization: Bearer $DOCTA_TOKEN" \
+  --data-urlencode "interval=1 month" \
+  --data-urlencode "top=20"
+```
+</RequestExample>
+
+## Respuesta Exitosa
+
+<ResponseField name="requested_range" type="object">
+  Rango solicitado, con `from` y `to` en formato YYYY-MM-DD.
+</ResponseField>
+
+<ResponseField name="effective_range" type="object">
+  Rango efectivo con datos disponibles, con `from` y `to` en formato YYYY-MM-DD.
+</ResponseField>
+
+<ResponseField name="target_currency" type="string">
+  Moneda de salida aplicada.
+</ResponseField>
+
+<ResponseField name="fx_kind" type="string">
+  Tipo de cambio aplicado.
+</ResponseField>
+
+<ResponseField name="vigent_days_window" type="integer">
+  Ventana de vigencia aplicada.
+</ResponseField>
+
+<ResponseField name="outlier_handling" type="string">
+  Tratamiento de outliers aplicado.
+</ResponseField>
+
+<ResponseField name="industry_total_flow" type="number | null">
+  Flujo neto total de la industria en el rango. Es null cuando no puede calcularse de forma completa.
+</ResponseField>
+
+<ResponseField name="total_managers" type="integer">
+  Cantidad total de gestoras en el ranking.
+</ResponseField>
+
+<ResponseField name="top_returned" type="integer">
+  Cantidad de gestoras devueltas en esta página.
+</ResponseField>
+
+<ResponseField name="offset" type="integer">
+  Desplazamiento aplicado.
+</ResponseField>
+
+<ResponseField name="managers" type="array">
+  Una entrada por gestora, ordenada por flujo neto.
+</ResponseField>
+
+<ResponseField name="managers[].rank" type="integer">
+  Posición en el ranking.
+</ResponseField>
+
+<ResponseField name="managers[].manager_name" type="string">
+  Nombre de la gestora.
+</ResponseField>
+
+<ResponseField name="managers[].net_flow" type="number | null">
+  Flujo neto de la gestora en el rango, expresado en `target_currency`. Es null cuando no puede calcularse.
+</ResponseField>
+
+<ResponseField name="managers[].fund_count_at_end" type="integer">
+  Cantidad de fondos de la gestora al cierre del rango.
+</ResponseField>
+
+<ResponseField name="managers[].aum_at_end" type="number">
+  AUM de la gestora al cierre del rango, expresado en `target_currency`.
+</ResponseField>
+
+<ResponseField name="managers[].partial_period" type="boolean">
+  Indica si la gestora tiene datos parciales dentro del rango.
+</ResponseField>
+
+<ResponseField name="data_quality" type="object">
+  Metadatos de calidad: `funds_total`, `funds_with_real_data`, `funds_with_partial_data`, `funds_excluded_by_outliers`, `fx_carried_forward_funds` y `reference_date`.
+</ResponseField>
+
+## Ejemplo de Respuesta Exitosa
+
+<ResponseExample>
+```json Success
+{
+  "requested_range": {
+    "from": "2026-07-02",
+    "to": "2026-08-02"
+  },
+  "effective_range": {
+    "from": "2026-07-02",
+    "to": "2026-07-30"
+  },
+  "target_currency": "ARS",
+  "fx_kind": "mep",
+  "vigent_days_window": 5,
+  "outlier_handling": "exclude_fund",
+  "industry_total_flow": null,
+  "total_managers": 57,
+  "top_returned": 3,
+  "offset": 0,
+  "managers": [
+    {
+      "rank": 1,
+      "manager_name": "Proahorro Administradora de Activos S.A.",
+      "net_flow": 21397882607.64,
+      "fund_count_at_end": 7,
+      "aum_at_end": 2014636421664.33,
+      "partial_period": false
+    },
+    {
+      "rank": 2,
+      "manager_name": "Sin gestora",
+      "net_flow": null,
+      "fund_count_at_end": 349,
+      "aum_at_end": 8093521431387.21,
+      "partial_period": true
+    },
+    {
+      "rank": 3,
+      "manager_name": "Pellegrini S.A.S.G.F.C.I.",
+      "net_flow": 662566036721.1,
+      "fund_count_at_end": 41,
+      "aum_at_end": 4416762701231.56,
+      "partial_period": false
+    }
+  ],
+  "data_quality": {
+    "funds_total": 4672,
+    "funds_with_real_data": 2422,
+    "funds_with_partial_data": 0,
+    "funds_excluded_by_outliers": 6,
+    "fx_carried_forward_funds": 0,
+    "reference_date": "2026-07-30"
+  }
+}
+```
+</ResponseExample>

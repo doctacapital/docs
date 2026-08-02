@@ -3,7 +3,7 @@ title: "Servidor MCP"
 description: "Conectá Claude, ChatGPT o tu editor a los datos de mercado de Docta"
 ---
 
-Docta expone un servidor remoto [MCP (Model Context Protocol)](https://modelcontextprotocol.io) para que asistentes de IA consulten datos de bonos argentinos — rendimientos, duration, flujos de fondos y paridad — directamente desde la conversación.
+Docta expone un servidor remoto [MCP (Model Context Protocol)](https://modelcontextprotocol.io) para que asistentes de IA consulten datos del mercado argentino — bonos (rendimientos, duration, flujos de fondos, paridad) y FCI (screener, series, performance, gestoras y flujos de industria) — directamente desde la conversación.
 
 <Card title="URL del servidor" icon="plug">
   `https://mcp.docta.com.ar/mcp`
@@ -30,7 +30,9 @@ La forma recomendada: iniciás sesión con tu cuenta de Docta y autorizás el ac
 
 ## Herramientas disponibles
 
-El servidor expone 10 herramientas, una por cada endpoint documentado de la API de bonos:
+El servidor expone 24 herramientas, una por cada endpoint documentado de la API.
+
+### Bonos
 
 | Herramienta | Endpoint | Qué hace |
 | --- | --- | --- |
@@ -45,10 +47,30 @@ El servidor expone 10 herramientas, una por cada endpoint documentado de la API 
 | `compare_bonds` | (agrupa `yields/intraday`) | Comparación de 2–5 bonos en una tabla |
 | `get_my_usage` | — | Tu plan y cuota restante (no consume requests) |
 
+### FCI
+
+| Herramienta | Endpoint | Qué hace |
+| --- | --- | --- |
+| `search_fci_funds` | `/fci/instruments/search` | Resolver un fondo por nombre, gestora o categoría |
+| `list_fci_funds` | `/fci/instruments` | Screener del universo FCI: filtros por gestora, categoría, AUM y retornos |
+| `get_fci_fund` | `/fci/instruments/{fund_name}` | Ficha del fondo: fees, composición, retornos preestablecidos |
+| `get_fci_series` | `.../{fund_name}/series` | Serie diaria de VCP, AUM, flujo y retornos |
+| `get_fci_performance` | `.../{fund_name}/performance` | Performance de un rango: retorno acumulado, TNA, mejor/peor día |
+| `get_fci_catalog` | `/fci/catalog` | Valores válidos de cada filtro del screener |
+| `list_fci_benchmarks` | `/fci/benchmarks` | Benchmarks disponibles (CER, BADLAR, MEP, …) |
+| `get_fci_benchmark_series` | `/fci/benchmarks/{name}/series` | Serie de retorno acumulado de un benchmark |
+| `compare_fci_funds` | `/fci/compare/table` | Comparación de hasta 30 fondos en una tabla |
+| `get_fci_market_kpis` | `/fci/market/kpis` | KPIs de industria: fondos vigentes, AUM total, gestoras activas |
+| `get_fci_aum_distribution` | `/fci/market/aum-distribution` | AUM de la industria por categoría |
+| `get_fci_top_managers` | `/fci/market/top-managers` | Ranking de gestoras por AUM |
+| `get_fci_top_managers_by_flow` | `/fci/market/top-managers-by-flow` | Ranking de gestoras por flujo neto |
+| `get_fci_flows_by_category` | `/fci/market/flows-by-category` | Flujos netos de una categoría en un rango |
+
 <Note>
-  El alcance es **renta fija argentina**. La API no cubre acciones, CEDEARs ni futuros, y no
-  expone precios, OHLC ni volumen operado: donde dice "intradiario" se trata de
-  **rendimientos** intradiarios, no de cotizaciones.
+  El alcance es **renta fija argentina y FCI**. La API no cubre acciones, CEDEARs ni futuros, y
+  en bonos no expone precios, OHLC ni volumen operado: donde dice "intradiario" se trata de
+  **rendimientos** intradiarios, no de cotizaciones. Los datos de FCI son de frecuencia diaria
+  (VCP/AUM al cierre) y los retornos son decimales (0.05 = 5%).
 </Note>
 
 ## Cuotas y caché

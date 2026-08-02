@@ -1,0 +1,198 @@
+---
+title: 'Performance de FCI'
+openapi: 'GET /api/v1/fci/instruments/{fund_name}/performance'
+---
+
+<Note>
+  Devuelve la performance descriptiva de un fondo sobre un rango: retorno acumulado, TNA proporcional, mejor y peor día, mejor y peor subperíodo móvil y conteo de días positivos y negativos. Requiere el scope `fci:read`.
+</Note>
+
+## Parámetros de ruta
+
+<ParamField path="fund_name" type="string" required>
+  Nombre del fondo. Va URL-encodeado, ya que los nombres contienen espacios (ej., `Premier%20Abierto%20Pymes%20-%20Clase%20A`).
+</ParamField>
+
+## Parámetros de consulta
+
+<ParamField query="interval" type="string">
+  Intervalo de fechas, mutuamente excluyente con `date_from`/`date_to`. Valores permitidos: `1 week`, `1 month`, `3 months`, `6 months`, `ytd`, `1 year` (también se aceptan los alias cortos `1W`, `1M`, `3M`, `6M`, `YTD`, `1Y`). A diferencia de la serie, este endpoint no acepta `max`.
+</ParamField>
+
+<ParamField query="date_from" type="string">
+  Fecha de inicio en formato YYYY-MM-DD. Mutuamente excluyente con `interval`.
+</ParamField>
+
+<ParamField query="date_to" type="string">
+  Fecha de fin en formato YYYY-MM-DD. Predeterminado: última fecha disponible. Mutuamente excluyente con `interval`.
+</ParamField>
+
+<ParamField query="fx" type="string" default="none">
+  Conversión de moneda. Con `none` los valores quedan en la moneda nativa del fondo. Valores: `none`, `mep`, `ccl`, `a3500`, `oficial_minorista`.
+</ParamField>
+
+## Ejemplo de Solicitud
+
+<RequestExample>
+```bash cURL
+curl -X GET "https://api.doctacapital.com.ar/api/v1/fci/instruments/Premier%20Abierto%20Pymes%20-%20Clase%20A/performance?interval=1%20month" \
+  -H "Authorization: Bearer $DOCTA_TOKEN"
+```
+</RequestExample>
+
+## Respuesta Exitosa
+
+<ResponseField name="fund_name" type="string">
+  Nombre del fondo.
+</ResponseField>
+
+<ResponseField name="currency" type="string">
+  Moneda nativa del fondo.
+</ResponseField>
+
+<ResponseField name="fx" type="string">
+  Conversión de moneda solicitada.
+</ResponseField>
+
+<ResponseField name="output_currency" type="string">
+  Moneda de salida de los valores.
+</ResponseField>
+
+<ResponseField name="requested_range" type="object">
+  Rango solicitado, con `from` y `to`.
+</ResponseField>
+
+<ResponseField name="effective_range" type="object">
+  Rango efectivo con datos disponibles, con `from` y `to`.
+</ResponseField>
+
+<ResponseField name="fund_inactive_in_range" type="boolean">
+  Indica si el fondo estuvo inactivo en el rango solicitado.
+</ResponseField>
+
+<ResponseField name="performance" type="object">
+  Métricas descriptivas del rango.
+</ResponseField>
+
+<ResponseField name="performance.cumulative_return" type="number">
+  Retorno acumulado del rango, en decimal.
+</ResponseField>
+
+<ResponseField name="performance.tna" type="number">
+  TNA proporcional del rango, en decimal.
+</ResponseField>
+
+<ResponseField name="performance.days_calendar" type="integer">
+  Días calendario del rango.
+</ResponseField>
+
+<ResponseField name="performance.days_business" type="integer">
+  Días hábiles del rango.
+</ResponseField>
+
+<ResponseField name="performance.best_day" type="object">
+  Mejor día del rango, con `date`, `return`, `previous_vcp` y `vcp`.
+</ResponseField>
+
+<ResponseField name="performance.worst_day" type="object">
+  Peor día del rango, con `date`, `return`, `previous_vcp` y `vcp`.
+</ResponseField>
+
+<ResponseField name="performance.positive_days" type="integer">
+  Cantidad de días con retorno positivo.
+</ResponseField>
+
+<ResponseField name="performance.negative_days" type="integer">
+  Cantidad de días con retorno negativo.
+</ResponseField>
+
+<ResponseField name="performance.best_subperiod" type="object">
+  Mejor subperíodo móvil, con `start`, `end`, `return`, `label`, `start_vcp` y `end_vcp`.
+</ResponseField>
+
+<ResponseField name="performance.worst_subperiod" type="object">
+  Peor subperíodo móvil, con `start`, `end`, `return`, `label`, `start_vcp` y `end_vcp`.
+</ResponseField>
+
+<ResponseField name="performance.subperiod_interval" type="string">
+  Longitud del subperíodo móvil (ej., "1 week").
+</ResponseField>
+
+<ResponseField name="range_too_short_for_meaningful_metrics" type="boolean">
+  Indica si el rango es demasiado corto para que las métricas sean significativas.
+</ResponseField>
+
+<ResponseField name="data_quality" type="object">
+  Calidad de los datos del rango: `real_data_pct`, `last_real_data_date`, `gap_count`, `long_gaps_detected`, `interpolated_days`, `missing_days`, `aum_estimated_days`, `fx_carried_forward_days` y `total_days`.
+</ResponseField>
+
+## Ejemplo de Respuesta Exitosa
+
+<ResponseExample>
+```json Success
+{
+  "fund_name": "Premier Abierto Pymes - Clase A",
+  "currency": "ARS",
+  "fx": "none",
+  "output_currency": "ARS",
+  "requested_range": {
+    "from": "2026-06-30",
+    "to": "2026-07-30"
+  },
+  "effective_range": {
+    "from": "2026-06-30",
+    "to": "2026-07-30"
+  },
+  "fund_inactive_in_range": false,
+  "performance": {
+    "cumulative_return": 0.016567519671488284,
+    "tna": 0.20157148933644078,
+    "days_calendar": 30,
+    "days_business": 21,
+    "best_day": {
+      "date": "2026-07-23",
+      "return": 0.009322698105125982,
+      "previous_vcp": 127330.413,
+      "vcp": 128517.476
+    },
+    "worst_day": {
+      "date": "2026-07-16",
+      "return": -0.004386222108857418,
+      "previous_vcp": 127709.675,
+      "vcp": 127149.512
+    },
+    "positive_days": 12,
+    "negative_days": 6,
+    "best_subperiod": {
+      "start": "2026-07-22",
+      "end": "2026-07-29",
+      "return": 0.015825441483489078,
+      "label": "Semana del 22 Jul 2026",
+      "start_vcp": 127330.413,
+      "end_vcp": 129345.473
+    },
+    "worst_subperiod": {
+      "start": "2026-07-15",
+      "end": "2026-07-22",
+      "return": -0.002969720187605218,
+      "label": "Semana del 15 Jul 2026",
+      "start_vcp": 127709.675,
+      "end_vcp": 127330.413
+    },
+    "subperiod_interval": "1 week"
+  },
+  "range_too_short_for_meaningful_metrics": false,
+  "data_quality": {
+    "real_data_pct": 0.952381,
+    "last_real_data_date": "2026-07-30",
+    "gap_count": 0,
+    "long_gaps_detected": [],
+    "interpolated_days": 1,
+    "missing_days": 0,
+    "aum_estimated_days": 1,
+    "fx_carried_forward_days": 0,
+    "total_days": 21
+  }
+}
+```
+</ResponseExample>

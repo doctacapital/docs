@@ -1,0 +1,165 @@
+---
+title: 'Detalle de FCI'
+openapi: 'GET /api/v1/fci/instruments/{fund_name}'
+---
+
+<Note>
+  Devuelve el detalle enriquecido de un fondo: metadatos (gerente, depositaria, categoría, horizonte), economics (comisiones, inversión mínima), composición de cartera (principales tenencias, HHI) y retornos preestablecidos (1D/1W/1M/3M/6M/YTD/1Y). Requiere el scope `fci:read`.
+</Note>
+
+## Parámetros de ruta
+
+<ParamField path="fund_name" type="string" required>
+  Nombre del fondo. Va URL-encodeado, ya que los nombres contienen espacios (ej., `Premier%20Abierto%20Pymes%20-%20Clase%20A`).
+</ParamField>
+
+## Parámetros de consulta
+
+<ParamField query="fx" type="string" default="none">
+  Conversión de moneda. Con `none` los valores quedan en la moneda nativa del fondo.
+</ParamField>
+
+<Info>
+Valores válidos para <code>fx</code>:
+
+- <code>none</code>
+- <code>mep</code>
+- <code>ccl</code>
+- <code>a3500</code>
+- <code>oficial_minorista</code>
+</Info>
+
+## Ejemplo de Solicitud
+
+<RequestExample>
+```bash cURL
+curl -X GET "https://api.doctacapital.com.ar/api/v1/fci/instruments/Premier%20Abierto%20Pymes%20-%20Clase%20A?fx=none" \
+  -H "Authorization: Bearer $DOCTA_TOKEN"
+```
+</RequestExample>
+
+## Respuesta Exitosa
+
+<ResponseField name="fund_name" type="string">
+  Nombre del fondo.
+</ResponseField>
+
+<ResponseField name="currency" type="string">
+  Moneda nativa del fondo.
+</ResponseField>
+
+<ResponseField name="fx" type="string">
+  Conversión de moneda solicitada.
+</ResponseField>
+
+<ResponseField name="output_currency" type="string">
+  Moneda de salida de los valores.
+</ResponseField>
+
+<ResponseField name="metadata" type="object">
+  Metadatos del fondo: `manager_name`, `depositary_name`, `class_type`, `fund_type`, `rent_type`, `region`, `benchmark`, `horizon` y `duration`.
+</ResponseField>
+
+<ResponseField name="economics" type="object | null">
+  Economics del fondo: `minimum_investment`, `management_fee`, `redemption_fee`, `subscription_fee`, `transfer_fee`, `custodian_fee` y `objective` (descripción del objetivo de inversión). Es null cuando CAFCI no está disponible.
+</ResponseField>
+
+<ResponseField name="composition" type="object | null">
+  Composición de cartera: `total_holdings`, `top_5` y `top_10` (listas de tenencias con `name` y `share` en porcentaje), `hhi` (índice de concentración Herfindahl-Hirschman) y `no_composition_data`. Es null cuando CAFCI no está disponible.
+</ResponseField>
+
+<ResponseField name="performance" type="object">
+  Retornos preestablecidos por período (`1D`, `1W`, `1M`, `3M`, `6M`, `YTD`, `1Y`). Cada período incluye `return` (decimal), `anchor_date`, `end_date` e `insufficient_history`.
+</ResponseField>
+
+<ResponseField name="cafci_unavailable" type="boolean">
+  Indica una respuesta parcial: cuando la fuente CAFCI no responde, este campo es `true` y `economics` y `composition` vuelven en null. El resto del detalle sigue disponible.
+</ResponseField>
+
+<ResponseField name="data_quality" type="object">
+  Calidad de los datos del fondo: `real_data_pct`, `last_real_data_date`, `gap_count`, `long_gaps_detected`, `interpolated_days`, `missing_days`, `aum_estimated_days`, `fx_carried_forward_days` y `total_days`.
+</ResponseField>
+
+## Ejemplo de Respuesta Exitosa
+
+<ResponseExample>
+```json Success
+{
+  "fund_name": "Premier Abierto Pymes - Clase A",
+  "currency": "ARS",
+  "fx": "none",
+  "output_currency": "ARS",
+  "metadata": {
+    "manager_name": "Supervielle Asset Management S.A.",
+    "depositary_name": "Banco Supervielle S.A.",
+    "class_type": "Mayorista",
+    "fund_type": "Abierto",
+    "rent_type": "PyMes",
+    "region": "Argentina",
+    "benchmark": "Otro",
+    "horizon": "Mediano Plazo",
+    "duration": "No Aplicable"
+  },
+  "economics": {
+    "minimum_investment": 1.0,
+    "management_fee": 2.024,
+    "redemption_fee": null,
+    "subscription_fee": null,
+    "transfer_fee": 0.0,
+    "custodian_fee": 0.176,
+    "objective": "Es un fondo que invierte en activos de renta fija principalmente ChPD Ons y FF de emisores Pymes."
+  },
+  "composition": {
+    "total_holdings": 11,
+    "top_5": [
+      {
+        "name": "Resto de Activos",
+        "share": 52.4
+      },
+      {
+        "name": "Caucion Colocadora $ Merval",
+        "share": 15.4
+      },
+      {
+        "name": "Bono Dual TXMJ0",
+        "share": 8.2
+      }
+    ],
+    "hhi": 3114.97,
+    "no_composition_data": false
+  },
+  "performance": {
+    "1D": {
+      "return": 0.0008049373324414688,
+      "anchor_date": "2026-07-29",
+      "end_date": "2026-07-30",
+      "insufficient_history": false
+    },
+    "1M": {
+      "return": 0.016567519671488284,
+      "anchor_date": "2026-06-30",
+      "end_date": "2026-07-30",
+      "insufficient_history": false
+    },
+    "1Y": {
+      "return": 0.4372903452209189,
+      "anchor_date": "2025-07-30",
+      "end_date": "2026-07-30",
+      "insufficient_history": false
+    }
+  },
+  "cafci_unavailable": false,
+  "data_quality": {
+    "real_data_pct": 0.983333,
+    "last_real_data_date": "2026-07-30",
+    "gap_count": 0,
+    "long_gaps_detected": [],
+    "interpolated_days": 1,
+    "missing_days": 0,
+    "aum_estimated_days": 1,
+    "fx_carried_forward_days": 0,
+    "total_days": 60
+  }
+}
+```
+</ResponseExample>

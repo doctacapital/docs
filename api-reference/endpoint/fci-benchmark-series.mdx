@@ -1,0 +1,117 @@
+---
+title: 'Serie de benchmark'
+openapi: 'GET /api/v1/fci/benchmarks/{name}/series'
+---
+
+<Note>
+  Devuelve la serie de retorno acumulado de un benchmark sobre un rango. Los benchmarks de tasa (BADLAR, TAMAR) capitalizan diariamente sobre TNA/365; los de cotización (CER, MEP, CCL, A3500) usan la variación simple de precio. Requiere el scope `fci:read`.
+</Note>
+
+## Parámetros de ruta
+
+<ParamField path="name" type="string" required>
+  Nombre del benchmark (ej., "CER", "BADLAR", "MEP"). Consultá los disponibles en `GET /api/v1/fci/benchmarks`.
+</ParamField>
+
+## Parámetros de consulta
+
+<ParamField query="interval" type="string">
+  Intervalo de fechas, mutuamente excluyente con `date_from`/`date_to`. Ejemplos: `1 week`, `1 month`, `3 months`, `ytd`, `1 year`, `max` (también se aceptan los alias cortos `1W`, `1M`, `3M`, `YTD`, `1Y`).
+</ParamField>
+
+<ParamField query="date_from" type="string">
+  Fecha de inicio en formato YYYY-MM-DD. Mutuamente excluyente con `interval`.
+</ParamField>
+
+<ParamField query="date_to" type="string">
+  Fecha de fin en formato YYYY-MM-DD. Predeterminado: hoy. Mutuamente excluyente con `interval`.
+</ParamField>
+
+## Ejemplo de Solicitud
+
+<RequestExample>
+```bash cURL
+curl -X GET "https://api.doctacapital.com.ar/api/v1/fci/benchmarks/CER/series?interval=1%20week" \
+  -H "Authorization: Bearer $DOCTA_TOKEN"
+```
+</RequestExample>
+
+## Respuesta Exitosa
+
+<ResponseField name="name" type="string">
+  Nombre del benchmark.
+</ResponseField>
+
+<ResponseField name="type" type="string">
+  Tipo de benchmark: `rate` o `quote`.
+</ResponseField>
+
+<ResponseField name="source" type="string">
+  Fuente de los datos.
+</ResponseField>
+
+<ResponseField name="rate_unit" type="string | null">
+  Unidad de la tasa para benchmarks de tipo `rate`. Es null en los de tipo `quote`.
+</ResponseField>
+
+<ResponseField name="requested_range" type="object">
+  Rango solicitado, con `from` y `to`.
+</ResponseField>
+
+<ResponseField name="effective_range" type="object">
+  Rango efectivo con datos disponibles, con `from` y `to`.
+</ResponseField>
+
+<ResponseField name="series" type="array">
+  Puntos diarios de la serie.
+</ResponseField>
+
+<ResponseField name="series[].date" type="string">
+  Fecha del punto (YYYY-MM-DD).
+</ResponseField>
+
+<ResponseField name="series[].quote" type="number">
+  Cotización del benchmark en la fecha. Presente solo en benchmarks de tipo `quote`; en los de tipo `rate` el punto trae el campo `rate` (la tasa, en la unidad de `rate_unit`) en lugar de `quote`.
+</ResponseField>
+
+<ResponseField name="series[].cumulative_return" type="number">
+  Retorno acumulado desde el inicio del rango, en decimal.
+</ResponseField>
+
+## Ejemplo de Respuesta Exitosa
+
+<ResponseExample>
+```json Success
+{
+  "name": "CER",
+  "type": "quote",
+  "source": "BCRA",
+  "rate_unit": null,
+  "requested_range": {
+    "from": "2026-07-26",
+    "to": "2026-08-02"
+  },
+  "effective_range": {
+    "from": "2026-07-27",
+    "to": "2026-08-02"
+  },
+  "series": [
+    {
+      "date": "2026-07-27",
+      "quote": 813.45653848551,
+      "cumulative_return": 0.0
+    },
+    {
+      "date": "2026-07-28",
+      "quote": 813.95058132289,
+      "cumulative_return": 0.0006073377175133121
+    },
+    {
+      "date": "2026-07-29",
+      "quote": 814.44492421112,
+      "cumulative_return": 0.0012150442941305517
+    }
+  ]
+}
+```
+</ResponseExample>

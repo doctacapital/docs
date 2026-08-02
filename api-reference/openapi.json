@@ -1,8 +1,8 @@
 {
   "openapi": "3.1.0",
   "info": {
-    "title": "API de Bonos de Docta",
-    "description": "API centrada en bonos de Argentina: instrumentos, detalle, cashflows y curvas/yields.",
+    "title": "API de Docta",
+    "description": "API de mercado argentino: bonos (instrumentos, cashflows, curvas/yields) y FCI (screener, series, performance, comparaciones y analytics de industria).",
     "license": {
       "name": "MIT"
     },
@@ -899,6 +899,2984 @@
                   "status": 500,
                   "detail": "Internal server error",
                   "correlation_id": "6cd1fd05-63e9-4863-832f-d873e58e9d67"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/fci/instruments": {
+      "get": {
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "description": "Listar y filtrar el universo de FCI (screener): metadata, AUM y retornos preestablecidos (1D/1W/1M/YTD/1Y), con filtros por gestora, depositaria, categoría, región, horizonte, AUM y retornos. Paginado con limit/offset.",
+        "tags": [
+          "FCI"
+        ],
+        "parameters": [
+          {
+            "name": "date",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+              "description": "Reference date YYYY-MM-DD (default: last close)"
+            }
+          },
+          {
+            "name": "native_currency_filter",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "ARS",
+                "USD"
+              ],
+              "type": "string",
+              "description": "Only funds whose native currency matches"
+            }
+          },
+          {
+            "name": "target_currency",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "ARS",
+                "USD"
+              ],
+              "type": "string",
+              "description": "Output currency for AUM and returns",
+              "default": "ARS"
+            }
+          },
+          {
+            "name": "fx_kind",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "mep",
+                "ccl",
+                "a3500",
+                "oficial_minorista"
+              ],
+              "type": "string",
+              "description": "FX rate used for currency conversion",
+              "default": "mep"
+            }
+          },
+          {
+            "name": "fund_names",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "Exact fund names (repeat the param for multiple)"
+            }
+          },
+          {
+            "name": "gerente",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "description": "Manager exact match"
+            }
+          },
+          {
+            "name": "depositaria",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "description": "Depositary exact match"
+            }
+          },
+          {
+            "name": "rent_type",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "description": "Income type / category (e.g. 'Mercado de Dinero')"
+            }
+          },
+          {
+            "name": "region",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "description": "Region"
+            }
+          },
+          {
+            "name": "benchmark",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "description": "Benchmark"
+            }
+          },
+          {
+            "name": "horizon",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "description": "Investment horizon"
+            }
+          },
+          {
+            "name": "duration",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "description": "Duration bucket"
+            }
+          },
+          {
+            "name": "fund_type",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "description": "Abierto / Cerrado"
+            }
+          },
+          {
+            "name": "class_type",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "description": "Share class (Mayorista / Minorista / etc.)"
+            }
+          },
+          {
+            "name": "aum_min",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "number",
+              "minimum": 0,
+              "description": "Minimum AUM in target_currency"
+            }
+          },
+          {
+            "name": "aum_max",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "number",
+              "minimum": 0,
+              "description": "Maximum AUM in target_currency"
+            }
+          },
+          {
+            "name": "return_period",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "1D",
+                "1W",
+                "1M",
+                "YTD",
+                "1Y"
+              ],
+              "type": "string",
+              "description": "Period for min_return/max_return filters"
+            }
+          },
+          {
+            "name": "min_return",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "number",
+              "description": "Minimum return for return_period (decimal, e.g. 0.05)"
+            }
+          },
+          {
+            "name": "max_return",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "number",
+              "description": "Maximum return for return_period (decimal)"
+            }
+          },
+          {
+            "name": "exclude_outliers",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "description": "Drop funds flagged with outlier daily returns (>20%)",
+              "default": false
+            }
+          },
+          {
+            "name": "order_by",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "aum",
+                "age_days",
+                "return_1d",
+                "return_1w",
+                "return_1m",
+                "return_ytd",
+                "return_1y"
+              ],
+              "type": "string",
+              "description": "Sort key",
+              "default": "aum"
+            }
+          },
+          {
+            "name": "order_dir",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "asc",
+                "desc"
+              ],
+              "type": "string",
+              "description": "Sort direction (nulls always last)",
+              "default": "desc"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 500,
+              "minimum": 1,
+              "description": "Max results per page",
+              "default": 50
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "description": "Pagination offset",
+              "default": 0
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Resultados del screener de FCI",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "example": {
+                  "reference_date": "2026-08-02",
+                  "native_currency_filter": null,
+                  "target_currency": "ARS",
+                  "fx_kind": "mep",
+                  "filters_applied": {
+                    "native_currency_filter": null
+                  },
+                  "ordering": {
+                    "by": "aum",
+                    "dir": "desc"
+                  },
+                  "pagination": {
+                    "limit": 2,
+                    "offset": 0
+                  },
+                  "total_matches": 4047,
+                  "page_size": 2,
+                  "funds": [
+                    {
+                      "fund_name": "Mercado Fondo - Clase A",
+                      "manager_name": "Mercado Pago Asset Managemet S.A.",
+                      "depositary_name": "Banco Industrial S.A.",
+                      "native_currency": "ARS",
+                      "rent_type": "Mercado de Dinero",
+                      "class_type": "Minorista",
+                      "fund_type": "Abierto",
+                      "region": "Argentina",
+                      "horizon": "Corto Plazo",
+                      "aum": 7882693319912.59,
+                      "fx_rate_applied": null,
+                      "age_days": 574,
+                      "last_quote_date": "2026-07-30",
+                      "performance": {
+                        "1D": {
+                          "return": 0.0004767150468019121,
+                          "missing_days_in_window": 0,
+                          "insufficient_history": false
+                        },
+                        "1W": {
+                          "return": 0.003353703949822595,
+                          "missing_days_in_window": 0,
+                          "insufficient_history": false
+                        },
+                        "1M": {
+                          "return": 0.014343980399997402,
+                          "missing_days_in_window": 0,
+                          "insufficient_history": false
+                        },
+                        "YTD": {
+                          "return": 0.12882713824396963,
+                          "missing_days_in_window": 0,
+                          "insufficient_history": false
+                        },
+                        "1Y": {
+                          "return": 0.28174540134475756,
+                          "missing_days_in_window": 0,
+                          "insufficient_history": false
+                        }
+                      },
+                      "outlier_suspected": null
+                    },
+                    {
+                      "fund_name": "Fima Premium - Clase B",
+                      "manager_name": "Galicia Asset Management S.A.U.",
+                      "depositary_name": "Banco de Galicia y Buenos Aires S.A.",
+                      "native_currency": "ARS",
+                      "rent_type": "Mercado de Dinero",
+                      "class_type": "Mayorista",
+                      "fund_type": "Abierto",
+                      "region": "Argentina",
+                      "horizon": "Corto Plazo",
+                      "aum": 4661582862673.45,
+                      "fx_rate_applied": null,
+                      "age_days": 574,
+                      "last_quote_date": "2026-07-30",
+                      "performance": {
+                        "1D": {
+                          "return": 0.0,
+                          "missing_days_in_window": 0,
+                          "insufficient_history": false
+                        },
+                        "1W": {
+                          "return": 0.002856311957774471,
+                          "missing_days_in_window": 0,
+                          "insufficient_history": false
+                        },
+                        "1M": {
+                          "return": 0.013773169031450871,
+                          "missing_days_in_window": 0,
+                          "insufficient_history": false
+                        },
+                        "YTD": {
+                          "return": 0.12782326121596155,
+                          "missing_days_in_window": 0,
+                          "insufficient_history": false
+                        },
+                        "1Y": {
+                          "return": 0.28765434930023526,
+                          "missing_days_in_window": 0,
+                          "insufficient_history": false
+                        }
+                      },
+                      "outlier_suspected": null
+                    }
+                  ],
+                  "data_quality": {
+                    "funds_total": 4570,
+                    "funds_with_real_data": 3478,
+                    "funds_with_partial_data": 569,
+                    "funds_with_outliers": 0,
+                    "funds_excluded": 523,
+                    "funds_insufficient_history": 569,
+                    "fx_carried_forward_funds": 0,
+                    "reference_date": "2026-08-02"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Autenticación requerida",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Permisos insuficientes: requiere el scope fci:read",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Parámetros inválidos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/fci/instruments/search": {
+      "get": {
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "description": "Buscar fondos por campo elegido con matching insensible a mayúsculas y acentos (exact > prefix > contains > fuzzy).",
+        "tags": [
+          "FCI"
+        ],
+        "parameters": [
+          {
+            "name": "query",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "description": "Search query (accent/case-insensitive)"
+            }
+          },
+          {
+            "name": "field",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "fund_name",
+                "manager_name",
+                "depositary_name",
+                "rent_type",
+                "horizon"
+              ],
+              "type": "string",
+              "description": "Field to match against",
+              "default": "fund_name"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100,
+              "minimum": 1,
+              "description": "Max results per page",
+              "default": 20
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "description": "Pagination offset",
+              "default": 0
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Resultados de búsqueda",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "example": {
+                  "query": "premier",
+                  "field": "fund_name",
+                  "total_matches": 74,
+                  "limit": 3,
+                  "offset": 0,
+                  "no_matches": false,
+                  "results": [
+                    {
+                      "fund_name": "Premier Abierto Pymes - Clase A",
+                      "manager_name": "Supervielle Asset Management S.A.",
+                      "depositary_name": "Banco Supervielle S.A.",
+                      "currency": "ARS",
+                      "rent_type": "PyMes",
+                      "class_type": "Mayorista",
+                      "fund_type": "Abierto",
+                      "horizon": "Mediano Plazo",
+                      "matched_value": "Premier Abierto Pymes - Clase A",
+                      "score": 4
+                    },
+                    {
+                      "fund_name": "Premier Abierto Pymes - Clase B",
+                      "manager_name": "Supervielle Asset Management S.A.",
+                      "depositary_name": "Banco Supervielle S.A.",
+                      "currency": "ARS",
+                      "rent_type": "PyMes",
+                      "class_type": "Minorista",
+                      "fund_type": "Abierto",
+                      "horizon": "Mediano Plazo",
+                      "matched_value": "Premier Abierto Pymes - Clase B",
+                      "score": 4
+                    },
+                    {
+                      "fund_name": "Premier Abierto Pymes - Clase C",
+                      "manager_name": "Supervielle Asset Management S.A.",
+                      "depositary_name": "Banco Supervielle S.A.",
+                      "currency": "ARS",
+                      "rent_type": "PyMes",
+                      "class_type": "No Registrada",
+                      "fund_type": "Abierto",
+                      "horizon": "Mediano Plazo",
+                      "matched_value": "Premier Abierto Pymes - Clase C",
+                      "score": 4
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Autenticación requerida",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Permisos insuficientes: requiere el scope fci:read",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Parámetros inválidos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/fci/instruments/{fund_name}": {
+      "get": {
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "description": "Detalle enriquecido de un fondo: metadata (gestora, depositaria, categoría), economics (fees, inversión mínima), composición de cartera (top holdings, HHI) y retornos preestablecidos. Si CAFCI no está disponible, la respuesta es parcial y cafci_unavailable=true.",
+        "tags": [
+          "FCI"
+        ],
+        "parameters": [
+          {
+            "name": "fund_name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "Fund name (URL-encoded)"
+            }
+          },
+          {
+            "name": "fx",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "none",
+                "mep",
+                "ccl",
+                "a3500",
+                "oficial_minorista"
+              ],
+              "type": "string",
+              "description": "FX conversion: none keeps the fund's native currency",
+              "default": "none"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Detalle del fondo",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "example": {
+                  "fund_name": "Premier Abierto Pymes - Clase A",
+                  "currency": "ARS",
+                  "fx": "none",
+                  "output_currency": "ARS",
+                  "metadata": {
+                    "manager_name": "Supervielle Asset Management S.A.",
+                    "depositary_name": "Banco Supervielle S.A.",
+                    "class_type": "Mayorista",
+                    "fund_type": "Abierto",
+                    "rent_type": "PyMes",
+                    "region": "Argentina",
+                    "benchmark": "Otro",
+                    "horizon": "Mediano Plazo",
+                    "duration": "No Aplicable"
+                  },
+                  "economics": {
+                    "minimum_investment": 1.0,
+                    "management_fee": 2.024,
+                    "redemption_fee": null,
+                    "subscription_fee": null,
+                    "transfer_fee": 0.0,
+                    "custodian_fee": 0.176,
+                    "objective": "Es un fondo que invierte en activos de renta fija principalmente ChPD Ons y FF de emisores Pymes."
+                  },
+                  "composition": {
+                    "total_holdings": 11,
+                    "top_5": [
+                      {
+                        "name": "Resto de Activos",
+                        "share": 52.4
+                      },
+                      {
+                        "name": "Caucion Colocadora $ Merval",
+                        "share": 15.4
+                      },
+                      {
+                        "name": "Bono Dual TXMJ0",
+                        "share": 8.2
+                      }
+                    ],
+                    "top_10": [
+                      {
+                        "name": "Resto de Activos",
+                        "share": 52.4
+                      },
+                      {
+                        "name": "Caucion Colocadora $ Merval",
+                        "share": 15.4
+                      },
+                      {
+                        "name": "Bono Dual TXMJ0",
+                        "share": 8.2
+                      }
+                    ],
+                    "hhi": 3114.97,
+                    "no_composition_data": false
+                  },
+                  "performance": {
+                    "1D": {
+                      "return": 0.0008049373324414688,
+                      "anchor_date": "2026-07-29",
+                      "end_date": "2026-07-30",
+                      "insufficient_history": false
+                    },
+                    "1W": {
+                      "return": 0.007252803501992311,
+                      "anchor_date": "2026-07-23",
+                      "end_date": "2026-07-30",
+                      "insufficient_history": false
+                    },
+                    "1M": {
+                      "return": 0.016567519671488284,
+                      "anchor_date": "2026-06-30",
+                      "end_date": "2026-07-30",
+                      "insufficient_history": false
+                    },
+                    "3M": {
+                      "return": 0.05791598925503716,
+                      "anchor_date": "2026-04-30",
+                      "end_date": "2026-07-30",
+                      "insufficient_history": false
+                    },
+                    "6M": {
+                      "return": 0.15268407459347366,
+                      "anchor_date": "2026-01-30",
+                      "end_date": "2026-07-30",
+                      "insufficient_history": false
+                    },
+                    "YTD": {
+                      "return": 0.18136974439941578,
+                      "anchor_date": "2025-12-30",
+                      "end_date": "2026-07-30",
+                      "insufficient_history": false
+                    },
+                    "1Y": {
+                      "return": 0.4372903452209189,
+                      "anchor_date": "2025-07-30",
+                      "end_date": "2026-07-30",
+                      "insufficient_history": false
+                    }
+                  },
+                  "cafci_unavailable": false,
+                  "data_quality": {
+                    "real_data_pct": 0.983333,
+                    "last_real_data_date": "2026-07-30",
+                    "gap_count": 0,
+                    "long_gaps_detected": [],
+                    "interpolated_days": 1,
+                    "missing_days": 0,
+                    "aum_estimated_days": 1,
+                    "fx_carried_forward_days": 0,
+                    "total_days": 60
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Autenticación requerida",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Permisos insuficientes: requiere el scope fci:read",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Parámetros inválidos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/fci/instruments/{fund_name}/series": {
+      "get": {
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "description": "Serie diaria de un fondo: VCP, AUM, flujo neto, retorno diario y acumulado, con flags de calidad de datos por punto. Rango por interval o date_from/date_to (mutuamente excluyentes).",
+        "tags": [
+          "FCI"
+        ],
+        "parameters": [
+          {
+            "name": "fund_name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "Fund name (URL-encoded)"
+            }
+          },
+          {
+            "name": "interval",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "description": "Date interval, mutually exclusive with date_from/date_to. Examples: '1 week', '1 month', '3 months', 'ytd', '1 year', 'max' (short aliases 1W, 1M, 3M, YTD, 1Y accepted)."
+            }
+          },
+          {
+            "name": "date_from",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+              "description": "Start date YYYY-MM-DD"
+            }
+          },
+          {
+            "name": "date_to",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+              "description": "End date YYYY-MM-DD (default: last available)"
+            }
+          },
+          {
+            "name": "fx",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "none",
+                "mep",
+                "ccl",
+                "a3500",
+                "oficial_minorista"
+              ],
+              "type": "string",
+              "description": "FX conversion: none keeps the fund's native currency",
+              "default": "none"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Serie diaria del fondo",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "example": {
+                  "fund_name": "Premier Abierto Pymes - Clase A",
+                  "currency": "ARS",
+                  "fx": "none",
+                  "output_currency": "ARS",
+                  "requested_range": {
+                    "from": "2026-07-23",
+                    "to": "2026-07-30"
+                  },
+                  "effective_range": {
+                    "from": "2026-07-23",
+                    "to": "2026-07-30"
+                  },
+                  "fund_inactive_in_range": false,
+                  "series": [
+                    {
+                      "date": "2026-07-23",
+                      "vcp": 128517.476,
+                      "aum": 17808478350.92,
+                      "flow": null,
+                      "daily_return": null,
+                      "cumulative_return": 0.0,
+                      "interpolated": false,
+                      "interpolation_method": null,
+                      "data_missing": false,
+                      "aum_estimated": false,
+                      "outlier_suspected": false,
+                      "flow_undefined": true
+                    },
+                    {
+                      "date": "2026-07-24",
+                      "vcp": 128724.617,
+                      "aum": 17837181587.2,
+                      "flow": 11.404281616210938,
+                      "daily_return": 0.001611773016768625,
+                      "cumulative_return": 0.001611773016768625,
+                      "interpolated": false,
+                      "interpolation_method": null,
+                      "data_missing": false,
+                      "aum_estimated": false,
+                      "outlier_suspected": false,
+                      "flow_undefined": false
+                    },
+                    {
+                      "date": "2026-07-27",
+                      "vcp": 129597.201,
+                      "aum": 17956094292.57,
+                      "flow": -1999981.1139335632,
+                      "daily_return": 0.006778687871333844,
+                      "cumulative_return": 0.008401386594302673,
+                      "interpolated": false,
+                      "interpolation_method": null,
+                      "data_missing": false,
+                      "aum_estimated": false,
+                      "outlier_suspected": false,
+                      "flow_undefined": false
+                    }
+                  ],
+                  "data_quality": {
+                    "real_data_pct": 1.0,
+                    "last_real_data_date": "2026-07-30",
+                    "gap_count": 0,
+                    "long_gaps_detected": [],
+                    "interpolated_days": 0,
+                    "missing_days": 0,
+                    "aum_estimated_days": 0,
+                    "fx_carried_forward_days": 0,
+                    "total_days": 6
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Autenticación requerida",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Permisos insuficientes: requiere el scope fci:read",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Parámetros inválidos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/fci/instruments/{fund_name}/performance": {
+      "get": {
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "description": "Performance descriptiva de un fondo en un rango: retorno acumulado, TNA proporcional, mejor/peor día, mejor/peor sub-período y conteo de días positivos/negativos.",
+        "tags": [
+          "FCI"
+        ],
+        "parameters": [
+          {
+            "name": "fund_name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "Fund name (URL-encoded)"
+            }
+          },
+          {
+            "name": "interval",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "description": "Date interval, mutually exclusive with date_from/date_to. Examples: '1 week', '1 month', '3 months', 'ytd', '1 year', 'max' (short aliases 1W, 1M, 3M, YTD, 1Y accepted)."
+            }
+          },
+          {
+            "name": "date_from",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+              "description": "Start date YYYY-MM-DD"
+            }
+          },
+          {
+            "name": "date_to",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+              "description": "End date YYYY-MM-DD (default: last available)"
+            }
+          },
+          {
+            "name": "fx",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "none",
+                "mep",
+                "ccl",
+                "a3500",
+                "oficial_minorista"
+              ],
+              "type": "string",
+              "description": "FX conversion: none keeps the fund's native currency",
+              "default": "none"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Performance del fondo",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "example": {
+                  "fund_name": "Premier Abierto Pymes - Clase A",
+                  "currency": "ARS",
+                  "fx": "none",
+                  "output_currency": "ARS",
+                  "requested_range": {
+                    "from": "2026-06-30",
+                    "to": "2026-07-30"
+                  },
+                  "effective_range": {
+                    "from": "2026-06-30",
+                    "to": "2026-07-30"
+                  },
+                  "fund_inactive_in_range": false,
+                  "performance": {
+                    "cumulative_return": 0.016567519671488284,
+                    "tna": 0.20157148933644078,
+                    "days_calendar": 30,
+                    "days_business": 21,
+                    "best_day": {
+                      "date": "2026-07-23",
+                      "return": 0.009322698105125982,
+                      "previous_vcp": 127330.413,
+                      "vcp": 128517.476
+                    },
+                    "worst_day": {
+                      "date": "2026-07-16",
+                      "return": -0.004386222108857418,
+                      "previous_vcp": 127709.675,
+                      "vcp": 127149.512
+                    },
+                    "positive_days": 12,
+                    "negative_days": 6,
+                    "best_subperiod": {
+                      "start": "2026-07-22",
+                      "end": "2026-07-29",
+                      "return": 0.015825441483489078,
+                      "label": "Semana del 22 Jul 2026",
+                      "start_vcp": 127330.413,
+                      "end_vcp": 129345.473
+                    },
+                    "worst_subperiod": {
+                      "start": "2026-07-15",
+                      "end": "2026-07-22",
+                      "return": -0.002969720187605218,
+                      "label": "Semana del 15 Jul 2026",
+                      "start_vcp": 127709.675,
+                      "end_vcp": 127330.413
+                    },
+                    "subperiod_interval": "1 week"
+                  },
+                  "range_too_short_for_meaningful_metrics": false,
+                  "data_quality": {
+                    "real_data_pct": 0.952381,
+                    "last_real_data_date": "2026-07-30",
+                    "gap_count": 0,
+                    "long_gaps_detected": [],
+                    "interpolated_days": 1,
+                    "missing_days": 0,
+                    "aum_estimated_days": 1,
+                    "fx_carried_forward_days": 0,
+                    "total_days": 21
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Autenticación requerida",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Permisos insuficientes: requiere el scope fci:read",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Parámetros inválidos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/fci/catalog": {
+      "get": {
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "description": "Catálogo de facetas del universo FCI: los valores válidos de cada filtro categórico del screener (rent_type, class_type, fund_type, manager_name, depositary_name, region, horizon, native_currency). El matching de filtros es exacto.",
+        "tags": [
+          "FCI"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Catálogo de facetas",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "example": {
+                  "reference_date": "2026-08-02",
+                  "total_funds": 4570,
+                  "facets": {
+                    "rent_type": [
+                      "ASG",
+                      "Fondos Cerrados",
+                      "Infraestructura"
+                    ],
+                    "class_type": [
+                      "General",
+                      "Mayorista",
+                      "Minorista"
+                    ],
+                    "fund_type": [
+                      "Abierto",
+                      "Cerrado"
+                    ],
+                    "manager_name": [
+                      "Adcap Asset Management S.G.F.C.I.S.A.",
+                      "Administradora de Titulos Valores S.G.F.C.I.S.A.",
+                      "Allaria Fondos Administrados S.G.F.C.I.S.A."
+                    ],
+                    "depositary_name": [
+                      "BBVA Argentina S.A.",
+                      "BNP Paribas",
+                      "Banco C.M.F. S.A."
+                    ],
+                    "region": [
+                      "Argentina",
+                      "Brasil",
+                      "Europa"
+                    ],
+                    "horizon": [
+                      "Corto Plazo",
+                      "Largo Plazo",
+                      "Mediano Plazo"
+                    ],
+                    "native_currency": [
+                      "ARS",
+                      "USD"
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Autenticación requerida",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Permisos insuficientes: requiere el scope fci:read",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Parámetros inválidos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/fci/benchmarks": {
+      "get": {
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "description": "Catálogo de benchmarks disponibles para comparaciones: BADLAR, TAMAR, CER, A3500, MEP, CCL y OFICIAL_MINORISTA, con su tipo (rate/quote) y fuente.",
+        "tags": [
+          "FCI"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Catálogo de benchmarks",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "example": {
+                  "benchmarks": [
+                    {
+                      "name": "BADLAR",
+                      "type": "rate",
+                      "source": "BCRA",
+                      "rate_unit": "annual_pct"
+                    },
+                    {
+                      "name": "TAMAR",
+                      "type": "rate",
+                      "source": "BCRA",
+                      "rate_unit": "annual_pct"
+                    },
+                    {
+                      "name": "CER",
+                      "type": "quote",
+                      "source": "BCRA"
+                    }
+                  ],
+                  "total": 7
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Autenticación requerida",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Permisos insuficientes: requiere el scope fci:read",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Parámetros inválidos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/fci/benchmarks/{name}/series": {
+      "get": {
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "description": "Serie de retorno acumulado de un benchmark. Los benchmarks de tasa (BADLAR, TAMAR) capitalizan diariamente sobre TNA/365; los de cotización (CER, MEP, CCL, A3500) usan variación simple.",
+        "tags": [
+          "FCI"
+        ],
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "Benchmark name (e.g. 'CER', 'BADLAR', 'MEP')"
+            }
+          },
+          {
+            "name": "interval",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "description": "Date interval, mutually exclusive with date_from/date_to. Examples: '1 week', '1 month', '3 months', 'ytd', '1 year', 'max' (short aliases 1W, 1M, 3M, YTD, 1Y accepted)."
+            }
+          },
+          {
+            "name": "date_from",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+              "description": "Start date YYYY-MM-DD"
+            }
+          },
+          {
+            "name": "date_to",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+              "description": "End date YYYY-MM-DD (default: today)"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Serie del benchmark",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "example": {
+                  "name": "CER",
+                  "type": "quote",
+                  "source": "BCRA",
+                  "rate_unit": null,
+                  "requested_range": {
+                    "from": "2026-07-26",
+                    "to": "2026-08-02"
+                  },
+                  "effective_range": {
+                    "from": "2026-07-27",
+                    "to": "2026-08-02"
+                  },
+                  "series": [
+                    {
+                      "date": "2026-07-27",
+                      "quote": 813.45653848551,
+                      "cumulative_return": 0.0
+                    },
+                    {
+                      "date": "2026-07-28",
+                      "quote": 813.95058132289,
+                      "cumulative_return": 0.0006073377175133121
+                    },
+                    {
+                      "date": "2026-07-29",
+                      "quote": 814.44492421112,
+                      "cumulative_return": 0.0012150442941305517
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Autenticación requerida",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Permisos insuficientes: requiere el scope fci:read",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Parámetros inválidos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/fci/compare/table": {
+      "get": {
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "description": "Tabla comparativa de hasta 30 fondos: AUM al cierre del rango, retornos preestablecidos (1D/1W/1M/YTD/1Y como decimales), retorno del rango y TNA proporcional.",
+        "tags": [
+          "FCI"
+        ],
+        "parameters": [
+          {
+            "name": "fund_names",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "minItems": 1,
+              "maxItems": 30,
+              "description": "Fund names (repeat the param: ?fund_names=A&fund_names=B)"
+            }
+          },
+          {
+            "name": "interval",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "description": "Date interval, mutually exclusive with date_from/date_to. Examples: '1 week', '1 month', '3 months', 'ytd', '1 year', 'max' (short aliases 1W, 1M, 3M, YTD, 1Y accepted)."
+            }
+          },
+          {
+            "name": "date_from",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+              "description": "Range start YYYY-MM-DD"
+            }
+          },
+          {
+            "name": "date_to",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+              "description": "Range end YYYY-MM-DD"
+            }
+          },
+          {
+            "name": "target_currency",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "ARS",
+                "USD"
+              ],
+              "type": "string",
+              "description": "Output currency",
+              "default": "ARS"
+            }
+          },
+          {
+            "name": "fx_kind",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "mep",
+                "ccl",
+                "a3500",
+                "oficial_minorista"
+              ],
+              "type": "string",
+              "description": "FX rate used for currency conversion",
+              "default": "mep"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Tabla comparativa",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "example": {
+                  "requested_range": {
+                    "from": "2026-06-30",
+                    "to": "2026-07-30"
+                  },
+                  "effective_range": {
+                    "from": "2026-06-30",
+                    "to": "2026-07-30"
+                  },
+                  "target_currency": "ARS",
+                  "fx_kind": "mep",
+                  "fund_count": 2,
+                  "rows": [
+                    {
+                      "fund_name": "Premier Abierto Pymes - Clase A",
+                      "native_currency": "ARS",
+                      "aum_at_end": 17918632369.3,
+                      "performance": {
+                        "1D": 0.0008049373324414688,
+                        "1W": 0.007252803501992311,
+                        "1M": 0.016567519671488284,
+                        "YTD": 0.18136974439941578,
+                        "1Y": 0.4372903452209189
+                      },
+                      "range_return": 0.016567519671488284,
+                      "tna_range": 0.20157148933644078,
+                      "fund_inactive_in_range": false
+                    },
+                    {
+                      "fund_name": "Mercado Fondo - Clase A",
+                      "native_currency": "ARS",
+                      "aum_at_end": 7882693319912.59,
+                      "performance": {
+                        "1D": 0.0004767150468019121,
+                        "1W": 0.003353703949822595,
+                        "1M": 0.014343980399997402,
+                        "YTD": 0.12882713824396963,
+                        "1Y": 0.28174540134475756
+                      },
+                      "range_return": 0.014343980399997402,
+                      "tna_range": 0.17451842819996838,
+                      "fund_inactive_in_range": false
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Autenticación requerida",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Permisos insuficientes: requiere el scope fci:read",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Parámetros inválidos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/fci/compare/series": {
+      "get": {
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "description": "Series de retorno acumulado de hasta 10 fondos alineadas a la primera fecha común, con overlays opcionales de benchmarks. Devuelve 400 si algún fondo no tiene datos en el rango.",
+        "tags": [
+          "FCI"
+        ],
+        "parameters": [
+          {
+            "name": "fund_names",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "minItems": 1,
+              "maxItems": 10,
+              "description": "Fund names (repeat the param: ?fund_names=A&fund_names=B)"
+            }
+          },
+          {
+            "name": "benchmarks",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "Benchmark names to overlay (repeat the param)"
+            }
+          },
+          {
+            "name": "interval",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "description": "Date interval, mutually exclusive with date_from/date_to. Examples: '1 week', '1 month', '3 months', 'ytd', '1 year', 'max' (short aliases 1W, 1M, 3M, YTD, 1Y accepted)."
+            }
+          },
+          {
+            "name": "date_from",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+              "description": "Range start YYYY-MM-DD"
+            }
+          },
+          {
+            "name": "date_to",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+              "description": "Range end YYYY-MM-DD"
+            }
+          },
+          {
+            "name": "target_currency",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "ARS",
+                "USD"
+              ],
+              "type": "string",
+              "description": "Output currency for funds",
+              "default": "ARS"
+            }
+          },
+          {
+            "name": "fx_kind",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "mep",
+                "ccl",
+                "a3500",
+                "oficial_minorista"
+              ],
+              "type": "string",
+              "description": "FX rate used for currency conversion",
+              "default": "mep"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Series comparativas",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "example": {
+                  "requested_range": {
+                    "from": null,
+                    "to": null
+                  },
+                  "effective_range": {
+                    "from": "2026-07-23",
+                    "to": "2026-07-30"
+                  },
+                  "target_currency": "ARS",
+                  "fx_kind": "mep",
+                  "fund_count": 2,
+                  "benchmark_count": 1,
+                  "funds": [
+                    {
+                      "fund_name": "Premier Abierto Pymes - Clase A",
+                      "native_currency": "ARS",
+                      "series": [
+                        {
+                          "date": "2026-07-23",
+                          "cumulative_return": 0.0
+                        },
+                        {
+                          "date": "2026-07-24",
+                          "cumulative_return": 0.001611773016768625
+                        },
+                        {
+                          "date": "2026-07-27",
+                          "cumulative_return": 0.008401386594302673
+                        }
+                      ]
+                    },
+                    {
+                      "fund_name": "Mercado Fondo - Clase A",
+                      "native_currency": "ARS",
+                      "series": [
+                        {
+                          "date": "2026-07-23",
+                          "cumulative_return": 0.0
+                        },
+                        {
+                          "date": "2026-07-24",
+                          "cumulative_return": 0.0004792094833239169
+                        },
+                        {
+                          "date": "2026-07-27",
+                          "cumulative_return": 0.0019162360121554034
+                        }
+                      ]
+                    }
+                  ],
+                  "benchmarks": [
+                    {
+                      "name": "CER",
+                      "type": "quote",
+                      "series": [
+                        {
+                          "date": "2026-07-27",
+                          "cumulative_return": 0.0
+                        },
+                        {
+                          "date": "2026-07-28",
+                          "cumulative_return": 0.0006073377175133121
+                        },
+                        {
+                          "date": "2026-07-29",
+                          "cumulative_return": 0.0012150442941305517
+                        }
+                      ]
+                    }
+                  ],
+                  "data_quality": {
+                    "common_dates_count": 6,
+                    "anchor_date": "2026-07-23"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Autenticación requerida",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Permisos insuficientes: requiere el scope fci:read",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Parámetros inválidos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/fci/market/kpis": {
+      "get": {
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "description": "KPIs de la industria a una fecha de referencia: fondos vigentes, AUM total, gestoras activas, tipo de cambio aplicado y última fecha de cierre.",
+        "tags": [
+          "FCI"
+        ],
+        "parameters": [
+          {
+            "name": "date",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+              "description": "Reference date YYYY-MM-DD (default: last close)"
+            }
+          },
+          {
+            "name": "target_currency",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "ARS",
+                "USD"
+              ],
+              "type": "string",
+              "description": "Output currency",
+              "default": "ARS"
+            }
+          },
+          {
+            "name": "fx_kind",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "mep",
+                "ccl",
+                "a3500",
+                "oficial_minorista"
+              ],
+              "type": "string",
+              "description": "FX rate used for currency conversion",
+              "default": "mep"
+            }
+          },
+          {
+            "name": "vigent_days_window",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 60,
+              "minimum": 1,
+              "description": "Days without quotes before a fund stops counting as vigent",
+              "default": 5
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "KPIs de mercado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "example": {
+                  "reference_date": "2026-07-30",
+                  "data_lag": true,
+                  "target_currency": "ARS",
+                  "fx_kind": "mep",
+                  "kpis": {
+                    "vigent_funds": 2431,
+                    "total_aum": 105081584883560.12,
+                    "active_managers": 57,
+                    "fx_rate": 1508.42945874002,
+                    "last_close_date": "2026-07-30"
+                  },
+                  "data_quality": {
+                    "funds_total": 4672,
+                    "funds_with_real_data": 4672,
+                    "funds_excluded": 0,
+                    "fx_carried_forward": false,
+                    "vigent_threshold_days": 5,
+                    "reference_date": "2026-07-30"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Autenticación requerida",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Permisos insuficientes: requiere el scope fci:read",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Parámetros inválidos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/fci/market/aum-distribution": {
+      "get": {
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "description": "Distribución de AUM por categoría a una fecha de referencia: AUM, participación de mercado y cantidad de fondos por categoría.",
+        "tags": [
+          "FCI"
+        ],
+        "parameters": [
+          {
+            "name": "date",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+              "description": "Reference date YYYY-MM-DD (default: last close)"
+            }
+          },
+          {
+            "name": "target_currency",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "ARS",
+                "USD"
+              ],
+              "type": "string",
+              "description": "Output currency",
+              "default": "ARS"
+            }
+          },
+          {
+            "name": "fx_kind",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "mep",
+                "ccl",
+                "a3500",
+                "oficial_minorista"
+              ],
+              "type": "string",
+              "description": "FX rate used for currency conversion",
+              "default": "mep"
+            }
+          },
+          {
+            "name": "breakdown",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "const": "sub_category",
+              "type": "string",
+              "description": "Distribution breakdown (only sub_category currently)",
+              "default": "sub_category"
+            }
+          },
+          {
+            "name": "vigent_days_window",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 60,
+              "minimum": 1,
+              "description": "Days without quotes before a fund stops counting as vigent",
+              "default": 5
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Distribución de AUM",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "example": {
+                  "reference_date": "2026-07-30",
+                  "data_lag": true,
+                  "target_currency": "ARS",
+                  "fx_kind": "mep",
+                  "breakdown": "sub_category",
+                  "vigent_days_window": 5,
+                  "total_aum": 105081584883560.0,
+                  "categories": [
+                    {
+                      "category": "Mercado de Dinero",
+                      "aum": 56385165799267.4,
+                      "share_pct": 53.658465336002806,
+                      "fund_count": 242
+                    },
+                    {
+                      "category": "Renta Fija",
+                      "aum": 27111005010171.2,
+                      "share_pct": 25.79995823265577,
+                      "fund_count": 992
+                    },
+                    {
+                      "category": "Sin clasificar",
+                      "aum": 8380970595105.71,
+                      "share_pct": 7.975679662990038,
+                      "fund_count": 357
+                    }
+                  ],
+                  "data_quality": {
+                    "funds_total": 4672,
+                    "funds_with_real_data": 2431,
+                    "fx_carried_forward": false,
+                    "reference_date": "2026-07-30"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Autenticación requerida",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Permisos insuficientes: requiere el scope fci:read",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Parámetros inválidos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/fci/market/top-managers": {
+      "get": {
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "description": "Ranking de gestoras por AUM a una fecha de referencia, con participación de mercado y cantidad de fondos por gestora.",
+        "tags": [
+          "FCI"
+        ],
+        "parameters": [
+          {
+            "name": "date",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+              "description": "Reference date YYYY-MM-DD (default: last close)"
+            }
+          },
+          {
+            "name": "target_currency",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "ARS",
+                "USD"
+              ],
+              "type": "string",
+              "description": "Output currency",
+              "default": "ARS"
+            }
+          },
+          {
+            "name": "fx_kind",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "mep",
+                "ccl",
+                "a3500",
+                "oficial_minorista"
+              ],
+              "type": "string",
+              "description": "FX rate used for currency conversion",
+              "default": "mep"
+            }
+          },
+          {
+            "name": "vigent_days_window",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 60,
+              "minimum": 1,
+              "description": "Days without quotes before a fund stops counting as vigent",
+              "default": 5
+            }
+          },
+          {
+            "name": "top",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100,
+              "minimum": 1,
+              "description": "Max managers per page",
+              "default": 20
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "description": "Pagination offset",
+              "default": 0
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Ranking de gestoras por AUM",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "example": {
+                  "reference_date": "2026-07-30",
+                  "data_lag": true,
+                  "target_currency": "ARS",
+                  "fx_kind": "mep",
+                  "vigent_days_window": 5,
+                  "industry_total_aum": 105081584883559.95,
+                  "total_managers": 57,
+                  "top_returned": 3,
+                  "offset": 0,
+                  "managers": [
+                    {
+                      "rank": 1,
+                      "manager_name": "Galicia Asset Management S.A.U.",
+                      "aum": 15653530692515.19,
+                      "share_pct": 14.896549866335512,
+                      "fund_count": 59
+                    },
+                    {
+                      "rank": 2,
+                      "manager_name": "Santander Rio Asset Management G.F.C.I.S.A.",
+                      "aum": 12136881301326.12,
+                      "share_pct": 11.549960266372937,
+                      "fund_count": 85
+                    },
+                    {
+                      "rank": 3,
+                      "manager_name": "Sin gestora",
+                      "aum": 8093521631387.21,
+                      "share_pct": 7.702131291943851,
+                      "fund_count": 351
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Autenticación requerida",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Permisos insuficientes: requiere el scope fci:read",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Parámetros inválidos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/fci/market/top-managers-by-flow": {
+      "get": {
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "description": "Ranking de gestoras por flujo neto de suscripciones/rescates en un rango, con AUM y cantidad de fondos al cierre.",
+        "tags": [
+          "FCI"
+        ],
+        "parameters": [
+          {
+            "name": "interval",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "description": "Date interval, mutually exclusive with date_from/date_to. Examples: '1 week', '1 month', '3 months', 'ytd', '1 year', 'max' (short aliases 1W, 1M, 3M, YTD, 1Y accepted)."
+            }
+          },
+          {
+            "name": "date_from",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+              "description": "Range start YYYY-MM-DD"
+            }
+          },
+          {
+            "name": "date_to",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+              "description": "Range end YYYY-MM-DD (default: last close)"
+            }
+          },
+          {
+            "name": "target_currency",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "ARS",
+                "USD"
+              ],
+              "type": "string",
+              "description": "Output currency",
+              "default": "ARS"
+            }
+          },
+          {
+            "name": "fx_kind",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "mep",
+                "ccl",
+                "a3500",
+                "oficial_minorista"
+              ],
+              "type": "string",
+              "description": "FX rate used for currency conversion",
+              "default": "mep"
+            }
+          },
+          {
+            "name": "vigent_days_window",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 60,
+              "minimum": 1,
+              "description": "Days without quotes before a fund stops counting as vigent",
+              "default": 5
+            }
+          },
+          {
+            "name": "top",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100,
+              "minimum": 1,
+              "description": "Max managers per page",
+              "default": 20
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "description": "Pagination offset",
+              "default": 0
+            }
+          },
+          {
+            "name": "outlier_handling",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "exclude_fund",
+                "skip_days",
+                "include"
+              ],
+              "type": "string",
+              "description": "How to treat funds with outlier daily returns",
+              "default": "exclude_fund"
+            }
+          },
+          {
+            "name": "report_outliers",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "description": "Include an outliers report in the response",
+              "default": false
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Ranking de gestoras por flujo",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "example": {
+                  "requested_range": {
+                    "from": "2026-07-02",
+                    "to": "2026-08-02"
+                  },
+                  "effective_range": {
+                    "from": "2026-07-02",
+                    "to": "2026-07-30"
+                  },
+                  "target_currency": "ARS",
+                  "fx_kind": "mep",
+                  "vigent_days_window": 5,
+                  "outlier_handling": "exclude_fund",
+                  "industry_total_flow": null,
+                  "total_managers": 57,
+                  "top_returned": 3,
+                  "offset": 0,
+                  "managers": [
+                    {
+                      "rank": 1,
+                      "manager_name": "Proahorro Administradora de Activos S.A.",
+                      "net_flow": 21397882607.64,
+                      "fund_count_at_end": 7,
+                      "aum_at_end": 2014636421664.33,
+                      "partial_period": false
+                    },
+                    {
+                      "rank": 2,
+                      "manager_name": "Sin gestora",
+                      "net_flow": null,
+                      "fund_count_at_end": 349,
+                      "aum_at_end": 8093521431387.21,
+                      "partial_period": true
+                    },
+                    {
+                      "rank": 3,
+                      "manager_name": "Pellegrini S.A.S.G.F.C.I.",
+                      "net_flow": 662566036721.1,
+                      "fund_count_at_end": 41,
+                      "aum_at_end": 4416762701231.56,
+                      "partial_period": false
+                    }
+                  ],
+                  "data_quality": {
+                    "funds_total": 4672,
+                    "funds_with_real_data": 2422,
+                    "funds_with_partial_data": 0,
+                    "funds_excluded_by_outliers": 6,
+                    "fx_carried_forward_funds": 0,
+                    "reference_date": "2026-07-30"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Autenticación requerida",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Permisos insuficientes: requiere el scope fci:read",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Parámetros inválidos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/fci/market/flows-by-category": {
+      "get": {
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "description": "Flujos netos de suscripciones/rescates de una categoría en un rango. El parámetro category es obligatorio.",
+        "tags": [
+          "FCI"
+        ],
+        "parameters": [
+          {
+            "name": "category",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "description": "Category exact match (e.g. 'Mercado de Dinero')"
+            }
+          },
+          {
+            "name": "interval",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "description": "Date interval, mutually exclusive with date_from/date_to. Examples: '1 week', '1 month', '3 months', 'ytd', '1 year', 'max' (short aliases 1W, 1M, 3M, YTD, 1Y accepted)."
+            }
+          },
+          {
+            "name": "date_from",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+              "description": "Range start YYYY-MM-DD"
+            }
+          },
+          {
+            "name": "date_to",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+              "description": "Range end YYYY-MM-DD (default: last close)"
+            }
+          },
+          {
+            "name": "target_currency",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "ARS",
+                "USD"
+              ],
+              "type": "string",
+              "description": "Output currency",
+              "default": "ARS"
+            }
+          },
+          {
+            "name": "fx_kind",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "mep",
+                "ccl",
+                "a3500",
+                "oficial_minorista"
+              ],
+              "type": "string",
+              "description": "FX rate used for currency conversion",
+              "default": "mep"
+            }
+          },
+          {
+            "name": "vigent_days_window",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 60,
+              "minimum": 1,
+              "description": "Days without quotes before a fund stops counting as vigent",
+              "default": 5
+            }
+          },
+          {
+            "name": "outlier_handling",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "exclude_fund",
+                "skip_days",
+                "include"
+              ],
+              "type": "string",
+              "description": "How to treat funds with outlier daily returns",
+              "default": "exclude_fund"
+            }
+          },
+          {
+            "name": "report_outliers",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "description": "Include an outliers report in the response",
+              "default": false
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Flujos por categoría",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "example": {
+                  "requested_range": {
+                    "from": "2026-07-02",
+                    "to": "2026-08-02"
+                  },
+                  "effective_range": {
+                    "from": "2026-07-02",
+                    "to": "2026-07-30"
+                  },
+                  "target_currency": "ARS",
+                  "fx_kind": "mep",
+                  "vigent_days_window": 5,
+                  "breakdown": "sub_category",
+                  "outlier_handling": "exclude_fund",
+                  "filters_applied": {
+                    "category": "Mercado de Dinero"
+                  },
+                  "no_matches": false,
+                  "total_net_flow": null,
+                  "categories": [
+                    {
+                      "category": "Mercado de Dinero",
+                      "net_flow": null,
+                      "fund_count": 242,
+                      "funds_with_partial_data": 0
+                    }
+                  ],
+                  "data_quality": {
+                    "funds_total": 4672,
+                    "funds_with_real_data": 242,
+                    "funds_with_partial_data": 0,
+                    "funds_excluded_by_outliers": 0,
+                    "fx_carried_forward_funds": 0,
+                    "reference_date": "2026-07-30"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Autenticación requerida",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Permisos insuficientes: requiere el scope fci:read",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Parámetros inválidos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/fci/market/series": {
+      "get": {
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "description": "Serie temporal de la industria para una métrica (aum, funds_count o net_flow) con breakdown opcional (category o currency), granularidad diaria/semanal/mensual y filtros por categoría o gestora.",
+        "tags": [
+          "FCI"
+        ],
+        "parameters": [
+          {
+            "name": "metric",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "enum": [
+                "aum",
+                "funds_count",
+                "net_flow"
+              ],
+              "type": "string",
+              "description": "Metric to aggregate"
+            }
+          },
+          {
+            "name": "interval",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "description": "Date interval, mutually exclusive with date_from/date_to. Examples: '1 week', '1 month', '3 months', 'ytd', '1 year', 'max' (short aliases 1W, 1M, 3M, YTD, 1Y accepted)."
+            }
+          },
+          {
+            "name": "date_from",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+              "description": "Range start YYYY-MM-DD"
+            }
+          },
+          {
+            "name": "date_to",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+              "description": "Range end YYYY-MM-DD (default: last close)"
+            }
+          },
+          {
+            "name": "breakdown",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "none",
+                "category",
+                "currency"
+              ],
+              "type": "string",
+              "description": "Series breakdown buckets",
+              "default": "none"
+            }
+          },
+          {
+            "name": "target_currency",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "ARS",
+                "USD"
+              ],
+              "type": "string",
+              "description": "Output currency",
+              "default": "ARS"
+            }
+          },
+          {
+            "name": "fx_kind",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "mep",
+                "ccl",
+                "a3500",
+                "oficial_minorista"
+              ],
+              "type": "string",
+              "description": "FX rate used for currency conversion",
+              "default": "mep"
+            }
+          },
+          {
+            "name": "vigent_days_window",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 60,
+              "minimum": 1,
+              "description": "Days without quotes before a fund stops counting as vigent",
+              "default": 5
+            }
+          },
+          {
+            "name": "outlier_handling",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "exclude_fund",
+                "skip_days",
+                "include"
+              ],
+              "type": "string",
+              "description": "How to treat funds with outlier daily returns",
+              "default": "exclude_fund"
+            }
+          },
+          {
+            "name": "report_outliers",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "description": "Include an outliers report in the response",
+              "default": false
+            }
+          },
+          {
+            "name": "category",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "description": "Filter to one category"
+            }
+          },
+          {
+            "name": "manager",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "description": "Filter to one manager (gestora)"
+            }
+          },
+          {
+            "name": "granularity",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "daily",
+                "weekly",
+                "monthly"
+              ],
+              "type": "string",
+              "description": "Sampling granularity",
+              "default": "daily"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Serie de mercado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "example": {
+                  "metric": "aum",
+                  "breakdown": "none",
+                  "granularity": "weekly",
+                  "target_currency": "ARS",
+                  "fx_kind": "mep",
+                  "vigent_days_window": 5,
+                  "outlier_handling": "exclude_fund",
+                  "filters_applied": {},
+                  "requested_range": {
+                    "from": "2026-07-02",
+                    "to": "2026-08-02"
+                  },
+                  "effective_range": {
+                    "from": "2026-07-03",
+                    "to": "2026-07-30"
+                  },
+                  "series": [
+                    {
+                      "date": "2026-07-03",
+                      "value": 106422408976946.19
+                    },
+                    {
+                      "date": "2026-07-08",
+                      "value": 106186067544387.39
+                    },
+                    {
+                      "date": "2026-07-17",
+                      "value": 104155695727697.48
+                    }
+                  ],
+                  "data_quality": {
+                    "funds_total": 4672,
+                    "funds_total_universe": 4672,
+                    "funds_with_real_data": 2453,
+                    "funds_excluded_by_outliers": 0,
+                    "reference_date": "2026-07-30"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Autenticación requerida",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Permisos insuficientes: requiere el scope fci:read",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Parámetros inválidos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
                 }
               }
             }

@@ -1,0 +1,197 @@
+---
+title: 'Comparar FCI (series)'
+openapi: 'GET /api/v1/fci/compare/series'
+---
+
+<Note>
+  Series de retorno acumulado para hasta 10 fondos, alineadas a la primera fecha común, con benchmarks opcionales superpuestos. Las series de fondos comparten un calendario común; los benchmarks conservan sus propios días de negociación. Requiere el scope `fci:read`.
+</Note>
+
+## Parámetros de consulta
+
+<ParamField query="fund_names" type="string[]" required>
+  Nombres exactos de los fondos a comparar. Se repite el parámetro por cada fondo (`?fund_names=A&fund_names=B`). Máximo 10 fondos.
+</ParamField>
+
+<ParamField query="benchmarks" type="string[]">
+  Benchmarks a superponer. Se repite el parámetro por cada benchmark. Los benchmarks disponibles se obtienen con `GET /api/v1/fci/benchmarks`.
+</ParamField>
+
+<ParamField query="interval" type="string">
+  Intervalo de fechas, mutuamente excluyente con `date_from`/`date_to`. Ejemplos: `1 week`, `1 month`, `3 months`, `ytd`, `1 year`, `max` (también acepta los alias cortos `1W`, `1M`, `3M`, `YTD`, `1Y`).
+</ParamField>
+
+<ParamField query="date_from" type="string">
+  Inicio del rango en formato YYYY-MM-DD. Mutuamente excluyente con `interval`.
+</ParamField>
+
+<ParamField query="date_to" type="string">
+  Fin del rango en formato YYYY-MM-DD. Mutuamente excluyente con `interval`.
+</ParamField>
+
+<ParamField query="target_currency" type="string">
+  Moneda de salida para los fondos: `ARS` o `USD` (predeterminado `ARS`).
+</ParamField>
+
+<ParamField query="fx_kind" type="string">
+  Tipo de cambio usado para la conversión de moneda (predeterminado `mep`).
+</ParamField>
+
+<Info>
+Valores válidos para <code>fx_kind</code>:
+
+- <code>mep</code>
+- <code>ccl</code>
+- <code>a3500</code>
+- <code>oficial_minorista</code>
+</Info>
+
+<Note>
+  El endpoint devuelve 400 si alguno de los fondos solicitados no tiene datos en el rango.
+</Note>
+
+## Ejemplo de Solicitud
+
+<RequestExample>
+```bash cURL
+curl -G "https://api.doctacapital.com.ar/api/v1/fci/compare/series" \
+  -H "Authorization: Bearer $DOCTA_TOKEN" \
+  --data-urlencode "fund_names=Premier Abierto Pymes - Clase A" \
+  --data-urlencode "fund_names=Mercado Fondo - Clase A" \
+  --data-urlencode "benchmarks=CER" \
+  --data-urlencode "interval=1 week"
+```
+</RequestExample>
+
+## Respuesta Exitosa
+
+<ResponseField name="requested_range" type="object">
+  Rango solicitado, con `from` y `to` en formato YYYY-MM-DD (null si se usó `interval` sin fechas explícitas).
+</ResponseField>
+
+<ResponseField name="effective_range" type="object">
+  Rango efectivo con datos disponibles, con `from` y `to` en formato YYYY-MM-DD.
+</ResponseField>
+
+<ResponseField name="target_currency" type="string">
+  Moneda de salida aplicada a los fondos.
+</ResponseField>
+
+<ResponseField name="fx_kind" type="string">
+  Tipo de cambio aplicado.
+</ResponseField>
+
+<ResponseField name="fund_count" type="integer">
+  Cantidad de fondos incluidos.
+</ResponseField>
+
+<ResponseField name="benchmark_count" type="integer">
+  Cantidad de benchmarks incluidos.
+</ResponseField>
+
+<ResponseField name="funds" type="array">
+  Una serie por fondo.
+</ResponseField>
+
+<ResponseField name="funds[].fund_name" type="string">
+  Nombre del fondo.
+</ResponseField>
+
+<ResponseField name="funds[].native_currency" type="string">
+  Moneda nativa del fondo.
+</ResponseField>
+
+<ResponseField name="funds[].series" type="array">
+  Puntos de la serie: `date` (YYYY-MM-DD) y `cumulative_return` (retorno acumulado como decimal, 0.0 en la fecha ancla).
+</ResponseField>
+
+<ResponseField name="benchmarks" type="array">
+  Una serie por benchmark, con `name`, `type` y sus propios puntos `date`/`cumulative_return`.
+</ResponseField>
+
+<ResponseField name="data_quality" type="object">
+  Metadatos de calidad: `common_dates_count` (fechas comunes entre fondos) y `anchor_date` (fecha ancla de la alineación).
+</ResponseField>
+
+## Ejemplo de Respuesta Exitosa
+
+<ResponseExample>
+```json Success
+{
+  "requested_range": {
+    "from": null,
+    "to": null
+  },
+  "effective_range": {
+    "from": "2026-07-23",
+    "to": "2026-07-30"
+  },
+  "target_currency": "ARS",
+  "fx_kind": "mep",
+  "fund_count": 2,
+  "benchmark_count": 1,
+  "funds": [
+    {
+      "fund_name": "Premier Abierto Pymes - Clase A",
+      "native_currency": "ARS",
+      "series": [
+        {
+          "date": "2026-07-23",
+          "cumulative_return": 0.0
+        },
+        {
+          "date": "2026-07-24",
+          "cumulative_return": 0.001611773016768625
+        },
+        {
+          "date": "2026-07-27",
+          "cumulative_return": 0.008401386594302673
+        }
+      ]
+    },
+    {
+      "fund_name": "Mercado Fondo - Clase A",
+      "native_currency": "ARS",
+      "series": [
+        {
+          "date": "2026-07-23",
+          "cumulative_return": 0.0
+        },
+        {
+          "date": "2026-07-24",
+          "cumulative_return": 0.0004792094833239169
+        },
+        {
+          "date": "2026-07-27",
+          "cumulative_return": 0.0019162360121554034
+        }
+      ]
+    }
+  ],
+  "benchmarks": [
+    {
+      "name": "CER",
+      "type": "quote",
+      "series": [
+        {
+          "date": "2026-07-27",
+          "cumulative_return": 0.0
+        },
+        {
+          "date": "2026-07-28",
+          "cumulative_return": 0.0006073377175133121
+        },
+        {
+          "date": "2026-07-29",
+          "cumulative_return": 0.0012150442941305517
+        }
+      ]
+    }
+  ],
+  "data_quality": {
+    "common_dates_count": 6,
+    "anchor_date": "2026-07-23"
+  }
+}
+```
+</ResponseExample>
