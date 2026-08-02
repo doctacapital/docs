@@ -44,7 +44,8 @@
               "api-reference/endpoint/bonds-yields-historical-curve",
               "api-reference/endpoint/bonds-cashflow",
               "api-reference/endpoint/bonds-cashflow-residual-value",
-              "api-reference/endpoint/bonds-calculadora"
+              "api-reference/endpoint/bonds-calculadora",
+              "api-reference/endpoint/bonds-compare"
             ]
           },
           {

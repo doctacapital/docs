@@ -30,7 +30,7 @@ La forma recomendada: iniciás sesión con tu cuenta de Docta y autorizás el ac
 
 ## Herramientas disponibles
 
-El servidor expone 24 herramientas, una por cada endpoint documentado de la API.
+El servidor expone 26 herramientas, una por cada endpoint documentado de la API.
 
 ### Bonos
 
@@ -44,7 +44,7 @@ El servidor expone 24 herramientas, una por cada endpoint documentado de la API.
 | `get_bond_cashflow` | `/bonds/analytics/{symbol}/cashflow` | Cronograma de pagos, con montos ajustados por CER/UVA |
 | `get_bond_residual_value` | `.../cashflows/residual-value` | Serie diaria de valor residual por plazo de liquidación |
 | `price_bond` | `/analytics/bonds/pricer` | Calculadora: de precio a TIR y viceversa |
-| `compare_bonds` | (agrupa `yields/intraday`) | Comparación de 2–5 bonos en una tabla |
+| `compare_bonds` | `/bonds/compare` | Comparación de 2–20 bonos en una tabla, en una sola request |
 | `get_my_usage` | — | Tu plan y cuota restante (no consume requests) |
 
 ### FCI
@@ -60,6 +60,8 @@ El servidor expone 24 herramientas, una por cada endpoint documentado de la API.
 | `list_fci_benchmarks` | `/fci/benchmarks` | Benchmarks disponibles (CER, BADLAR, MEP, …) |
 | `get_fci_benchmark_series` | `/fci/benchmarks/{name}/series` | Serie de retorno acumulado de un benchmark |
 | `compare_fci_funds` | `/fci/compare/table` | Comparación de hasta 30 fondos en una tabla |
+| `compare_fci_series` | `/fci/compare/series` | Series de retorno acumulado de hasta 10 fondos + benchmarks |
+| `get_fci_market_series` | `/fci/market/series` | Serie temporal de la industria (AUM, cantidad de fondos o flujo neto) |
 | `get_fci_market_kpis` | `/fci/market/kpis` | KPIs de industria: fondos vigentes, AUM total, gestoras activas |
 | `get_fci_aum_distribution` | `/fci/market/aum-distribution` | AUM de la industria por categoría |
 | `get_fci_top_managers` | `/fci/market/top-managers` | Ranking de gestoras por AUM |
