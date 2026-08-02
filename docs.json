@@ -25,7 +25,8 @@
             "group": "Introducción",
             "pages": [
               "api-reference/introduction",
-              "servidor-mcp"
+              "servidor-mcp",
+              "onboarding-ia"
             ]
           },
           {
@@ -115,20 +116,20 @@
       "canonical": "https://docs.doctacapital.com.ar",
       "charset": "UTF-8",
       "viewport": "width=device-width, initial-scale=1.0",
-      "description": "Documentación de la API de Bonos de Docta - Catálogo de bonos, cashflows y curvas de rendimiento en Argentina.",
-      "keywords": "API de Bonos, Docta, bonos, cashflows, curvas de rendimiento, yields intradiarios, Argentina",
+      "description": "Documentación de la API de Docta: bonos de Argentina (catálogo, rendimientos, cashflows, curvas) y Fondos Comunes de Inversión (screener, series, performance y analytics de industria).",
+      "keywords": "API de Bonos, API de FCI, Fondos Comunes de Inversión, Docta, bonos argentina, argentine bonds API, mutual funds argentina, renta fija, obligaciones negociables, cashflows, curvas de rendimiento, yield curve, TIR, TNA, duration, curva CER, AL30, GD30, VCP, AUM, CAFCI, BADLAR, dólar MEP, MCP server, Argentina",
       "author": "Docta",
       "robots": "index, follow",
       "language": "es",
       "copyright": "Copyright 2024 Docta",
-      "og:title": "API de Bonos de Docta - Documentación",
+      "og:title": "API de Docta - Bonos de Argentina y FCI",
       "og:type": "website",
-      "og:description": "Documentación completa de la API de Bonos de Docta para acceder a instrumentos, cashflows y curvas de bonos.",
+      "og:description": "Documentación de la API de Docta: bonos de Argentina (instrumentos, cashflows, curvas de rendimiento) y Fondos Comunes de Inversión (screener, series y analytics).",
       "og:site_name": "Docta API",
       "og:locale": "es_AR",
       "twitter:card": "summary_large_image",
-      "twitter:title": "API de Bonos de Docta - Documentación",
-      "twitter:description": "Documentación completa de la API de Bonos de Docta para acceder a instrumentos, cashflows y curvas de bonos."
+      "twitter:title": "API de Docta - Bonos de Argentina y FCI",
+      "twitter:description": "Documentación de la API de Docta: bonos de Argentina (instrumentos, cashflows, curvas de rendimiento) y Fondos Comunes de Inversión (screener, series y analytics)."
     }
   }
 }

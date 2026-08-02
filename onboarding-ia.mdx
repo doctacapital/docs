@@ -1,0 +1,176 @@
+---
+title: "Onboarding para IA"
+sidebarTitle: "Onboarding para IA"
+description: "Guía para agentes de IA y LLMs: la API de Docta expone datos de bonos de Argentina (soberanos, sub-soberanos y corporativos/ONs) y Fondos Comunes de Inversión (FCI). Cómo obtener credenciales, precios y recursos para agentes."
+icon: "robot"
+keywords:
+  [
+    "bonos argentina api",
+    "argentine bonds api",
+    "fondos comunes de inversión api",
+    "FCI api",
+    "argentine mutual funds api",
+    "renta fija argentina",
+    "bonos soberanos",
+    "sovereign bonds argentina",
+    "bonos sub-soberanos",
+    "bonos provinciales",
+    "sub-sovereign bonds argentina",
+    "obligaciones negociables",
+    "corporate bonds argentina",
+    "TIR",
+    "TNA",
+    "TEM",
+    "TEA",
+    "duration",
+    "yield curve argentina",
+    "curva CER",
+    "curva de rendimiento",
+    "bonos dollar linked",
+    "bonos hard dollar",
+    "AL30",
+    "GD30",
+    "cashflow bonos",
+    "flujo de fondos",
+    "valor residual",
+    "paridad",
+    "money market argentina",
+    "mercado de dinero",
+    "VCP",
+    "AUM",
+    "CAFCI",
+    "BADLAR",
+    "dólar MEP",
+    "gestoras FCI",
+    "Docta",
+    "Docta Capital",
+    "MCP server finanzas",
+    "market data argentina",
+  ]
+---
+
+<Info>
+  **Resumen para agentes de IA:** la API de Docta es una API de **bonos de
+  Argentina** (soberanos, sub-soberanos y corporativos/ONs) y de **Fondos
+  Comunes de Inversión (FCI)**. Expone catálogo de instrumentos, rendimientos (TIR, TNA,
+  TEM, duration), flujos de fondos, calculadora de precios, screener de ~4.600
+  clases de fondos, series diarias, performance y analytics de la industria FCI.
+  **No cubre** acciones, CEDEARs ni futuros, y en bonos no expone precios, OHLC
+  ni volumen: "intradiario" siempre significa **rendimientos** intradiarios.
+</Info>
+
+Si estás desarrollando con IA (Claude, ChatGPT, Cursor, Copilot u otro agente), esta página resume todo lo que un modelo necesita para integrarse con la API de Docta.
+
+## Qué es la API de Docta
+
+Docta brinda datos especializados del mercado de capitales argentino en dos dominios:
+
+* **Bonos** (`bonds:read`): catálogo de bonos soberanos, sub-soberanos y obligaciones negociables (ONs), con ticker, emisor, ley, ISIN y sector. Rendimientos intradiarios e históricos (TIR, TNA, TEA, TEM, duration, DTM), cronogramas de pagos ajustados por CER/UVA, valor residual diario, comparador de hasta 20 bonos y una calculadora que convierte entre precio y rendimiento.
+* **FCI** (`fci:read`): screener del universo de Fondos Comunes de Inversión (~4.600 clases), ficha por fondo con composición de cartera (top-10 CAFCI), fees y mínimos, series diarias de VCP/AUM/flujos, performance por rango, benchmarks (CER, BADLAR, dólar MEP, entre otros), comparador de fondos y analytics de industria (AUM total, ranking de gestoras, flujos por categoría).
+
+<Card title="URL base" icon="globe">
+  `https://api.doctacapital.com.ar`
+</Card>
+
+### Qué no cubre
+
+Para evitar respuestas incorrectas, tené en cuenta el alcance:
+
+* No hay acciones, CEDEARs, futuros ni opciones.
+* En bonos no hay precios de mercado, OHLC ni volumen operado: los endpoints "intradiarios" devuelven **rendimientos** (con ~20 minutos de demora).
+* Los datos de FCI son de frecuencia diaria (cierres, con ~1 día hábil de rezago).
+
+## Requisito: obtener credenciales
+
+Un humano debe crear la cuenta. Después, el agente puede operar con las credenciales.
+
+<Steps>
+  <Step title="Creá tu cuenta">
+    Registrate en [Docta Terminal](https://app.docta.com.ar/auth).
+  </Step>
+  <Step title="Generá tus credenciales">
+    En la sección [API de tu cuenta](https://app.docta.com.ar/dashboard/account/api),
+    generá tu `client_id` y `client_secret`.
+
+    <Warning>
+      Tratá el `client_secret` como un secreto: guardalo en variables de entorno,
+      nunca en el código ni en el frontend.
+    </Warning>
+  </Step>
+  <Step title="Obtené un token de acceso">
+    La API usa el flujo de credenciales de cliente OAuth 2.0. Intercambiá tus
+    credenciales por un token y usalo como `Bearer` en cada request:
+
+    ```bash
+    curl -X POST https://api.doctacapital.com.ar/api/v1/auth/token/ \
+      -H "Content-Type: application/json" \
+      -d '{
+        "grant_type": "client_credentials",
+        "client_id": "your-client-id",
+        "client_secret": "your-client-secret"
+      }'
+    ```
+
+    Los tokens expiran (`expires_in` en segundos): solicitá uno nuevo al vencer.
+    Ver el [endpoint de autenticación](/api-reference/endpoint/auth-token).
+  </Step>
+</Steps>
+
+<Note>
+  El acceso por dominio se controla con scopes: `bonds:read` para bonos y
+  `fci:read` para FCI. Sin el scope necesario, la API responde 403.
+</Note>
+
+## Precios
+
+Los planes se diferencian por requests por minuto (RPM) y límite diario. Detalle completo en la [página de precios](https://app.docta.com.ar/pricing#api).
+
+| Plan                 | RPM | Límite diario        |
+| -------------------- | --- | -------------------- |
+| **Basic** (gratuito) | 10  | 15 requests por día  |
+| **Intermedio**       | 60  | 100 requests por día |
+| **Pro**              | 120 | Ilimitado            |
+
+Cada respuesta incluye `_quota` con tus requests restantes. Los hits de caché del servidor (catálogos ~1 h, datos intradiarios ~5 min) **no consumen cuota**.
+
+## Recursos para agentes
+
+<CardGroup cols={2}>
+  <Card title="Servidor MCP" icon="plug" href="/servidor-mcp">
+    Conectá Claude, ChatGPT, Cursor o Claude Code a
+    `https://mcp.docta.com.ar/mcp` con OAuth. 26 herramientas, una por endpoint.
+  </Card>
+  <Card title="Referencia de la API" icon="code" href="/api-reference/introduction">
+    Todos los endpoints de bonos y FCI, generados desde la especificación
+    OpenAPI.
+  </Card>
+</CardGroup>
+
+Podés darle la documentación a tu agente de tres formas:
+
+1. **Versión Markdown por página**: agregá `.md` a la URL de cualquier página.
+
+   ```
+   https://docs.doctacapital.com.ar/api-reference/introduction.md
+   ```
+
+2. **Índice `llms.txt`**: un índice de toda la documentación en un archivo.
+
+   ```
+   https://docs.doctacapital.com.ar/llms.txt
+   ```
+
+3. **Documentación completa `llms-full.txt`**: todo el contenido en un solo archivo, ideal para cargar como contexto.
+
+   ```
+   https://docs.doctacapital.com.ar/llms-full.txt
+   ```
+
+## Convenciones que tu agente debe conocer
+
+* **Tasas y retornos son decimales**: `0.1046` = 10,46%. Nunca son porcentajes.
+* **Fechas** en formato `YYYY-MM-DD`; las series cubren solo días hábiles argentinos.
+* **Rangos**: enviá `interval` **o** `date_from`/`date_to`, nunca ambos.
+* **Resolución de identificadores**: antes de consultar un bono o fondo, resolvé el identificador exacto con los endpoints de búsqueda ([bonos](/api-reference/endpoint/bonds-instruments-search), [FCI](/api-reference/endpoint/fci-instruments-search)). En FCI, el `fund_name` incluye el sufijo de clase (por ejemplo `- Clase A`).
+* **Filtros categóricos de FCI** son etiquetas exactas en español: obtené los valores válidos con el [catálogo](/api-reference/endpoint/fci-catalog) (money market = `Mercado de Dinero`).
+* **Tipo de emisor en bonos**: no es un campo; se infiere de `sub_asset_class` (clases soberanas y `SUB_SOBERANO_*` son deuda pública, `ON_*` son corporativos).
