@@ -93,7 +93,7 @@
     "primary": {
       "type": "button",
       "label": "Página principal",
-      "href": "https://app.doctacapital.com.ar"
+      "href": "https://app.docta.com.ar"
     }
   },
   "contextual": {
@@ -113,7 +113,7 @@
   },
   "seo": {
     "metatags": {
-      "canonical": "https://docs.doctacapital.com.ar",
+      "canonical": "https://docs.docta.com.ar",
       "charset": "UTF-8",
       "viewport": "width=device-width, initial-scale=1.0",
       "description": "Documentación de la API de Docta: bonos de Argentina (catálogo, rendimientos, cashflows, curvas) y Fondos Comunes de Inversión (screener, series, performance y analytics de industria).",
