@@ -10,7 +10,7 @@ openapi: 'GET /api/v1/futures/history/{ticker}'
 ## Parámetros de ruta
 
 <ParamField path="ticker" type="string" required>
-  Ticker exacto del contrato, con la barra (`DLR/NOV26`) o URL-encodeado (`DLR%2FNOV26`). Solo se aceptan tickers que cumplen `^DLR/[A-Z]{3}\d{2}$`.
+  Ticker exacto del contrato, con la barra (`DLR/NOV26`) o URL-encodeado (`DLR%2FNOV26`). No se normalizan mayúsculas: `dlr/nov26` da 404. Solo se aceptan tickers que cumplen `^DLR/[A-Z]{3}\d{2}$`.
 </ParamField>
 
 ## Parámetros de consulta
@@ -24,11 +24,11 @@ openapi: 'GET /api/v1/futures/history/{ticker}'
 </ParamField>
 
 <ParamField query="date_to" type="string">
-  Fecha de fin en formato YYYY-MM-DD. Mutuamente excluyente con `interval`.
+  Fecha de fin en formato YYYY-MM-DD. Requiere `date_from` y es mutuamente excluyente con `interval`.
 </ParamField>
 
 <Info>
-Enviá <code>interval</code> o <code>date_from</code>/<code>date_to</code>, nunca ambos. Si mandás los dos, la API responde 422. Sin ninguno, devuelve el último año.
+Enviá <code>interval</code> o <code>date_from</code>/<code>date_to</code>, nunca ambos. Si mandás los dos, la API responde 422. También da 422 mandar <code>date_to</code> sin <code>date_from</code> ("Must provide 'interval' or 'date_from'"). Sin ninguno, devuelve el último año.
 </Info>
 
 ## Ejemplo de Solicitud
@@ -51,7 +51,7 @@ curl -X GET "https://api.doctacapital.com.ar/api/v1/futures/history/DLR/NOV26?in
 </ResponseField>
 
 <ResponseField name="rows" type="array">
-  Una fila por día, con los valores en el orden de `columns`. `date` va en YYYY-MM-DD, los precios en ARS y `trade_volume` en contratos operados. Si una vela no trae un valor, ese lugar va en `null`.
+  Una fila por día, con los valores en el orden de `columns`. `date` va en YYYY-MM-DD, los precios en ARS y `trade_volume` en contratos operados. Si una vela no trae un valor, ese lugar va en `null`. Las filas más viejas pueden traer solo el cierre, con apertura, máximo, mínimo y volumen en `null` (ej., `["2026-09-29", null, null, null, 1576.5, null]`). `trade_volume` puede venir como float (`142615.0`).
 </ResponseField>
 
 <Info>
@@ -66,9 +66,8 @@ Para graficar la evolución del precio, usá <code>date</code> en el eje X y <co
   "ticker": "DLR/NOV26",
   "columns": ["date", "opening_price", "high_price", "low_price", "closing_price", "trade_volume"],
   "rows": [
-    ["2026-10-26", 1561.0, 1566.0, 1559.5, 1564.0, 87410],
-    ["2026-10-27", 1564.5, 1569.0, 1563.0, 1567.5, 91877],
-    ["2026-10-28", 1569.0, 1572.0, 1566.5, 1570.5, 98211]
+    ["2026-09-29", null, null, null, 1576.5, null],
+    ["2026-10-29", 1568.5, 1570.0, 1567.5, 1568.0, 142615.0]
   ]
 }
 ```

@@ -89,6 +89,7 @@ El servidor expone 30 herramientas, una por cada endpoint documentado de la API.
 ## Cuotas y caché
 
 - Cada llamada a una herramienta consume requests de tu [plan de API](https://app.docta.com.ar/pricing#api), con una excepción importante: las respuestas se cachean del lado del servidor (catálogos ~1 h, datos intradiarios ~5 min) y **los hits de caché no consumen tu cuota**.
+- Las 4 herramientas de dólar futuro no cachean: llaman directo a la API, nunca devuelven `_cached` y cada llamada consume una request de tu cuota.
 - Cada respuesta incluye `_quota` (requests restantes) y `_cached`. La herramienta `get_my_usage` muestra tu estado sin gastar requests.
 - Los datos intradiarios de bonos tienen ~20 minutos de demora. Los de dólar futuro son en tiempo real. Las tasas son decimales (0.1046 = 10,46%).
 

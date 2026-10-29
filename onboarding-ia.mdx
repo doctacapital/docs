@@ -142,7 +142,7 @@ Los planes se diferencian por requests por minuto (RPM) y límite diario. Detall
 | **Intermedio**       | 60  | 100 requests por día |
 | **Pro**              | 120 | Ilimitado            |
 
-Cada respuesta incluye `_quota` con tus requests restantes. Los hits de caché del servidor (catálogos ~1 h, datos intradiarios ~5 min) **no consumen cuota**.
+Cada respuesta incluye `_quota` con tus requests restantes. Los hits de caché del servidor (catálogos ~1 h, datos intradiarios ~5 min) **no consumen cuota**. Dólar futuro no se cachea: en el MCP cada llamada a esas herramientas consume una request y nunca devuelve `_cached`.
 
 ## Recursos para agentes
 

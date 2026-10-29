@@ -9,7 +9,7 @@ openapi: 'GET /api/v1/futures/instruments'
 
 ## Qué contratos entran
 
-Solo los tickers que cumplen `^DLR/[A-Z]{3}\d{2}$`, uno por vencimiento mensual (por ejemplo `DLR/NOV26`, `DLR/DIC26`, `DLR/ENE27`). Quedan afuera dos casos:
+Solo los tickers que cumplen `^DLR/[A-Z]{3}\d{2}$`, uno por vencimiento mensual (por ejemplo `DLR/NOV26`, `DLR/DIC26`, `DLR/ENE27`). El 29 de octubre de 2026 eran 14 contratos, de `DLR/OCT26` a `DLR/NOV27`. Quedan afuera dos casos:
 
 - Los gemelos `M`, como `DLR/NOV26M`. Son un segundo book sobre el mismo vencimiento y duplicarían cada punto de la curva.
 - `DLR/PF0`. Está en el segmento de dólar pero no tiene un vencimiento real, así que rompe las curvas.
@@ -22,6 +22,7 @@ Los datos son los del mercado en el momento de la llamada, sin la demora de ~20 
 
 - Las tasas y variaciones son decimales: `0.0172` = 1,72 %.
 - Los precios están en ARS por dólar.
+- `trade_volume`, `bid_size` y `offer_size` pueden venir como float (`142615.0`).
 - Las fechas van en `YYYY-MM-DD`. `operation_date` es ISO 8601 con offset, tal como llega del feed.
 - Un campo sin dato para un contrato vuelve en `null`. Nunca se omite.
 
@@ -124,6 +125,8 @@ La API no calcula curvas. Las armás vos con `instruments`, que ya viene ordenad
   </Step>
 </Steps>
 
+El heatmap de event-guard usa esta misma lista: `variation` como color y `trade_volume` u `open_interest` como tamaño.
+
 ## Ejemplo de Respuesta Exitosa
 
 <ResponseExample>
@@ -134,45 +137,45 @@ La API no calcula curvas. Las armás vos con `instruments`, que ya viene ordenad
     "price": 1541.0,
     "date": "2026-10-29"
   },
-  "count": 13,
+  "count": 14,
   "instruments": [
     {
       "ticker": "DLR/NOV26",
       "maturity_date": "2026-11-30",
       "days_to_maturity": 32,
-      "last_price": 1568.5,
+      "last_price": 1568.0,
       "closing_price": 1570.5,
-      "variation": -0.00127,
-      "trade_volume": 105386,
+      "variation": -0.0015918497293855305,
+      "trade_volume": 142615.0,
       "bid_price": 1567.5,
-      "bid_size": 5089,
-      "offer_price": 1568.5,
-      "offer_size": 1774,
-      "open_interest": 1312478,
-      "implied_rate": 0.017846,
-      "tna": 0.203551,
-      "tea": 0.223549,
+      "bid_size": 11170.0,
+      "offer_price": 1568.0,
+      "offer_size": 1060.0,
+      "open_interest": 1125435,
+      "implied_rate": 0.01752109020116807,
+      "tna": 0.1998499351070733,
+      "tea": 0.21921110908860508,
       "forward_tem": 0.0172,
-      "operation_date": "2026-10-29T13:29:11.084000-03:00"
+      "operation_date": "2026-10-29T14:41:44.647000-03:00"
     },
     {
       "ticker": "DLR/DIC26",
-      "maturity_date": "2026-12-31",
-      "days_to_maturity": 63,
-      "last_price": 1597.0,
+      "maturity_date": "2026-12-30",
+      "days_to_maturity": 62,
+      "last_price": 1596.5,
       "closing_price": 1599.0,
-      "variation": -0.001251,
-      "trade_volume": 61204,
-      "bid_price": 1596.5,
-      "bid_size": 2310,
-      "offer_price": 1597.5,
-      "offer_size": 1480,
+      "variation": -0.0015634771732332409,
+      "trade_volume": 61204.0,
+      "bid_price": 1596.0,
+      "bid_size": 2310.0,
+      "offer_price": 1596.5,
+      "offer_size": 1480.0,
       "open_interest": 884215,
-      "implied_rate": 0.03634,
-      "tna": 0.210541,
-      "tea": 0.229744,
-      "forward_tem": 0.017579,
-      "operation_date": "2026-10-29T13:28:54.512000-03:00"
+      "implied_rate": 0.0360155743024011,
+      "tna": 0.21202717129639356,
+      "tea": 0.23158049412222104,
+      "forward_tem": 0.01817602040816335,
+      "operation_date": "2026-10-29T14:41:58.296000-03:00"
     }
   ]
 }

@@ -14,7 +14,7 @@ openapi: 'GET /api/v1/futures/instruments/{ticker}'
 </ParamField>
 
 <Info>
-La coincidencia es exacta. `DLR/DIC26` devuelve ese contrato y nunca su gemelo `DLR/DIC26M`. Solo se aceptan tickers que cumplen <code>^DLR/[A-Z]{3}\d{2}$</code>: los gemelos <code>M</code> y <code>DLR/PF0</code> responden 404, igual que un contrato que no existe.
+La coincidencia es exacta y no normaliza mayúsculas: <code>dlr/nov26</code> da 404. <code>DLR/DIC26</code> devuelve ese contrato y nunca su gemelo <code>DLR/DIC26M</code>. Solo se aceptan tickers que cumplen <code>^DLR/[A-Z]{3}\d{2}$</code>: los gemelos <code>M</code> y <code>DLR/PF0</code> responden 404, igual que un contrato que no existe.
 </Info>
 
 ## Ejemplo de Solicitud
@@ -122,20 +122,20 @@ curl -X GET "https://api.doctacapital.com.ar/api/v1/futures/instruments/DLR/NOV2
     "ticker": "DLR/NOV26",
     "maturity_date": "2026-11-30",
     "days_to_maturity": 32,
-    "last_price": 1568.5,
+    "last_price": 1568.0,
     "closing_price": 1570.5,
-    "variation": -0.00127,
-    "trade_volume": 105386,
+    "variation": -0.0015918497293855305,
+    "trade_volume": 142615.0,
     "bid_price": 1567.5,
-    "bid_size": 5089,
-    "offer_price": 1568.5,
-    "offer_size": 1774,
-    "open_interest": 1312478,
-    "implied_rate": 0.017846,
-    "tna": 0.203551,
-    "tea": 0.223549,
+    "bid_size": 11170.0,
+    "offer_price": 1568.0,
+    "offer_size": 1060.0,
+    "open_interest": 1125435,
+    "implied_rate": 0.01752109020116807,
+    "tna": 0.1998499351070733,
+    "tea": 0.21921110908860508,
     "forward_tem": 0.0172,
-    "operation_date": "2026-10-29T13:29:11.084000-03:00",
+    "operation_date": "2026-10-29T14:41:44.647000-03:00",
     "opening_price": 1568.5,
     "high_price": 1570.0,
     "low_price": 1567.5
