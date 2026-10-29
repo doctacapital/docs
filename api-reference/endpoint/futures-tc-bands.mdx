@@ -1,0 +1,79 @@
+---
+title: 'Bandas cambiarias'
+openapi: 'GET /api/v1/futures/tc-bands'
+---
+
+<Note>
+  Devuelve el piso y el techo de las bandas cambiarias del BCRA y su proyección con un supuesto de inflación mensual. Cruzado con el [listado de contratos](/api-reference/endpoint/futures-instruments), arma el gráfico "Futuros y bandas". Requiere el scope `futures:read`.
+</Note>
+
+<Warning>
+  Las filas con `is_projected = true` no son dato del BCRA. Son una proyección de Docta con el supuesto de `monthly_inflation`, y cambian si cambiás ese parámetro. Las filas oficiales llegan hasta `last_official_date`.
+</Warning>
+
+## Parámetros de consulta
+
+<ParamField query="monthly_inflation" type="number" default="0.01">
+  Supuesto de inflación mensual para la proyección, en decimal (0.01 = 1 %). Debe ser mayor o igual a 0.
+</ParamField>
+
+<ParamField query="date_to" type="string">
+  Última fecha de la serie, en formato YYYY-MM-DD. Predeterminado: `maturity_date` del último contrato vigente, así las bandas cubren toda la curva de futuros.
+</ParamField>
+
+## Ejemplo de Solicitud
+
+<RequestExample>
+```bash cURL
+curl -X GET "https://api.doctacapital.com.ar/api/v1/futures/tc-bands?monthly_inflation=0.01" \
+  -H "Authorization: Bearer $DOCTA_TOKEN"
+```
+</RequestExample>
+
+## Respuesta Exitosa
+
+<ResponseField name="monthly_inflation" type="number">
+  Supuesto de inflación mensual usado para las filas proyectadas, en decimal.
+</ResponseField>
+
+<ResponseField name="last_official_date" type="string | null">
+  Última fecha con dato oficial del BCRA (YYYY-MM-DD). Las fechas posteriores son proyección.
+</ResponseField>
+
+<ResponseField name="columns" type="string[]">
+  Nombres de columna, siempre en este orden: `date`, `lower_band`, `upper_band`, `is_projected`.
+</ResponseField>
+
+<ResponseField name="rows" type="array">
+  Una fila por fecha, con los valores en el orden de `columns`. `date` va en YYYY-MM-DD, `lower_band` y `upper_band` son números en ARS por dólar, e `is_projected` es `true` si la fila es proyección.
+</ResponseField>
+
+## Armar "Futuros y bandas"
+
+<Steps>
+  <Step title="Pedí las dos series">
+    Llamá a este endpoint y a [`GET /api/v1/futures/instruments`](/api-reference/endpoint/futures-instruments). Si no mandás `date_to`, las bandas terminan en el vencimiento del último contrato.
+  </Step>
+  <Step title="Graficá las bandas">
+    Con `date` en el eje X, dibujá `lower_band` y `upper_band` como dos líneas. Distinguí visualmente el tramo con `is_projected = true` del tramo oficial.
+  </Step>
+  <Step title="Superponé los contratos">
+    Cada contrato de `instruments` es un punto con `maturity_date` en X y `last_price` en Y. Así ves dónde opera cada vencimiento respecto del piso y el techo.
+  </Step>
+</Steps>
+
+## Ejemplo de Respuesta Exitosa
+
+<ResponseExample>
+```json Success
+{
+  "monthly_inflation": 0.01,
+  "last_official_date": "2026-11-30",
+  "columns": ["date", "lower_band", "upper_band", "is_projected"],
+  "rows": [
+    ["2026-10-29", 712.75, 1949.91, false],
+    ["2026-12-01", 698.0, 1990.5, true]
+  ]
+}
+```
+</ResponseExample>

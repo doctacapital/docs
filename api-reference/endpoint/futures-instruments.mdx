@@ -1,0 +1,180 @@
+---
+title: 'Contratos de dólar futuro'
+openapi: 'GET /api/v1/futures/instruments'
+---
+
+<Note>
+  Lista todos los contratos vigentes de dólar futuro de A3 (Matba Rofex), ordenados por vencimiento, con precios, puntas, volumen, interés abierto y tasas implícitas, más el dólar mayorista A3500 de referencia. Con esta lista armás el screener, la curva normal y la curva forward. Requiere el scope `futures:read`.
+</Note>
+
+## Qué contratos entran
+
+Solo los tickers que cumplen `^DLR/[A-Z]{3}\d{2}$`, uno por vencimiento mensual (por ejemplo `DLR/NOV26`, `DLR/DIC26`, `DLR/ENE27`). Quedan afuera dos casos:
+
+- Los gemelos `M`, como `DLR/NOV26M`. Son un segundo book sobre el mismo vencimiento y duplicarían cada punto de la curva.
+- `DLR/PF0`. Está en el segmento de dólar pero no tiene un vencimiento real, así que rompe las curvas.
+
+## Tiempo real
+
+Los datos son los del mercado en el momento de la llamada, sin la demora de ~20 minutos de bonos y sin caché propio en estas rutas. Dos llamadas seguidas pueden devolver precios distintos.
+
+## Convenciones
+
+- Las tasas y variaciones son decimales: `0.0172` = 1,72 %.
+- Los precios están en ARS por dólar.
+- Las fechas van en `YYYY-MM-DD`. `operation_date` es ISO 8601 con offset, tal como llega del feed.
+- Un campo sin dato para un contrato vuelve en `null`. Nunca se omite.
+
+## Ejemplo de Solicitud
+
+<RequestExample>
+```bash cURL
+curl -X GET "https://api.doctacapital.com.ar/api/v1/futures/instruments" \
+  -H "Authorization: Bearer $DOCTA_TOKEN"
+```
+</RequestExample>
+
+## Respuesta Exitosa
+
+<ResponseField name="spot" type="object">
+  Dólar mayorista de referencia contra el que se calculan `implied_rate` y el primer `forward_tem`. Incluye `ticker` (`TC_OFICIAL_MAYORISTA`), `price` (cotización A3500 en ARS) y `date` (YYYY-MM-DD).
+</ResponseField>
+
+<ResponseField name="count" type="integer">
+  Cantidad de contratos vigentes.
+</ResponseField>
+
+<ResponseField name="instruments" type="array">
+  Contratos vigentes, ordenados por `maturity_date` ascendente.
+</ResponseField>
+
+<ResponseField name="instruments[].ticker" type="string">
+  Ticker del contrato (ej., `DLR/NOV26`).
+</ResponseField>
+
+<ResponseField name="instruments[].maturity_date" type="string">
+  Vencimiento del contrato (YYYY-MM-DD).
+</ResponseField>
+
+<ResponseField name="instruments[].days_to_maturity" type="integer | null">
+  Días al vencimiento.
+</ResponseField>
+
+<ResponseField name="instruments[].last_price" type="number | null">
+  Último precio operado.
+</ResponseField>
+
+<ResponseField name="instruments[].closing_price" type="number | null">
+  Último precio operado de la última rueda completa. Durante la rueda es el cierre de la rueda anterior y sirve de base para `variation`.
+</ResponseField>
+
+<ResponseField name="instruments[].variation" type="number | null">
+  Variación del día: `last_price / closing_price - 1`, en decimal.
+</ResponseField>
+
+<ResponseField name="instruments[].trade_volume" type="number | null">
+  Contratos operados en la rueda.
+</ResponseField>
+
+<ResponseField name="instruments[].bid_price" type="number | null">
+  Mejor compra. `bid_size` es la cantidad de contratos a ese precio.
+</ResponseField>
+
+<ResponseField name="instruments[].offer_price" type="number | null">
+  Mejor venta. `offer_size` es la cantidad de contratos a ese precio.
+</ResponseField>
+
+<ResponseField name="instruments[].open_interest" type="number | null">
+  Interés abierto.
+</ResponseField>
+
+<ResponseField name="instruments[].implied_rate" type="number | null">
+  Tasa directa: `precio del contrato / dólar mayorista (A3500) - 1`, en decimal. Es la devaluación implícita hasta el vencimiento.
+</ResponseField>
+
+<ResponseField name="instruments[].tna" type="number | null">
+  Tasa nominal anual, en decimal.
+</ResponseField>
+
+<ResponseField name="instruments[].tea" type="number | null">
+  Tasa efectiva anual, en decimal.
+</ResponseField>
+
+<ResponseField name="instruments[].forward_tem" type="number | null">
+  Tasa forward entre este contrato y el anterior, efectiva mensual, en decimal. Para el primer contrato de la lista se calcula contra el A3500.
+</ResponseField>
+
+<ResponseField name="instruments[].operation_date" type="string | null">
+  Fecha y hora del último tick, en ISO 8601 con offset (ej., `2026-10-29T13:29:11.084000-03:00`).
+</ResponseField>
+
+## Armar las curvas
+
+La API no calcula curvas. Las armás vos con `instruments`, que ya viene ordenado por `maturity_date`.
+
+<Steps>
+  <Step title="Curva normal">
+    Un punto por contrato: en el eje X `maturity_date` (o `days_to_maturity`), en el eje Y `tea`, `tna` o `implied_rate`, según qué tasa quieras mostrar.
+  </Step>
+  <Step title="Curva forward">
+    Mismo eje X, con `forward_tem` en el eje Y. Cada punto es la tasa mensual implícita entre el vencimiento anterior y ese contrato. El primer punto mide el tramo entre el A3500 de `spot` y el primer vencimiento.
+  </Step>
+  <Step title="Futuros y bandas">
+    Pedí [`GET /api/v1/futures/tc-bands`](/api-reference/endpoint/futures-tc-bands) y graficá `lower_band` y `upper_band` por `date`. Encima, poné cada contrato como un punto con `maturity_date` en X y `last_price` en Y. Sin `date_to`, las bandas llegan hasta el vencimiento del último contrato, así que cubren toda la curva.
+  </Step>
+</Steps>
+
+## Ejemplo de Respuesta Exitosa
+
+<ResponseExample>
+```json Success
+{
+  "spot": {
+    "ticker": "TC_OFICIAL_MAYORISTA",
+    "price": 1541.0,
+    "date": "2026-10-29"
+  },
+  "count": 13,
+  "instruments": [
+    {
+      "ticker": "DLR/NOV26",
+      "maturity_date": "2026-11-30",
+      "days_to_maturity": 32,
+      "last_price": 1568.5,
+      "closing_price": 1570.5,
+      "variation": -0.00127,
+      "trade_volume": 105386,
+      "bid_price": 1567.5,
+      "bid_size": 5089,
+      "offer_price": 1568.5,
+      "offer_size": 1774,
+      "open_interest": 1312478,
+      "implied_rate": 0.017846,
+      "tna": 0.203551,
+      "tea": 0.223549,
+      "forward_tem": 0.0172,
+      "operation_date": "2026-10-29T13:29:11.084000-03:00"
+    },
+    {
+      "ticker": "DLR/DIC26",
+      "maturity_date": "2026-12-31",
+      "days_to_maturity": 63,
+      "last_price": 1597.0,
+      "closing_price": 1599.0,
+      "variation": -0.001251,
+      "trade_volume": 61204,
+      "bid_price": 1596.5,
+      "bid_size": 2310,
+      "offer_price": 1597.5,
+      "offer_size": 1480,
+      "open_interest": 884215,
+      "implied_rate": 0.03634,
+      "tna": 0.210541,
+      "tea": 0.229744,
+      "forward_tem": 0.017579,
+      "operation_date": "2026-10-29T13:28:54.512000-03:00"
+    }
+  ]
+}
+```
+</ResponseExample>

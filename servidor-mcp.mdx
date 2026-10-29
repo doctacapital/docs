@@ -3,7 +3,7 @@ title: "Servidor MCP"
 description: "Conectá Claude, ChatGPT o tu editor a los datos de mercado de Docta"
 ---
 
-Docta expone un servidor remoto [MCP (Model Context Protocol)](https://modelcontextprotocol.io) para que asistentes de IA consulten datos del mercado argentino — bonos (rendimientos, duration, flujos de fondos, paridad) y FCI (screener, series, performance, gestoras y flujos de industria) — directamente desde la conversación.
+Docta expone un servidor remoto [MCP (Model Context Protocol)](https://modelcontextprotocol.io) para que asistentes de IA consulten datos del mercado argentino desde la conversación: bonos (rendimientos, duration, flujos de fondos, paridad), FCI (screener, series, performance, gestoras y flujos de industria) y dólar futuro (contratos de A3 en tiempo real, curvas y bandas cambiarias).
 
 <Card title="URL del servidor" icon="plug">
   `https://mcp.docta.com.ar/mcp`
@@ -30,7 +30,7 @@ La forma recomendada: iniciás sesión con tu cuenta de Docta y autorizás el ac
 
 ## Herramientas disponibles
 
-El servidor expone 26 herramientas, una por cada endpoint documentado de la API.
+El servidor expone 30 herramientas, una por cada endpoint documentado de la API. Las herramientas disponibles dependen de los scopes de tu cuenta: `bonds:read`, `fci:read` y `futures:read`.
 
 ### Bonos
 
@@ -68,9 +68,20 @@ El servidor expone 26 herramientas, una por cada endpoint documentado de la API.
 | `get_fci_top_managers_by_flow` | `/fci/market/top-managers-by-flow` | Ranking de gestoras por flujo neto |
 | `get_fci_flows_by_category` | `/fci/market/flows-by-category` | Flujos netos de una categoría en un rango |
 
+### Dólar futuro
+
+| Herramienta | Endpoint | Qué hace |
+| --- | --- | --- |
+| `list_futures` | `/futures/instruments` | Contratos vigentes de dólar de A3 con precios, puntas, volumen y tasas, ordenados por vencimiento |
+| `get_future` | `/futures/instruments/{ticker}` | Un contrato por ticker exacto, con apertura, máximo y mínimo de la rueda |
+| `get_future_history` | `/futures/history/{ticker}` | Velas diarias de un contrato |
+| `get_futures_tc_bands` | `/futures/tc-bands` | Bandas cambiarias del BCRA y su proyección con un supuesto de inflación |
+
 <Note>
-  El alcance es **renta fija argentina y FCI**. La API no cubre acciones, CEDEARs ni futuros, y
-  en bonos no expone precios, OHLC ni volumen operado: donde dice "intradiario" se trata de
+  El alcance es **renta fija argentina, FCI y dólar futuro de A3**. La API no cubre acciones,
+  CEDEARs, opciones ni otros futuros (índice, tasas, commodities). Del dólar futuro solo entran
+  los contratos mensuales como `DLR/NOV26`. Quedan afuera los gemelos `M` (`DLR/NOV26M`) y
+  `DLR/PF0`. En bonos la API no expone precios, OHLC ni volumen operado: donde dice "intradiario" se trata de
   **rendimientos** intradiarios, no de cotizaciones. Los datos de FCI son de frecuencia diaria
   (VCP/AUM al cierre) y los retornos son decimales (0.05 = 5%).
 </Note>
@@ -79,7 +90,7 @@ El servidor expone 26 herramientas, una por cada endpoint documentado de la API.
 
 - Cada llamada a una herramienta consume requests de tu [plan de API](https://app.docta.com.ar/pricing#api), con una excepción importante: las respuestas se cachean del lado del servidor (catálogos ~1 h, datos intradiarios ~5 min) y **los hits de caché no consumen tu cuota**.
 - Cada respuesta incluye `_quota` (requests restantes) y `_cached`. La herramienta `get_my_usage` muestra tu estado sin gastar requests.
-- Los datos intradiarios tienen ~20 minutos de demora y las tasas son decimales (0.1046 = 10,46%).
+- Los datos intradiarios de bonos tienen ~20 minutos de demora. Los de dólar futuro son en tiempo real. Las tasas son decimales (0.1046 = 10,46%).
 
 ## Alternativa: autenticación por headers
 
