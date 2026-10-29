@@ -74,6 +74,15 @@
                 ]
               }
             ]
+          },
+          {
+            "group": "Dólar futuro",
+            "pages": [
+              "api-reference/endpoint/futures-instruments",
+              "api-reference/endpoint/futures-instruments-detail",
+              "api-reference/endpoint/futures-history",
+              "api-reference/endpoint/futures-tc-bands"
+            ]
           }
         ]
       }
@@ -116,20 +125,20 @@
       "canonical": "https://docs.docta.com.ar",
       "charset": "UTF-8",
       "viewport": "width=device-width, initial-scale=1.0",
-      "description": "Documentación de la API de Docta: bonos de Argentina (catálogo, rendimientos, cashflows, curvas) y Fondos Comunes de Inversión (screener, series, performance y analytics de industria).",
-      "keywords": "API de Bonos, API de FCI, Fondos Comunes de Inversión, Docta, bonos argentina, argentine bonds API, mutual funds argentina, renta fija, obligaciones negociables, cashflows, curvas de rendimiento, yield curve, TIR, TNA, duration, curva CER, AL30, GD30, VCP, AUM, CAFCI, BADLAR, dólar MEP, MCP server, Argentina",
+      "description": "Documentación de la API de Docta: bonos de Argentina (catálogo, rendimientos, cashflows, curvas), Fondos Comunes de Inversión (screener, series, performance y analytics de industria) y dólar futuro de A3 en tiempo real (contratos, tasas implícitas, velas y bandas cambiarias).",
+      "keywords": "API de Bonos, API de FCI, Fondos Comunes de Inversión, Docta, bonos argentina, argentine bonds API, mutual funds argentina, renta fija, obligaciones negociables, cashflows, curvas de rendimiento, yield curve, TIR, TNA, duration, curva CER, AL30, GD30, VCP, AUM, CAFCI, BADLAR, dólar MEP, dólar futuro, futuros de dólar, A3, Matba Rofex, DLR, tasa implícita, curva forward, bandas cambiarias, MCP server, Argentina",
       "author": "Docta",
       "robots": "index, follow",
       "language": "es",
       "copyright": "Copyright 2024 Docta",
-      "og:title": "API de Docta - Bonos de Argentina y FCI",
+      "og:title": "API de Docta - Bonos de Argentina, FCI y dólar futuro",
       "og:type": "website",
-      "og:description": "Documentación de la API de Docta: bonos de Argentina (instrumentos, cashflows, curvas de rendimiento) y Fondos Comunes de Inversión (screener, series y analytics).",
+      "og:description": "Documentación de la API de Docta: bonos de Argentina (instrumentos, cashflows, curvas de rendimiento), Fondos Comunes de Inversión (screener, series y analytics) y dólar futuro de A3 en tiempo real.",
       "og:site_name": "Docta API",
       "og:locale": "es_AR",
       "twitter:card": "summary_large_image",
-      "twitter:title": "API de Docta - Bonos de Argentina y FCI",
-      "twitter:description": "Documentación de la API de Docta: bonos de Argentina (instrumentos, cashflows, curvas de rendimiento) y Fondos Comunes de Inversión (screener, series y analytics)."
+      "twitter:title": "API de Docta - Bonos de Argentina, FCI y dólar futuro",
+      "twitter:description": "Documentación de la API de Docta: bonos de Argentina (instrumentos, cashflows, curvas de rendimiento), Fondos Comunes de Inversión (screener, series y analytics) y dólar futuro de A3 en tiempo real."
     }
   }
 }

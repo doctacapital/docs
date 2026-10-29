@@ -1,7 +1,7 @@
 ---
 title: "Onboarding para IA"
 sidebarTitle: "Onboarding para IA"
-description: "Guía para agentes de IA y LLMs: la API de Docta expone datos de bonos de Argentina (soberanos, sub-soberanos y corporativos/ONs) y Fondos Comunes de Inversión (FCI). Cómo obtener credenciales, precios y recursos para agentes."
+description: "Guía para agentes de IA y LLMs: la API de Docta expone datos de bonos de Argentina (soberanos, sub-soberanos y corporativos/ONs), Fondos Comunes de Inversión (FCI) y dólar futuro de A3. Cómo obtener credenciales, precios y recursos para agentes."
 icon: "robot"
 keywords:
   [
@@ -44,6 +44,13 @@ keywords:
     "gestoras FCI",
     "Docta",
     "Docta Capital",
+    "dólar futuro",
+    "futuros de dólar",
+    "Matba Rofex",
+    "A3 Mercados",
+    "tasa implícita",
+    "curva forward",
+    "bandas cambiarias",
     "MCP server finanzas",
     "market data argentina",
   ]
@@ -51,22 +58,25 @@ keywords:
 
 <Info>
   **Resumen para agentes de IA:** la API de Docta es una API de **bonos de
-  Argentina** (soberanos, sub-soberanos y corporativos/ONs) y de **Fondos
-  Comunes de Inversión (FCI)**. Expone catálogo de instrumentos, rendimientos (TIR, TNA,
+  Argentina** (soberanos, sub-soberanos y corporativos/ONs), de **Fondos
+  Comunes de Inversión (FCI)** y de **dólar futuro** de A3 (Matba Rofex). Expone catálogo de instrumentos, rendimientos (TIR, TNA,
   TEM, duration), flujos de fondos, calculadora de precios, screener de ~4.600
-  clases de fondos, series diarias, performance y analytics de la industria FCI.
-  **No cubre** acciones, CEDEARs ni futuros, y en bonos no expone precios, OHLC
-  ni volumen: "intradiario" siempre significa **rendimientos** intradiarios.
+  clases de fondos, series diarias, performance y analytics de la industria FCI,
+  y los contratos de dólar futuro en tiempo real con tasas implícitas, velas
+  diarias y bandas cambiarias. **No cubre** acciones, CEDEARs, opciones ni otros
+  futuros (índice, tasas, commodities), y en bonos no expone precios, OHLC ni
+  volumen: "intradiario" siempre significa **rendimientos** intradiarios.
 </Info>
 
 Si estás desarrollando con IA (Claude, ChatGPT, Cursor, Copilot u otro agente), esta página resume todo lo que un modelo necesita para integrarse con la API de Docta.
 
 ## Qué es la API de Docta
 
-Docta brinda datos especializados del mercado de capitales argentino en dos dominios:
+Docta brinda datos especializados del mercado de capitales argentino en tres dominios:
 
 * **Bonos** (`bonds:read`): catálogo de bonos soberanos, sub-soberanos y obligaciones negociables (ONs), con ticker, emisor, ley, ISIN y sector. Rendimientos intradiarios e históricos (TIR, TNA, TEA, TEM, duration, DTM), cronogramas de pagos ajustados por CER/UVA, valor residual diario, comparador de hasta 20 bonos y una calculadora que convierte entre precio y rendimiento.
 * **FCI** (`fci:read`): screener del universo de Fondos Comunes de Inversión (~4.600 clases), ficha por fondo con composición de cartera (top-10 CAFCI), fees y mínimos, series diarias de VCP/AUM/flujos, performance por rango, benchmarks (CER, BADLAR, dólar MEP, entre otros), comparador de fondos y analytics de industria (AUM total, ranking de gestoras, flujos por categoría).
+* **Dólar futuro** (`futures:read`): los contratos mensuales vigentes de dólar de A3 (Matba Rofex, tickers como `DLR/NOV26`) en tiempo real, con último precio, puntas, volumen, interés abierto, tasa implícita contra el A3500, TNA, TEA y tasa forward mensual. Velas diarias por contrato y bandas cambiarias del BCRA con su proyección. Con esto se arman el screener y las curvas normal y forward.
 
 <Card title="URL base" icon="globe">
   `https://api.doctacapital.com.ar`
@@ -76,9 +86,10 @@ Docta brinda datos especializados del mercado de capitales argentino en dos domi
 
 Para evitar respuestas incorrectas, tené en cuenta el alcance:
 
-* No hay acciones, CEDEARs, futuros ni opciones.
+* No hay acciones, CEDEARs ni opciones. De futuros solo está el dólar de A3: no hay futuros de índice, tasas ni commodities, y quedan afuera los gemelos `M` (`DLR/NOV26M`) y `DLR/PF0`.
 * En bonos no hay precios de mercado, OHLC ni volumen operado: los endpoints "intradiarios" devuelven **rendimientos** (con ~20 minutos de demora).
 * Los datos de FCI son de frecuencia diaria (cierres, con ~1 día hábil de rezago).
+* Los datos de dólar futuro son en tiempo real, sin demora, salvo la historia, que son velas diarias.
 
 ## Requisito: obtener credenciales
 
@@ -117,8 +128,8 @@ Un humano debe crear la cuenta. Después, el agente puede operar con las credenc
 </Steps>
 
 <Note>
-  El acceso por dominio se controla con scopes: `bonds:read` para bonos y
-  `fci:read` para FCI. Sin el scope necesario, la API responde 403.
+  El acceso por dominio se controla con scopes: `bonds:read` para bonos,
+  `fci:read` para FCI y `futures:read` para dólar futuro. Sin el scope necesario, la API responde 403.
 </Note>
 
 ## Precios
@@ -131,17 +142,17 @@ Los planes se diferencian por requests por minuto (RPM) y límite diario. Detall
 | **Intermedio**       | 60  | 100 requests por día |
 | **Pro**              | 120 | Ilimitado            |
 
-Cada respuesta incluye `_quota` con tus requests restantes. Los hits de caché del servidor (catálogos ~1 h, datos intradiarios ~5 min) **no consumen cuota**.
+Cada respuesta incluye `_quota` con tus requests restantes. Los hits de caché del servidor (catálogos ~1 h, datos intradiarios ~5 min) **no consumen cuota**. Dólar futuro no se cachea: en el MCP cada llamada a esas herramientas consume una request y nunca devuelve `_cached`.
 
 ## Recursos para agentes
 
 <CardGroup cols={2}>
   <Card title="Servidor MCP" icon="plug" href="/servidor-mcp">
     Conectá Claude, ChatGPT, Cursor o Claude Code a
-    `https://mcp.docta.com.ar/mcp` con OAuth. 26 herramientas, una por endpoint.
+    `https://mcp.docta.com.ar/mcp` con OAuth. 30 herramientas, una por endpoint.
   </Card>
   <Card title="Referencia de la API" icon="code" href="/api-reference/introduction">
-    Todos los endpoints de bonos y FCI, generados desde la especificación
+    Todos los endpoints de bonos, FCI y dólar futuro, generados desde la especificación
     OpenAPI.
   </Card>
 </CardGroup>
@@ -171,6 +182,7 @@ Podés darle la documentación a tu agente de tres formas:
 * **Tasas y retornos son decimales**: `0.1046` = 10,46%. Nunca son porcentajes.
 * **Fechas** en formato `YYYY-MM-DD`; las series cubren solo días hábiles argentinos.
 * **Rangos**: enviá `interval` **o** `date_from`/`date_to`, nunca ambos.
+* **Dólar futuro**: los tickers llevan barra (`DLR/NOV26`) y la coincidencia es exacta. Listá los contratos vigentes con [`/futures/instruments`](/api-reference/endpoint/futures-instruments) antes de pedir uno.
 * **Resolución de identificadores**: antes de consultar un bono o fondo, resolvé el identificador exacto con los endpoints de búsqueda ([bonos](/api-reference/endpoint/bonds-instruments-search), [FCI](/api-reference/endpoint/fci-instruments-search)). En FCI, el `fund_name` incluye el sufijo de clase (por ejemplo `- Clase A`).
 * **Filtros categóricos de FCI** son etiquetas exactas en español: obtené los valores válidos con el [catálogo](/api-reference/endpoint/fci-catalog) (money market = `Mercado de Dinero`).
 * **Tipo de emisor en bonos**: no es un campo; se infiere de `sub_asset_class` (clases soberanas y `SUB_SOBERANO_*` son deuda pública, `ON_*` son corporativos).

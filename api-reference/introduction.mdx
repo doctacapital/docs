@@ -1,11 +1,11 @@
 ---
 title: 'API de Docta'
-description: 'Documentación de la API de Docta: bonos (catálogo, cashflows, curvas de rendimiento) y FCI (screener, series, performance y analytics de industria).'
+description: 'Documentación de la API de Docta: bonos (catálogo, cashflows, curvas de rendimiento), FCI (screener, series, performance y analytics de industria) y dólar futuro de A3 en tiempo real.'
 ---
 
 ## Bienvenido a la API de Docta
 
-La API de Docta brinda datos especializados del mercado argentino. Bonos: catálogo de instrumentos, detalle enriquecido, flujos de fondos, yields intradiarios y curvas históricas. FCI: screener del universo de fondos, detalle con composición y fees, series diarias, performance, comparaciones y analytics de la industria (AUM, gestoras, flujos). La autenticación sigue el flujo de credenciales de cliente OAuth 2.0.
+La API de Docta brinda datos especializados del mercado argentino. Bonos: catálogo de instrumentos, detalle enriquecido, flujos de fondos, yields intradiarios y curvas históricas. FCI: screener del universo de fondos, detalle con composición y fees, series diarias, performance, comparaciones y analytics de la industria (AUM, gestoras, flujos). Dólar futuro: los contratos vigentes de A3 (Matba Rofex) en tiempo real, con puntas, volumen, interés abierto y tasas implícitas, velas diarias por contrato y las bandas cambiarias del BCRA con su proyección. La autenticación sigue el flujo de credenciales de cliente OAuth 2.0.
 
 <Card
   title="URL Base"
@@ -21,10 +21,10 @@ La API de Docta brinda datos especializados del mercado argentino. Bonos: catál
 
 ## Autenticación
 
-La API utiliza el flujo de credenciales de cliente OAuth 2.0. Necesitas obtener un token de acceso antes de consultar instrumentos, cashflows, curvas o datos de FCI.
+La API utiliza el flujo de credenciales de cliente OAuth 2.0. Necesitas obtener un token de acceso antes de consultar instrumentos, cashflows, curvas, datos de FCI o futuros.
 
 <Note>
-  El acceso por dominio se controla con scopes: `bonds:read` para los endpoints de bonos y `fci:read` para los de FCI. Si tu cliente no tiene el scope necesario, la API responde 403.
+  El acceso por dominio se controla con scopes: `bonds:read` para los endpoints de bonos, `fci:read` para los de FCI y `futures:read` para los de dólar futuro. Si tu cliente no tiene el scope necesario, la API responde 403.
 </Note>
 
 <Steps>
