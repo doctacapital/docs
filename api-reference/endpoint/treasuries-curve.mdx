@@ -1,0 +1,215 @@
+---
+title: 'Curva del Tesoro'
+openapi: 'GET /api/v1/treasuries/curve'
+---
+
+<Note>
+  Devuelve la curva del Tesoro de Estados Unidos de un día: una tasa por tenor. Opcionalmente suma una tasa interpolada a N días y la curva de otra fecha con el cambio por tenor. Las tasas vienen en porcentaje (`4.98` es 4,98%). Requiere el scope `treasuries:read`.
+</Note>
+
+## Curvas disponibles
+
+| `curve` | Qué es | Tenors |
+| --- | --- | --- |
+| `par_yield` (predeterminada) | Rendimiento par de notas y bonos | `1M`, `1.5M`, `2M`, `3M`, `4M`, `6M`, `1Y`, `2Y`, `3Y`, `5Y`, `7Y`, `10Y`, `20Y`, `30Y` |
+| `bill_discount` | Tasa de descuento bancario de letras | `4W`, `6W`, `8W`, `13W`, `17W`, `26W`, `52W` |
+| `bill_coupon_equivalent` | Rendimiento equivalente de cupón de letras | `4W`, `6W`, `8W`, `13W`, `17W`, `26W`, `52W` |
+
+Hay una curva por día hábil de Estados Unidos. `par_yield` tiene tasas desde el 2 de enero de 2025. Si pedís una fecha anterior a la primera de la curva, el error trae esa fecha en `first_rate_date`.
+
+## Parámetros de consulta
+
+<ParamField query="curve" type="string" default="par_yield">
+  `par_yield`, `bill_discount` o `bill_coupon_equivalent`.
+</ParamField>
+
+<ParamField query="date" type="string">
+  Día de la curva, `YYYY-MM-DD`. Si no hay tasas ese día (fin de semana, feriado o una fecha posterior a la última), la API devuelve el último día con tasas anterior y lo informa en `rate_date` y `rate_age_days`. Predeterminado: el último día con tasas.
+</ParamField>
+
+<ParamField query="tenor_days" type="string">
+  Días al vencimiento, de 1 a 20000. Suma `interpolated`: la tasa interpolada linealmente en días entre los dos tenors que rodean ese plazo.
+</ParamField>
+
+<ParamField query="compare_date" type="string">
+  Segunda fecha, `YYYY-MM-DD`. Suma `compare`: la curva de ese día, con la misma regla de último día con tasas, y el cambio por tenor.
+</ParamField>
+
+## Ejemplo de solicitud
+
+<RequestExample>
+```bash cURL
+curl "https://api.doctacapital.com.ar/api/v1/treasuries/curve?date=2026-11-10&tenor_days=300&compare_date=2026-01-02" \
+  -H "Authorization: Bearer $DOCTA_TOKEN"
+```
+</RequestExample>
+
+## Respuesta exitosa
+
+<ResponseField name="curve" type="string">
+  Curva devuelta.
+</ResponseField>
+
+<ResponseField name="requested_date" type="string">
+  Fecha pedida en `date`, o el último día con tasas si no la mandaste.
+</ResponseField>
+
+<ResponseField name="rate_date" type="string">
+  Día de la curva devuelta: el último día con tasas en o antes de `requested_date`.
+</ResponseField>
+
+<ResponseField name="rate_age_days" type="integer">
+  Días entre `rate_date` y `requested_date`. `0` si ese día tiene tasas.
+</ResponseField>
+
+<ResponseField name="points" type="array">
+  Un punto por tenor, de menor a mayor plazo.
+</ResponseField>
+
+<ResponseField name="points[].tenor" type="string">
+  Etiqueta del tenor (ej., `2Y`, `1.5M`, `52W`).
+</ResponseField>
+
+<ResponseField name="points[].tenor_days" type="integer">
+  Plazo del tenor en días (ej., `2Y` es `730`, `52W` es `364`).
+</ResponseField>
+
+<ResponseField name="points[].rate" type="number | null">
+  Tasa en porcentaje. `null` si el Tesoro no publicó ese tenor ese día.
+</ResponseField>
+
+<ResponseField name="interpolated" type="object | null">
+  Solo con `tenor_days`; si no, `null`.
+</ResponseField>
+
+<ResponseField name="interpolated.tenor_days" type="integer">
+  El plazo pedido.
+</ResponseField>
+
+<ResponseField name="interpolated.rate" type="number">
+  Tasa interpolada, en porcentaje. En un tenor exacto es la tasa de ese tenor. Por debajo del primer tenor o por encima del último, la del extremo.
+</ResponseField>
+
+<ResponseField name="interpolated.method" type="string">
+  Siempre `linear_days`.
+</ResponseField>
+
+<ResponseField name="interpolated.lower" type="object">
+  Tenor inferior usado: `tenor`, `tenor_days` y `rate`.
+</ResponseField>
+
+<ResponseField name="interpolated.upper" type="object">
+  Tenor superior usado: `tenor`, `tenor_days` y `rate`. Igual a `lower` en un tenor exacto o fuera de los extremos.
+</ResponseField>
+
+<ResponseField name="compare" type="object | null">
+  Solo con `compare_date`; si no, `null`.
+</ResponseField>
+
+<ResponseField name="compare.requested_date" type="string">
+  La fecha pedida en `compare_date`.
+</ResponseField>
+
+<ResponseField name="compare.rate_date" type="string">
+  Día de la curva de comparación.
+</ResponseField>
+
+<ResponseField name="compare.rate_age_days" type="integer">
+  Días entre `compare.rate_date` y `compare.requested_date`.
+</ResponseField>
+
+<ResponseField name="compare.points" type="array">
+  Un punto por tenor, en el mismo orden que `points`: `tenor`, `tenor_days`, `rate` (la tasa del día de comparación, en porcentaje) y `change`.
+</ResponseField>
+
+<ResponseField name="compare.points[].change" type="number | null">
+  Tasa de la curva principal menos tasa de la curva de comparación, en puntos porcentuales y redondeada a 6 decimales. `null` si falta alguna de las dos.
+</ResponseField>
+
+<Info>
+Una fecha posterior a la última con tasas no es un error. Con <code>compare_date=2099-01-01</code>, <code>compare</code> trae la última curva disponible y <code>rate_age_days: 26350</code>. Mirá siempre <code>rate_date</code> para saber qué día graficás.
+</Info>
+
+## Ejemplo de respuesta exitosa
+
+En el primer ejemplo, `points` y `compare.points` están recortados a cuatro de los 14 tenors.
+
+<ResponseExample>
+```json 200
+{
+  "curve": "par_yield",
+  "requested_date": "2026-11-10",
+  "rate_date": "2026-11-10",
+  "rate_age_days": 0,
+  "points": [
+    { "tenor": "1M", "tenor_days": 30, "rate": 4.05 },
+    { "tenor": "2Y", "tenor_days": 730, "rate": 4.73 },
+    { "tenor": "10Y", "tenor_days": 3652, "rate": 4.98 },
+    { "tenor": "30Y", "tenor_days": 10957, "rate": 5.35 }
+  ],
+  "interpolated": {
+    "tenor_days": 300,
+    "rate": 4.4957142857142856,
+    "method": "linear_days",
+    "lower": { "tenor": "6M", "tenor_days": 183, "rate": 4.38 },
+    "upper": { "tenor": "1Y", "tenor_days": 365, "rate": 4.56 }
+  },
+  "compare": {
+    "requested_date": "2026-01-02",
+    "rate_date": "2026-01-02",
+    "rate_age_days": 0,
+    "points": [
+      { "tenor": "1M", "tenor_days": 30, "rate": 3.72, "change": 0.33 },
+      { "tenor": "2Y", "tenor_days": 730, "rate": 3.47, "change": 1.26 },
+      { "tenor": "10Y", "tenor_days": 3652, "rate": 4.19, "change": 0.79 },
+      { "tenor": "30Y", "tenor_days": 10957, "rate": 4.86, "change": 0.49 }
+    ]
+  }
+}
+```
+
+```json 200 bill_discount
+{
+  "curve": "bill_discount",
+  "requested_date": "2026-11-10",
+  "rate_date": "2026-11-10",
+  "rate_age_days": 0,
+  "points": [
+    { "tenor": "4W", "tenor_days": 28, "rate": 3.88 },
+    { "tenor": "6W", "tenor_days": 42, "rate": 4.01 },
+    { "tenor": "8W", "tenor_days": 56, "rate": 4.02 },
+    { "tenor": "13W", "tenor_days": 91, "rate": 4.12 },
+    { "tenor": "17W", "tenor_days": 119, "rate": 4.17 },
+    { "tenor": "26W", "tenor_days": 182, "rate": 4.26 },
+    { "tenor": "52W", "tenor_days": 364, "rate": 4.34 }
+  ],
+  "interpolated": null,
+  "compare": null
+}
+```
+
+```json 422
+{
+  "type": "/errors/validation-error",
+  "title": "Validation Error",
+  "status": 422,
+  "detail": "No 'par_yield' rates on or before 1900-01-01",
+  "details": {
+    "code": "no_rates_on_or_before",
+    "first_rate_date": "2025-01-02"
+  }
+}
+```
+</ResponseExample>
+
+## Errores
+
+| Status | `details.code` | Cuándo |
+| --- | --- | --- |
+| 422 | `invalid_curve` | `curve` fuera de las tres curvas. |
+| 422 | `invalid_date` | `date` o `compare_date` no son una fecha `YYYY-MM-DD` válida. |
+| 422 | `invalid_parameter` | `tenor_days` no es un entero de 1 a 20000. |
+| 422 | `no_rates_on_or_before` | `date` o `compare_date` son anteriores al 2025-01-02. Trae `first_rate_date`. |
+| 422 | `no_rates` | La curva no tiene ninguna tasa cargada. Trae `first_rate_date`. |
+
+La taxonomía completa está en la [guía](/api-reference/treasuries-guia#errores).

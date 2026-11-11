@@ -1,0 +1,298 @@
+---
+title: 'Precio de modelo de un US Treasury'
+openapi: 'GET /api/v1/treasuries/instruments/{id}/price'
+---
+
+<Note>
+  Devuelve el precio de modelo de una letra, nota o bono del Tesoro de Estados Unidos, en dólares o en pesos. Es un precio calculado sobre la curva del Tesoro de un día, no una cotización de mercado ni una operación. Requiere el scope `treasuries:read`.
+</Note>
+
+## Cómo se calcula
+
+Docta valúa el título con la curva publicada el día `rate_date`, el último día con tasas en o antes de `as_of`:
+
+- Letras y letras de caja (`family: "BILL"`): la tasa de descuento de la curva `bill_discount` interpolada linealmente en días al vencimiento (`discount_rate`), y precio `100 × (1 − discount_rate / 100 × residual_days / 360)`.
+- Notas y bonos (`family: "NOTE"` o `"BOND"`): los cupones y el capital descontados al `par_yield` interpolado linealmente en días al vencimiento, con capitalización semestral. El interés corrido se devenga ACT/ACT hasta `as_of`. `price` es el precio sucio.
+
+Por debajo del primer tenor o por encima del último, la interpolación toma la tasa del extremo. Los TIPS, los FRN y los STRIPS no se valúan y responden 404.
+
+## Parámetros de ruta
+
+<ParamField path="id" type="string" required>
+  ISIN de 12 caracteres (`US91282CMM00`), ISIN sin dígito verificador de 11 (`US91282CMM0`) o CUSIP de 9 (`91282CMM0`). No distingue mayúsculas.
+</ParamField>
+
+## Parámetros de consulta
+
+<ParamField query="as_of" type="string">
+  Fecha de valuación, `YYYY-MM-DD`, hasta hoy. Una fecha futura responde 422 `invalid_date`. Predeterminado: el último día con tasas. En un fin de semana o feriado usa la curva del último día hábil anterior.
+</ParamField>
+
+<ParamField query="currency" type="string" default="usd">
+  Moneda de `price`: `usd`, `ars_ccl` (pesos al dólar CCL) o `ars_mep` (pesos al dólar MEP). El dólar es el de `as_of` o el último publicado antes.
+</ParamField>
+
+## Ejemplo de solicitud
+
+<RequestExample>
+```bash cURL
+curl "https://api.doctacapital.com.ar/api/v1/treasuries/instruments/US91282CMM00/price" \
+  -H "Authorization: Bearer $DOCTA_TOKEN"
+```
+</RequestExample>
+
+## Respuesta exitosa
+
+Las tasas vienen en porcentaje (`4.927972602739726` es 4,93%) y lo dice `units: "percent"`. Los precios son por 100 de valor nominal. Solo `price` cambia de moneda con `currency`; los demás precios quedan siempre en dólares. La respuesta no tiene campos en `null`: los que no aplican a la familia del título no vienen.
+
+<ResponseField name="isin" type="string">
+  ISIN de 12 caracteres.
+</ResponseField>
+
+<ResponseField name="cusip" type="string">
+  CUSIP de 9 caracteres.
+</ResponseField>
+
+<ResponseField name="family" type="string">
+  Cómo se valúa el título: `BILL` (letras y letras de caja), `NOTE` o `BOND`.
+</ResponseField>
+
+<ResponseField name="security_type" type="string">
+  Tipo según el Tesoro: `Bill`, `Note` o `Bond`.
+</ResponseField>
+
+<ResponseField name="security_term" type="string">
+  Plazo de la subasta original (ej., `52-Week`, `10-Year`).
+</ResponseField>
+
+<ResponseField name="issue_date" type="string">
+  Fecha de emisión.
+</ResponseField>
+
+<ResponseField name="maturity_date" type="string">
+  Fecha de vencimiento.
+</ResponseField>
+
+<ResponseField name="coupon" type="number">
+  Solo notas y bonos. Tasa de cupón anual, en porcentaje.
+</ResponseField>
+
+<ResponseField name="as_of" type="string">
+  Fecha de valuación. Sin `as_of` en la request, es el último día con tasas.
+</ResponseField>
+
+<ResponseField name="rate_date" type="string">
+  Día de la curva usada.
+</ResponseField>
+
+<ResponseField name="rate_age_days" type="integer">
+  Días entre `rate_date` y `as_of`. `0` en un día hábil, `2` un domingo.
+</ResponseField>
+
+<ResponseField name="method" type="string">
+  `bill_discount_interpolated` para letras, `par_yield_interpolated` para notas y bonos.
+</ResponseField>
+
+<ResponseField name="units" type="string">
+  Siempre `percent`: las tasas de esta respuesta están en porcentaje.
+</ResponseField>
+
+<ResponseField name="currency" type="string">
+  `USD`, o `ARS` con `currency=ars_ccl` o `ars_mep`. Indica la moneda de `price` y nada más.
+</ResponseField>
+
+<ResponseField name="price" type="number">
+  Precio de modelo por 100 de valor nominal, en `currency`. En una letra es el precio; en una nota o un bono, el precio sucio.
+</ResponseField>
+
+<ResponseField name="price_usd_per_100" type="number">
+  El mismo precio en dólares por 100, cualquiera sea `currency`. Es el valor que encadenás con la [calculadora](/api-reference/endpoint/treasuries-calculator): `input=price` en una letra, `input=dirty` en una nota o un bono.
+</ResponseField>
+
+<ResponseField name="price_per_100" type="number">
+  Solo letras. Precio en dólares por 100, igual a `price_usd_per_100`.
+</ResponseField>
+
+<ResponseField name="discount_rate" type="number">
+  Solo letras. Tasa de descuento bancario interpolada en la curva `bill_discount`, en porcentaje.
+</ResponseField>
+
+<ResponseField name="coupon_equivalent" type="number">
+  Solo letras. Rendimiento equivalente de cupón (la fórmula del Tesoro, base 365 o 366) del precio de modelo, en porcentaje.
+</ResponseField>
+
+<ResponseField name="dirty_price" type="number">
+  Solo notas y bonos. Precio sucio en dólares por 100.
+</ResponseField>
+
+<ResponseField name="clean_price" type="number">
+  Solo notas y bonos. Precio limpio en dólares por 100: `dirty_price` menos `accrued_interest`.
+</ResponseField>
+
+<ResponseField name="accrued_interest" type="number">
+  Solo notas y bonos. Interés corrido al `as_of`, en dólares por 100.
+</ResponseField>
+
+<ResponseField name="par_yield" type="number">
+  Solo notas y bonos. Rendimiento de la curva `par_yield` interpolado a los días al vencimiento, en porcentaje. Es la tasa con la que se descontó el título.
+</ResponseField>
+
+<ResponseField name="prev_coupon" type="string">
+  Solo notas y bonos. Último cupón en o antes de `as_of`.
+</ResponseField>
+
+<ResponseField name="next_coupon" type="string">
+  Solo notas y bonos. Próximo cupón.
+</ResponseField>
+
+<ResponseField name="residual_days" type="integer">
+  Días corridos de `as_of` al vencimiento.
+</ResponseField>
+
+<ResponseField name="fx_used" type="string">
+  Solo con `currency` en pesos. `ccl` o `mep`.
+</ResponseField>
+
+<ResponseField name="fx_value" type="number">
+  Solo con `currency` en pesos. Pesos por dólar usados para `price`.
+</ResponseField>
+
+<ResponseField name="fx_date" type="string">
+  Solo con `currency` en pesos. Fecha del dólar usado: la de `as_of` o la última anterior con dato.
+</ResponseField>
+
+<Warning>
+  Para el rendimiento de mercado de este precio, pasá `price_usd_per_100` a la calculadora, que responde en fracción. No mezcles `par_yield` (porcentaje) con las tasas de la calculadora sin convertir la escala. La receta completa está en la [guía](/api-reference/treasuries-guia#recetas).
+</Warning>
+
+## Ejemplo de respuesta exitosa
+
+<ResponseExample>
+```json 200 nota
+{
+  "isin": "US91282CMM00",
+  "cusip": "91282CMM0",
+  "family": "NOTE",
+  "security_type": "Note",
+  "security_term": "10-Year",
+  "issue_date": "2025-02-18",
+  "maturity_date": "2035-02-15",
+  "coupon": 4.625,
+  "as_of": "2026-11-10",
+  "rate_date": "2026-11-10",
+  "rate_age_days": 0,
+  "method": "par_yield_interpolated",
+  "units": "percent",
+  "currency": "USD",
+  "price": 99.0500870138465,
+  "price_usd_per_100": 99.0500870138465,
+  "dirty_price": 99.0500870138465,
+  "clean_price": 97.95667668775954,
+  "accrued_interest": 1.0934103260869565,
+  "par_yield": 4.927972602739726,
+  "prev_coupon": "2026-08-15",
+  "next_coupon": "2027-02-15",
+  "residual_days": 3019
+}
+```
+
+```json 200 letra
+{
+  "isin": "US912797VR56",
+  "cusip": "912797VR5",
+  "family": "BILL",
+  "security_type": "Bill",
+  "security_term": "52-Week",
+  "issue_date": "2026-08-06",
+  "maturity_date": "2027-08-05",
+  "as_of": "2026-11-10",
+  "rate_date": "2026-11-10",
+  "rate_age_days": 0,
+  "method": "bill_discount_interpolated",
+  "units": "percent",
+  "currency": "USD",
+  "price": 96.80052503052504,
+  "price_usd_per_100": 96.80052503052504,
+  "price_per_100": 96.80052503052504,
+  "discount_rate": 4.297802197802198,
+  "coupon_equivalent": 4.469651318800733,
+  "residual_days": 268
+}
+```
+
+```json 200 currency=ars_ccl
+{
+  "isin": "US91282CMM00",
+  "cusip": "91282CMM0",
+  "family": "NOTE",
+  "security_type": "Note",
+  "security_term": "10-Year",
+  "issue_date": "2025-02-18",
+  "maturity_date": "2035-02-15",
+  "coupon": 4.625,
+  "as_of": "2026-11-10",
+  "rate_date": "2026-11-10",
+  "rate_age_days": 0,
+  "method": "par_yield_interpolated",
+  "units": "percent",
+  "currency": "ARS",
+  "price": 166277.26384039284,
+  "price_usd_per_100": 99.0500870138465,
+  "dirty_price": 99.0500870138465,
+  "clean_price": 97.95667668775954,
+  "accrued_interest": 1.0934103260869565,
+  "par_yield": 4.927972602739726,
+  "prev_coupon": "2026-08-15",
+  "next_coupon": "2027-02-15",
+  "residual_days": 3019,
+  "fx_used": "ccl",
+  "fx_value": 1678.71900826446,
+  "fx_date": "2026-11-06"
+}
+```
+
+```json 404
+{
+  "type": "/errors/not-found",
+  "title": "Resource not found",
+  "status": 404,
+  "detail": "TIPS are not valued: they need the CPI index",
+  "details": {
+    "code": "excluded_tips",
+    "isin": "US91282CFR79"
+  }
+}
+```
+
+```json 422
+{
+  "type": "/errors/validation-error",
+  "title": "Validation Error",
+  "status": 422,
+  "detail": "No 'par_yield' rates on or before 2020-01-02",
+  "details": {
+    "code": "no_rates_on_or_before",
+    "first_rate_date": "2025-01-02"
+  }
+}
+```
+</ResponseExample>
+
+## Errores
+
+Gana el primer error que aplica, en el orden de la tabla.
+
+| Status | `details.code` | Cuándo | Ejemplo de `detail` |
+| --- | --- | --- | --- |
+| 422 | `invalid_id` | El `id` no tiene forma de ISIN, ISIN de 11 o CUSIP, o falla el dígito verificador. | `'US91282CMM01' fails the ISIN check digit` |
+| 422 | `invalid_date` | `as_of` mal formado, inexistente o futuro. | `'as_of' 2099-01-01 is in the future (today is 2026-11-11)` |
+| 422 | `invalid_currency` | `currency` fuera de `usd`, `ars_ccl`, `ars_mep`. | `'currency' must be one of ['usd', 'ars_ccl', 'ars_mep'], got 'eur'` |
+| 404 | `not_in_catalog` | El título no está en el catálogo del Tesoro. | `Title not in the Treasury catalog` |
+| 404 | `excluded_tips`, `excluded_frn`, `excluded_strips`, `excluded_other` | El título no se valúa. | `Floating rate notes are not valued: the catalog has no margin` |
+| 404 | `matured` | El título vence en o antes de `as_of`. Trae `maturity_date`. | `US9127933Y02 matured on 1980-04-03` |
+| 404 | `not_issued` | `as_of` es anterior a la emisión. Trae `issue_date`. | `US91282CMM00 is issued on 2025-02-18` |
+| 422 | `no_rates_on_or_before` | No hay curva en o antes de `as_of` (las tasas empiezan el 2025-01-02). Trae `first_rate_date`. | `No 'par_yield' rates on or before 2020-01-02` |
+| 422 | `no_rates` | La curva no tiene ninguna tasa cargada. Trae `first_rate_date`. | |
+| 422 | `no_fx` | No hay dólar CCL o MEP en o antes de `as_of`. Trae `fx_used`. | |
+
+Todos los 404 traen `details.isin`. La taxonomía completa está en la [guía](/api-reference/treasuries-guia#errores).
