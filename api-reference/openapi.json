@@ -3884,6 +3884,1378 @@
         }
       }
     },
+    "/api/v1/treasuries/instruments": {
+      "get": {
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "description": "Catálogo de títulos del Tesoro de Estados Unidos, una fila por título (las reaperturas se agrupan en la subasta original), ordenado por maturity_date. Letras, letras de caja, notas, bonos, TIPS y FRN desde 1980. No trae precio. Por defecto lista todos los títulos, vencidos incluidos, hasta limit=1000. Coupon en porcentaje.",
+        "tags": [
+          "US Treasuries"
+        ],
+        "parameters": [
+          {
+            "name": "type",
+            "in": "query",
+            "required": false,
+            "description": "Tipos separados por punto: bill, cmb, note, bond, tips, frn. Ej.: note.bond.",
+            "schema": {
+              "type": "string"
+            },
+            "example": "note.bond"
+          },
+          {
+            "name": "as_of",
+            "in": "query",
+            "required": false,
+            "description": "Fecha de referencia para outstanding, days_to_maturity y last_auction, YYYY-MM-DD. Predeterminado: hoy.",
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "outstanding",
+            "in": "query",
+            "required": false,
+            "description": "true deja los títulos con issue_date <= as_of < maturity_date. false lista todos.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "true",
+                "false"
+              ],
+              "default": "false"
+            }
+          },
+          {
+            "name": "maturity_from",
+            "in": "query",
+            "required": false,
+            "description": "Vencimiento mínimo, inclusivo, YYYY-MM-DD.",
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "maturity_to",
+            "in": "query",
+            "required": false,
+            "description": "Vencimiento máximo, inclusivo, YYYY-MM-DD.",
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "term",
+            "in": "query",
+            "required": false,
+            "description": "Plazo exacto de la subasta original, ej. 52-Week o 10-Year.",
+            "schema": {
+              "type": "string"
+            },
+            "example": "52-Week"
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "required": false,
+            "description": "Fragmento del ISIN o del CUSIP.",
+            "schema": {
+              "type": "string"
+            },
+            "example": "91282CJK"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "description": "Máximo de filas, de 1 a 10000.",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 10000,
+              "default": 1000
+            }
+          },
+          {
+            "name": "include",
+            "in": "query",
+            "required": false,
+            "description": "Extras separados por punto. Único valor: reopenings (agrega auctions a cada fila).",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "reopenings"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Catálogo de títulos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TreasuryCatalogResponse"
+                },
+                "example": {
+                  "as_of": "2026-11-11",
+                  "filters": {
+                    "type": [
+                      "bill"
+                    ],
+                    "outstanding": true,
+                    "maturity_from": null,
+                    "maturity_to": null,
+                    "term": null,
+                    "q": null,
+                    "include": null
+                  },
+                  "total": 44,
+                  "returned": 3,
+                  "data": [
+                    {
+                      "isin": "US912797UY17",
+                      "cusip": "912797UY1",
+                      "kind": "BILL",
+                      "security_type": "Bill",
+                      "security_term": "26-Week",
+                      "issue_date": "2026-05-14",
+                      "dated_date": null,
+                      "maturity_date": "2026-11-12",
+                      "days_to_maturity": 1,
+                      "outstanding": true,
+                      "coupon": null,
+                      "interest_payment_frequency": null,
+                      "first_interest_payment_date": null,
+                      "reopenings": 2,
+                      "auction": {
+                        "auction_date": null,
+                        "announcement_date": "2026-05-07",
+                        "price_per_100": null,
+                        "high_discount_rate": null,
+                        "high_investment_rate": null
+                      },
+                      "last_auction": {
+                        "issue_date": "2026-10-01",
+                        "security_term": "6-Week",
+                        "reopening": true,
+                        "cash_management_bill": false,
+                        "price_per_100": null,
+                        "high_discount_rate": null,
+                        "high_investment_rate": null,
+                        "auction_date": null,
+                        "announcement_date": "2026-09-24"
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Autenticación requerida",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TreasuryError"
+                },
+                "example": {
+                  "type": "/errors/authentication-required",
+                  "title": "Authorization header missing",
+                  "status": 401,
+                  "detail": "Authorization header missing"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Permisos insuficientes: requiere el scope treasuries:read",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TreasuryError"
+                },
+                "example": {
+                  "type": "/errors/insufficient-permissions",
+                  "title": "Insufficient permissions. Required scope: treasuries:read",
+                  "status": 403,
+                  "detail": "Insufficient permissions. Required scope: treasuries:read"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Parámetro inválido; details.code indica la regla",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TreasuryError"
+                },
+                "example": {
+                  "type": "/errors/validation-error",
+                  "title": "Validation Error",
+                  "status": 422,
+                  "detail": "'type' accepts ['bill', 'cmb', 'note', 'bond', 'tips', 'frn'] separated by dots, got ['foo']",
+                  "details": {
+                    "code": "invalid_type"
+                  }
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Límite de requests de tu plan superado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TreasuryError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/treasuries/instruments/{id}": {
+      "get": {
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "description": "Ficha de un título: subasta original (title), todas las subastas (reopenings) y calendario de cupones en as_of. Responde también títulos vencidos, TIPS y FRN. Tasas en porcentaje.",
+        "tags": [
+          "US Treasuries"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "ISIN de 12 caracteres (US91282CMM00), ISIN sin dígito verificador de 11 (US91282CMM0) o CUSIP de 9 (91282CMM0). No distingue mayúsculas.",
+            "schema": {
+              "type": "string",
+              "pattern": "^([A-Za-z0-9]{9}|[Uu][Ss][A-Za-z0-9]{9,10})$"
+            },
+            "example": "US91282CMM00"
+          },
+          {
+            "name": "as_of",
+            "in": "query",
+            "required": false,
+            "description": "Fecha de referencia para el calendario de cupones, days_to_maturity y outstanding, YYYY-MM-DD. Predeterminado: hoy.",
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Ficha del título",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TreasuryDetailResponse"
+                },
+                "example": {
+                  "isin": "US912797VR56",
+                  "cusip": "912797VR5",
+                  "kind": "BILL",
+                  "title": {
+                    "cusip": "912797VR5",
+                    "isin": "US912797VR56",
+                    "issue_date": "2026-08-06",
+                    "security_type": "Bill",
+                    "security_term": "52-Week",
+                    "maturity_date": "2027-08-05",
+                    "dated_date": null,
+                    "interest_rate": null,
+                    "interest_payment_frequency": null,
+                    "first_interest_payment_date": null,
+                    "price_per_100": null,
+                    "high_discount_rate": null,
+                    "high_investment_rate": null,
+                    "tips": false,
+                    "floating_rate": false,
+                    "cash_management_bill": false,
+                    "reopening": false,
+                    "auction_date": null,
+                    "announcement_date": "2026-07-30"
+                  },
+                  "as_of": "2026-11-11",
+                  "days_to_maturity": 267,
+                  "outstanding": true,
+                  "pay_date": "2027-08-05",
+                  "coupon": null,
+                  "reopenings": [
+                    {
+                      "issue_date": "2026-08-06",
+                      "security_term": "52-Week",
+                      "reopening": false,
+                      "cash_management_bill": false,
+                      "price_per_100": null,
+                      "high_discount_rate": null,
+                      "high_investment_rate": null,
+                      "auction_date": null,
+                      "announcement_date": "2026-07-30"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Autenticación requerida",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TreasuryError"
+                },
+                "example": {
+                  "type": "/errors/authentication-required",
+                  "title": "Authorization header missing",
+                  "status": 401,
+                  "detail": "Authorization header missing"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Permisos insuficientes: requiere el scope treasuries:read",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TreasuryError"
+                },
+                "example": {
+                  "type": "/errors/insufficient-permissions",
+                  "title": "Insufficient permissions. Required scope: treasuries:read",
+                  "status": 403,
+                  "detail": "Insufficient permissions. Required scope: treasuries:read"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Título fuera del catálogo (not_in_catalog) o STRIPS (excluded_strips)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TreasuryError"
+                },
+                "example": {
+                  "type": "/errors/not-found",
+                  "title": "Resource not found",
+                  "status": 404,
+                  "detail": "Title not in the Treasury catalog",
+                  "details": {
+                    "code": "not_in_catalog",
+                    "isin": "US0378331005"
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Identificador o fecha inválidos (invalid_id, invalid_date)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TreasuryError"
+                },
+                "example": {
+                  "type": "/errors/validation-error",
+                  "title": "Validation Error",
+                  "status": 422,
+                  "detail": "'US91282CMM01' fails the ISIN check digit",
+                  "details": {
+                    "code": "invalid_id"
+                  }
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Límite de requests de tu plan superado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TreasuryError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/treasuries/instruments/{id}/price": {
+      "get": {
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "description": "Precio de modelo, no una cotización de mercado: letras por descuento bancario interpolado en la curva bill_discount, notas y bonos por el par_yield interpolado en días, con interés corrido ACT/ACT al as_of. Precios por 100 de valor nominal; price es el precio sucio en notas y bonos y solo price cambia de moneda con currency. Tasas en porcentaje (units: percent). TIPS, FRN y STRIPS no se valúan.",
+        "tags": [
+          "US Treasuries"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "ISIN de 12 caracteres (US91282CMM00), ISIN sin dígito verificador de 11 (US91282CMM0) o CUSIP de 9 (91282CMM0). No distingue mayúsculas.",
+            "schema": {
+              "type": "string",
+              "pattern": "^([A-Za-z0-9]{9}|[Uu][Ss][A-Za-z0-9]{9,10})$"
+            },
+            "example": "US91282CMM00"
+          },
+          {
+            "name": "as_of",
+            "in": "query",
+            "required": false,
+            "description": "Fecha de valuación hasta hoy, YYYY-MM-DD. Predeterminado: el último día con tasas.",
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "currency",
+            "in": "query",
+            "required": false,
+            "description": "Moneda de price: usd, ars_ccl o ars_mep (pesos al dólar CCL o MEP de as_of o el último anterior).",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "usd",
+                "ars_ccl",
+                "ars_mep"
+              ],
+              "default": "usd"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Precio de modelo",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TreasuryPriceResponse"
+                },
+                "example": {
+                  "isin": "US91282CMM00",
+                  "cusip": "91282CMM0",
+                  "family": "NOTE",
+                  "security_type": "Note",
+                  "security_term": "10-Year",
+                  "issue_date": "2025-02-18",
+                  "maturity_date": "2035-02-15",
+                  "coupon": 4.625,
+                  "as_of": "2026-11-10",
+                  "rate_date": "2026-11-10",
+                  "rate_age_days": 0,
+                  "method": "par_yield_interpolated",
+                  "units": "percent",
+                  "currency": "USD",
+                  "price": 99.0500870138465,
+                  "price_usd_per_100": 99.0500870138465,
+                  "dirty_price": 99.0500870138465,
+                  "clean_price": 97.95667668775954,
+                  "accrued_interest": 1.0934103260869565,
+                  "par_yield": 4.927972602739726,
+                  "prev_coupon": "2026-08-15",
+                  "next_coupon": "2027-02-15",
+                  "residual_days": 3019
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Autenticación requerida",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TreasuryError"
+                },
+                "example": {
+                  "type": "/errors/authentication-required",
+                  "title": "Authorization header missing",
+                  "status": 401,
+                  "detail": "Authorization header missing"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Permisos insuficientes: requiere el scope treasuries:read",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TreasuryError"
+                },
+                "example": {
+                  "type": "/errors/insufficient-permissions",
+                  "title": "Insufficient permissions. Required scope: treasuries:read",
+                  "status": 403,
+                  "detail": "Insufficient permissions. Required scope: treasuries:read"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "not_in_catalog, matured, not_issued, excluded_tips, excluded_frn, excluded_strips o excluded_other",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TreasuryError"
+                },
+                "example": {
+                  "type": "/errors/not-found",
+                  "title": "Resource not found",
+                  "status": 404,
+                  "detail": "TIPS are not valued: they need the CPI index",
+                  "details": {
+                    "code": "excluded_tips",
+                    "isin": "US91282CFR79"
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "invalid_id, invalid_date, invalid_currency, no_rates_on_or_before, no_rates o no_fx",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TreasuryError"
+                },
+                "example": {
+                  "type": "/errors/validation-error",
+                  "title": "Validation Error",
+                  "status": 422,
+                  "detail": "No 'par_yield' rates on or before 2020-01-02",
+                  "details": {
+                    "code": "no_rates_on_or_before",
+                    "first_rate_date": "2025-01-02"
+                  }
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Límite de requests de tu plan superado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TreasuryError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/treasuries/curve": {
+      "get": {
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "description": "Curva del Tesoro del último día con tasas en o antes de date (rate_date, rate_age_days). Tasas en porcentaje; compare.points[].change en puntos porcentuales. tenor_days agrega interpolated (lineal en días) y compare_date agrega compare. Hay tasas desde 2025-01-02.",
+        "tags": [
+          "US Treasuries"
+        ],
+        "parameters": [
+          {
+            "name": "curve",
+            "in": "query",
+            "required": false,
+            "description": "Curva: par_yield (notas y bonos, 1M a 30Y), bill_discount o bill_coupon_equivalent (letras, 4W a 52W).",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "par_yield",
+                "bill_discount",
+                "bill_coupon_equivalent"
+              ],
+              "default": "par_yield"
+            }
+          },
+          {
+            "name": "date",
+            "in": "query",
+            "required": false,
+            "description": "Día de la curva, YYYY-MM-DD. Predeterminado: el último día con tasas.",
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "tenor_days",
+            "in": "query",
+            "required": false,
+            "description": "Días al vencimiento, de 1 a 20000. Agrega interpolated.",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 20000
+            },
+            "example": 300
+          },
+          {
+            "name": "compare_date",
+            "in": "query",
+            "required": false,
+            "description": "Segunda fecha, YYYY-MM-DD. Agrega compare con el cambio por tenor.",
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Curva de un día",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TreasuryCurveResponse"
+                },
+                "example": {
+                  "curve": "par_yield",
+                  "requested_date": "2026-11-10",
+                  "rate_date": "2026-11-10",
+                  "rate_age_days": 0,
+                  "points": [
+                    {
+                      "tenor": "1M",
+                      "tenor_days": 30,
+                      "rate": 4.05
+                    },
+                    {
+                      "tenor": "1.5M",
+                      "tenor_days": 46,
+                      "rate": 4.16
+                    },
+                    {
+                      "tenor": "2M",
+                      "tenor_days": 61,
+                      "rate": 4.21
+                    },
+                    {
+                      "tenor": "3M",
+                      "tenor_days": 91,
+                      "rate": 4.3
+                    },
+                    {
+                      "tenor": "4M",
+                      "tenor_days": 122,
+                      "rate": 4.28
+                    },
+                    {
+                      "tenor": "6M",
+                      "tenor_days": 183,
+                      "rate": 4.38
+                    },
+                    {
+                      "tenor": "1Y",
+                      "tenor_days": 365,
+                      "rate": 4.56
+                    },
+                    {
+                      "tenor": "2Y",
+                      "tenor_days": 730,
+                      "rate": 4.73
+                    },
+                    {
+                      "tenor": "3Y",
+                      "tenor_days": 1096,
+                      "rate": 4.74
+                    },
+                    {
+                      "tenor": "5Y",
+                      "tenor_days": 1826,
+                      "rate": 4.81
+                    },
+                    {
+                      "tenor": "7Y",
+                      "tenor_days": 2557,
+                      "rate": 4.89
+                    },
+                    {
+                      "tenor": "10Y",
+                      "tenor_days": 3652,
+                      "rate": 4.98
+                    },
+                    {
+                      "tenor": "20Y",
+                      "tenor_days": 7305,
+                      "rate": 5.39
+                    },
+                    {
+                      "tenor": "30Y",
+                      "tenor_days": 10957,
+                      "rate": 5.35
+                    }
+                  ],
+                  "interpolated": {
+                    "tenor_days": 300,
+                    "rate": 4.4957142857142856,
+                    "method": "linear_days",
+                    "lower": {
+                      "tenor": "6M",
+                      "tenor_days": 183,
+                      "rate": 4.38
+                    },
+                    "upper": {
+                      "tenor": "1Y",
+                      "tenor_days": 365,
+                      "rate": 4.56
+                    }
+                  },
+                  "compare": {
+                    "requested_date": "2026-01-02",
+                    "rate_date": "2026-01-02",
+                    "rate_age_days": 0,
+                    "points": [
+                      {
+                        "tenor": "1M",
+                        "tenor_days": 30,
+                        "rate": 3.72,
+                        "change": 0.33
+                      },
+                      {
+                        "tenor": "1.5M",
+                        "tenor_days": 46,
+                        "rate": 3.71,
+                        "change": 0.45
+                      },
+                      {
+                        "tenor": "2M",
+                        "tenor_days": 61,
+                        "rate": 3.66,
+                        "change": 0.55
+                      },
+                      {
+                        "tenor": "3M",
+                        "tenor_days": 91,
+                        "rate": 3.65,
+                        "change": 0.65
+                      },
+                      {
+                        "tenor": "4M",
+                        "tenor_days": 122,
+                        "rate": 3.62,
+                        "change": 0.66
+                      },
+                      {
+                        "tenor": "6M",
+                        "tenor_days": 183,
+                        "rate": 3.58,
+                        "change": 0.8
+                      },
+                      {
+                        "tenor": "1Y",
+                        "tenor_days": 365,
+                        "rate": 3.47,
+                        "change": 1.09
+                      },
+                      {
+                        "tenor": "2Y",
+                        "tenor_days": 730,
+                        "rate": 3.47,
+                        "change": 1.26
+                      },
+                      {
+                        "tenor": "3Y",
+                        "tenor_days": 1096,
+                        "rate": 3.55,
+                        "change": 1.19
+                      },
+                      {
+                        "tenor": "5Y",
+                        "tenor_days": 1826,
+                        "rate": 3.74,
+                        "change": 1.07
+                      },
+                      {
+                        "tenor": "7Y",
+                        "tenor_days": 2557,
+                        "rate": 3.95,
+                        "change": 0.94
+                      },
+                      {
+                        "tenor": "10Y",
+                        "tenor_days": 3652,
+                        "rate": 4.19,
+                        "change": 0.79
+                      },
+                      {
+                        "tenor": "20Y",
+                        "tenor_days": 7305,
+                        "rate": 4.81,
+                        "change": 0.58
+                      },
+                      {
+                        "tenor": "30Y",
+                        "tenor_days": 10957,
+                        "rate": 4.86,
+                        "change": 0.49
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Autenticación requerida",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TreasuryError"
+                },
+                "example": {
+                  "type": "/errors/authentication-required",
+                  "title": "Authorization header missing",
+                  "status": 401,
+                  "detail": "Authorization header missing"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Permisos insuficientes: requiere el scope treasuries:read",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TreasuryError"
+                },
+                "example": {
+                  "type": "/errors/insufficient-permissions",
+                  "title": "Insufficient permissions. Required scope: treasuries:read",
+                  "status": 403,
+                  "detail": "Insufficient permissions. Required scope: treasuries:read"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "invalid_curve, invalid_date, invalid_parameter, no_rates_on_or_before o no_rates",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TreasuryError"
+                },
+                "example": {
+                  "type": "/errors/validation-error",
+                  "title": "Validation Error",
+                  "status": 422,
+                  "detail": "No 'par_yield' rates on or before 1900-01-01",
+                  "details": {
+                    "code": "no_rates_on_or_before",
+                    "first_rate_date": "2025-01-02"
+                  }
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Límite de requests de tu plan superado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TreasuryError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/treasuries/curve/history": {
+      "get": {
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "description": "Serie diaria de la curva por tenor, ascendente, una fila por día con tasas: data[] con rate_date y una clave por tenor. Con spread=A-B cada fila suma spread (A menos B). Tasas en porcentaje; spread en puntos porcentuales.",
+        "tags": [
+          "US Treasuries"
+        ],
+        "parameters": [
+          {
+            "name": "curve",
+            "in": "query",
+            "required": false,
+            "description": "Curva: par_yield (notas y bonos, 1M a 30Y), bill_discount o bill_coupon_equivalent (letras, 4W a 52W).",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "par_yield",
+                "bill_discount",
+                "bill_coupon_equivalent"
+              ],
+              "default": "par_yield"
+            }
+          },
+          {
+            "name": "tenors",
+            "in": "query",
+            "required": false,
+            "description": "Tenors separados por punto, ej. 2Y.10Y o 1.5M.2Y. Predeterminado: todos los de la curva.",
+            "schema": {
+              "type": "string"
+            },
+            "example": "2Y.10Y"
+          },
+          {
+            "name": "from_date",
+            "in": "query",
+            "required": false,
+            "description": "Primera fecha, inclusiva, YYYY-MM-DD. Predeterminado: un año antes de to_date.",
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "to_date",
+            "in": "query",
+            "required": false,
+            "description": "Última fecha, inclusiva, YYYY-MM-DD. Predeterminado: el último día con tasas.",
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "spread",
+            "in": "query",
+            "required": false,
+            "description": "A-B entre dos tenors de la curva, ej. 10Y-2Y.",
+            "schema": {
+              "type": "string"
+            },
+            "example": "10Y-2Y"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Serie de la curva",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TreasuryCurveHistoryResponse"
+                },
+                "example": {
+                  "curve": "par_yield",
+                  "tenors": [
+                    "2Y",
+                    "10Y"
+                  ],
+                  "spread": "10Y-2Y",
+                  "from_date": "2026-10-26",
+                  "to_date": "2026-11-10",
+                  "total_records": 12,
+                  "data": [
+                    {
+                      "rate_date": "2026-10-26",
+                      "2Y": 4.68,
+                      "10Y": 5.0,
+                      "spread": 0.32
+                    },
+                    {
+                      "rate_date": "2026-10-27",
+                      "2Y": 4.7,
+                      "10Y": 4.99,
+                      "spread": 0.29
+                    },
+                    {
+                      "rate_date": "2026-10-28",
+                      "2Y": 4.67,
+                      "10Y": 5.05,
+                      "spread": 0.38
+                    },
+                    {
+                      "rate_date": "2026-10-29",
+                      "2Y": 4.61,
+                      "10Y": 4.98,
+                      "spread": 0.37
+                    },
+                    {
+                      "rate_date": "2026-10-30",
+                      "2Y": 4.56,
+                      "10Y": 4.94,
+                      "spread": 0.38
+                    },
+                    {
+                      "rate_date": "2026-11-02",
+                      "2Y": 4.59,
+                      "10Y": 4.91,
+                      "spread": 0.32
+                    },
+                    {
+                      "rate_date": "2026-11-03",
+                      "2Y": 4.61,
+                      "10Y": 4.95,
+                      "spread": 0.34
+                    },
+                    {
+                      "rate_date": "2026-11-04",
+                      "2Y": 4.58,
+                      "10Y": 4.9,
+                      "spread": 0.32
+                    },
+                    {
+                      "rate_date": "2026-11-05",
+                      "2Y": 4.46,
+                      "10Y": 4.84,
+                      "spread": 0.38
+                    },
+                    {
+                      "rate_date": "2026-11-06",
+                      "2Y": 4.51,
+                      "10Y": 4.86,
+                      "spread": 0.35
+                    },
+                    {
+                      "rate_date": "2026-11-09",
+                      "2Y": 4.56,
+                      "10Y": 4.88,
+                      "spread": 0.32
+                    },
+                    {
+                      "rate_date": "2026-11-10",
+                      "2Y": 4.73,
+                      "10Y": 4.98,
+                      "spread": 0.25
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Autenticación requerida",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TreasuryError"
+                },
+                "example": {
+                  "type": "/errors/authentication-required",
+                  "title": "Authorization header missing",
+                  "status": 401,
+                  "detail": "Authorization header missing"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Permisos insuficientes: requiere el scope treasuries:read",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TreasuryError"
+                },
+                "example": {
+                  "type": "/errors/insufficient-permissions",
+                  "title": "Insufficient permissions. Required scope: treasuries:read",
+                  "status": 403,
+                  "detail": "Insufficient permissions. Required scope: treasuries:read"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "invalid_curve, invalid_tenor, invalid_spread, invalid_date, invalid_range o no_rates",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TreasuryError"
+                },
+                "example": {
+                  "type": "/errors/validation-error",
+                  "title": "Validation Error",
+                  "status": 422,
+                  "detail": "'8Y' is not a tenor of the curve; valid: ['1M', '1.5M', '2M', '3M', '4M', '6M', '1Y', '2Y', '3Y', '5Y', '7Y', '10Y', '20Y', '30Y']",
+                  "details": {
+                    "code": "invalid_tenor"
+                  }
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Límite de requests de tu plan superado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TreasuryError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/treasuries/calculator": {
+      "get": {
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "description": "Métricas de una letra, nota o bono a partir de un precio o una tasa. Tasas como fracción, en value y en la respuesta (0.042 = 4,2%, units: fraction), a diferencia de /curve y /price, que responden en porcentaje; coupon sigue en porcentaje. Precios por 100 de valor nominal: value de un input de precio, market_price, principal, accrued_amount y total van en currency; dirty_price, clean_price y accrued_interest siempre en dólares. Notas y bonos con convención street.",
+        "tags": [
+          "US Treasuries"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "required": true,
+            "description": "ISIN de 12 caracteres (US91282CMM00), ISIN sin dígito verificador de 11 (US91282CMM0) o CUSIP de 9 (91282CMM0). No distingue mayúsculas.",
+            "schema": {
+              "type": "string"
+            },
+            "example": "US91282CMM00"
+          },
+          {
+            "name": "input",
+            "in": "query",
+            "required": true,
+            "description": "Qué es value. Notas y bonos: price (precio limpio), clean, dirty, yield, annual_equivalent. Letras: price, clean, dirty, yield, discount_rate, leap_year_yield, govt_equivalent, simple_act360.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "price",
+                "dirty",
+                "clean",
+                "yield",
+                "discount_rate",
+                "leap_year_yield",
+                "govt_equivalent",
+                "simple_act360",
+                "annual_equivalent"
+              ]
+            },
+            "example": "yield"
+          },
+          {
+            "name": "value",
+            "in": "query",
+            "required": true,
+            "description": "Precio por 100 en currency (mayor que 0) o tasa como fracción (rendimientos entre -0.5 y 2.0).",
+            "schema": {
+              "type": "number"
+            },
+            "example": 0.042
+          },
+          {
+            "name": "as_of",
+            "in": "query",
+            "required": false,
+            "description": "Fecha de la operación, YYYY-MM-DD. Predeterminado: hoy. Acepta fechas futuras.",
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "settlement_entry",
+            "in": "query",
+            "required": false,
+            "description": "24hs (primer día hábil de EE.UU. posterior a as_of) o CI (as_of, o el siguiente hábil).",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "24hs",
+                "CI"
+              ],
+              "default": "24hs"
+            }
+          },
+          {
+            "name": "currency",
+            "in": "query",
+            "required": false,
+            "description": "Moneda de un value de precio y de market_price, principal, accrued_amount y total.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "usd",
+                "ars_ccl",
+                "ars_mep"
+              ],
+              "default": "usd"
+            }
+          },
+          {
+            "name": "fx_value",
+            "in": "query",
+            "required": false,
+            "description": "Pesos por dólar que reemplazan al CCL o MEP del día. Solo con currency ars_ccl o ars_mep.",
+            "schema": {
+              "type": "number",
+              "exclusiveMinimum": 0
+            },
+            "example": 1480
+          },
+          {
+            "name": "face",
+            "in": "query",
+            "required": false,
+            "description": "Valor nominal. Agrega face, principal, accrued_amount y total.",
+            "schema": {
+              "type": "number",
+              "exclusiveMinimum": 0
+            },
+            "example": 100000
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Métricas del título",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TreasuryCalculatorResponse"
+                },
+                "example": {
+                  "isin": "US91282CMM00",
+                  "family": "NOTE",
+                  "maturity_date": "2035-02-15",
+                  "coupon": 4.625,
+                  "operation_date": "2026-11-11",
+                  "settlement_date": "2026-11-12",
+                  "settlement_entry": "24hs",
+                  "input_used": "clean",
+                  "units": "fraction",
+                  "currency": "USD",
+                  "convention": "street",
+                  "market_price": 101.5,
+                  "dirty_price": 102.61854619565217,
+                  "clean_price": 101.5,
+                  "accrued_interest": 1.1185461956521738,
+                  "yield_to_maturity": 0.04405432964586303,
+                  "annual_equivalent_yield": 0.04453952563599972,
+                  "true_yield": 0.04405249610847223,
+                  "current_yield": 0.04556650246305419,
+                  "duration": 6.894548592276823,
+                  "modified_duration": 6.745954344052409,
+                  "convexity": 54.416148325638304,
+                  "risk": 6.922600274889025,
+                  "dv01_per_1mm": 692.2600274889026,
+                  "prev_coupon": "2026-08-15",
+                  "next_coupon": "2027-02-15",
+                  "days_to_maturity": 3017,
+                  "face": 100000.0,
+                  "principal": 101500.0,
+                  "accrued_amount": 1118.5461956521738,
+                  "total": 102618.54619565216
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Autenticación requerida",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TreasuryError"
+                },
+                "example": {
+                  "type": "/errors/authentication-required",
+                  "title": "Authorization header missing",
+                  "status": 401,
+                  "detail": "Authorization header missing"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Permisos insuficientes: requiere el scope treasuries:read",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TreasuryError"
+                },
+                "example": {
+                  "type": "/errors/insufficient-permissions",
+                  "title": "Insufficient permissions. Required scope: treasuries:read",
+                  "status": 403,
+                  "detail": "Insufficient permissions. Required scope: treasuries:read"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "not_in_catalog, matured, not_issued, excluded_tips, excluded_frn, excluded_strips o excluded_other",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TreasuryError"
+                },
+                "example": {
+                  "type": "/errors/not-found",
+                  "title": "Resource not found",
+                  "status": 404,
+                  "detail": "TIPS are not valued: they need the CPI index",
+                  "details": {
+                    "code": "excluded_tips",
+                    "isin": "US91282CFR79"
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "invalid_id, missing_parameter, invalid_input, invalid_value, invalid_settlement_entry, invalid_currency, invalid_fx_value, invalid_date, no_rates_on_or_before, no_rates, no_fx o did_not_converge",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TreasuryError"
+                },
+                "example": {
+                  "type": "/errors/validation-error",
+                  "title": "Validation Error",
+                  "status": 422,
+                  "detail": "'value' of a yield must be in [-0.5, 2.0], got 50.0",
+                  "details": {
+                    "code": "invalid_value"
+                  }
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Límite de requests de tu plan superado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TreasuryError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/bonds/compare": {
       "get": {
         "security": [
@@ -4390,6 +5762,1245 @@
             "type": "string",
             "format": "uuid",
             "example": "2eb07802-94de-468a-b70f-75a49f3e9516"
+          }
+        }
+      },
+      "TreasuryError": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "description": "Tipo de error",
+            "example": "/errors/not-found"
+          },
+          "title": {
+            "type": "string",
+            "description": "Título del error",
+            "example": "Resource not found"
+          },
+          "status": {
+            "type": "integer",
+            "description": "Status HTTP",
+            "example": 404
+          },
+          "detail": {
+            "type": "string",
+            "description": "Mensaje legible, en inglés. Puede cambiar: no lo parsees."
+          },
+          "details": {
+            "type": "object",
+            "properties": {
+              "code": {
+                "type": "string",
+                "description": "Código estable del error. Es lo que distingue cada caso.",
+                "enum": [
+                  "invalid_id",
+                  "invalid_date",
+                  "invalid_type",
+                  "invalid_include",
+                  "invalid_parameter",
+                  "invalid_curve",
+                  "invalid_tenor",
+                  "invalid_spread",
+                  "invalid_range",
+                  "invalid_currency",
+                  "missing_parameter",
+                  "invalid_input",
+                  "invalid_value",
+                  "invalid_settlement_entry",
+                  "invalid_fx_value",
+                  "no_rates_on_or_before",
+                  "no_rates",
+                  "no_fx",
+                  "did_not_converge",
+                  "not_in_catalog",
+                  "excluded_strips",
+                  "excluded_tips",
+                  "excluded_frn",
+                  "excluded_other",
+                  "matured",
+                  "not_issued"
+                ]
+              },
+              "isin": {
+                "type": "string",
+                "description": "ISIN del título, en los 404 y en did_not_converge"
+              },
+              "maturity_date": {
+                "type": "string",
+                "description": "Vencimiento, en matured",
+                "format": "date"
+              },
+              "issue_date": {
+                "type": "string",
+                "description": "Emisión, en not_issued",
+                "format": "date"
+              },
+              "first_rate_date": {
+                "type": "string",
+                "description": "Primera fecha con tasas, en no_rates_on_or_before y no_rates",
+                "format": "date"
+              },
+              "fx_used": {
+                "type": "string",
+                "description": "ccl o mep, en no_fx"
+              }
+            },
+            "required": [
+              "code"
+            ],
+            "description": "Solo en los errores del dominio (404 y 422 de Treasuries)"
+          }
+        },
+        "required": [
+          "type",
+          "title",
+          "status",
+          "detail"
+        ]
+      },
+      "TreasuryCatalogItem": {
+        "type": "object",
+        "properties": {
+          "isin": {
+            "type": "string",
+            "description": "ISIN de 12 caracteres"
+          },
+          "cusip": {
+            "type": "string",
+            "description": "CUSIP de 9 caracteres"
+          },
+          "kind": {
+            "type": "string",
+            "description": "Tipo de título",
+            "enum": [
+              "BILL",
+              "CMB",
+              "NOTE",
+              "BOND",
+              "TIPS",
+              "FRN"
+            ]
+          },
+          "security_type": {
+            "type": "string",
+            "description": "Tipo según el Tesoro: Bill, Note o Bond"
+          },
+          "security_term": {
+            "type": "string",
+            "description": "Plazo de la subasta original"
+          },
+          "issue_date": {
+            "type": "string",
+            "description": "Emisión de la subasta original",
+            "format": "date"
+          },
+          "dated_date": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Inicio del devengamiento del primer cupón",
+            "format": "date"
+          },
+          "maturity_date": {
+            "type": "string",
+            "description": "Vencimiento",
+            "format": "date"
+          },
+          "days_to_maturity": {
+            "type": "integer",
+            "description": "Días de as_of al vencimiento; negativo si venció"
+          },
+          "outstanding": {
+            "type": "boolean",
+            "description": "Vigente en as_of"
+          },
+          "coupon": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "description": "Cupón anual en porcentaje; null en letras y FRN"
+          },
+          "interest_payment_frequency": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Frecuencia de pago de intereses"
+          },
+          "first_interest_payment_date": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Primer pago de intereses",
+            "format": "date"
+          },
+          "reopenings": {
+            "type": "integer",
+            "description": "Cantidad de reaperturas"
+          },
+          "auction": {
+            "type": "object",
+            "properties": {
+              "price_per_100": {
+                "type": [
+                  "number",
+                  "null"
+                ],
+                "description": "Precio de la subasta por 100"
+              },
+              "high_discount_rate": {
+                "type": [
+                  "number",
+                  "null"
+                ],
+                "description": "Tasa de descuento de corte"
+              },
+              "high_investment_rate": {
+                "type": [
+                  "number",
+                  "null"
+                ],
+                "description": "Tasa de inversión de corte"
+              },
+              "auction_date": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "description": "Fecha de la subasta",
+                "format": "date"
+              },
+              "announcement_date": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "description": "Fecha de anuncio",
+                "format": "date"
+              }
+            },
+            "description": "Subasta original"
+          },
+          "last_auction": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "properties": {
+              "issue_date": {
+                "type": "string",
+                "description": "Fecha de emisión de esa subasta",
+                "format": "date"
+              },
+              "security_term": {
+                "type": "string",
+                "description": "Plazo de esa subasta"
+              },
+              "reopening": {
+                "type": "boolean",
+                "description": "true si es una reapertura"
+              },
+              "cash_management_bill": {
+                "type": "boolean",
+                "description": "Si es letra de caja"
+              },
+              "price_per_100": {
+                "type": [
+                  "number",
+                  "null"
+                ],
+                "description": "Precio de la subasta por 100"
+              },
+              "high_discount_rate": {
+                "type": [
+                  "number",
+                  "null"
+                ],
+                "description": "Tasa de descuento de corte"
+              },
+              "high_investment_rate": {
+                "type": [
+                  "number",
+                  "null"
+                ],
+                "description": "Tasa de inversión de corte"
+              },
+              "auction_date": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "description": "Fecha de la subasta",
+                "format": "date"
+              },
+              "announcement_date": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "description": "Fecha de anuncio",
+                "format": "date"
+              }
+            },
+            "description": "Última subasta en o antes de as_of"
+          },
+          "auctions": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "issue_date": {
+                  "type": "string",
+                  "description": "Fecha de emisión de esa subasta",
+                  "format": "date"
+                },
+                "security_term": {
+                  "type": "string",
+                  "description": "Plazo de esa subasta"
+                },
+                "reopening": {
+                  "type": "boolean",
+                  "description": "true si es una reapertura"
+                },
+                "cash_management_bill": {
+                  "type": "boolean",
+                  "description": "Si es letra de caja"
+                },
+                "price_per_100": {
+                  "type": [
+                    "number",
+                    "null"
+                  ],
+                  "description": "Precio de la subasta por 100"
+                },
+                "high_discount_rate": {
+                  "type": [
+                    "number",
+                    "null"
+                  ],
+                  "description": "Tasa de descuento de corte"
+                },
+                "high_investment_rate": {
+                  "type": [
+                    "number",
+                    "null"
+                  ],
+                  "description": "Tasa de inversión de corte"
+                },
+                "auction_date": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "description": "Fecha de la subasta",
+                  "format": "date"
+                },
+                "announcement_date": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "description": "Fecha de anuncio",
+                  "format": "date"
+                }
+              }
+            },
+            "description": "Solo con include=reopenings: todas las subastas"
+          }
+        }
+      },
+      "TreasuryCatalogResponse": {
+        "type": "object",
+        "properties": {
+          "as_of": {
+            "type": "string",
+            "description": "Fecha de referencia",
+            "format": "date"
+          },
+          "filters": {
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": [
+                  "array",
+                  "null"
+                ],
+                "description": "Tipos",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "outstanding": {
+                "type": "boolean",
+                "description": "Filtro de vigencia"
+              },
+              "maturity_from": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "date"
+              },
+              "maturity_to": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "date"
+              },
+              "term": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "q": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "description": "En mayúscula"
+              },
+              "include": {
+                "type": [
+                  "array",
+                  "null"
+                ],
+                "items": {
+                  "type": "string"
+                }
+              }
+            },
+            "description": "Filtros aplicados, normalizados"
+          },
+          "total": {
+            "type": "integer",
+            "description": "Títulos que cumplen los filtros"
+          },
+          "returned": {
+            "type": "integer",
+            "description": "Filas devueltas"
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TreasuryCatalogItem"
+            }
+          }
+        },
+        "required": [
+          "as_of",
+          "filters",
+          "total",
+          "returned",
+          "data"
+        ]
+      },
+      "TreasuryDetailResponse": {
+        "type": "object",
+        "properties": {
+          "isin": {
+            "type": "string",
+            "description": "ISIN"
+          },
+          "cusip": {
+            "type": "string",
+            "description": "CUSIP"
+          },
+          "kind": {
+            "type": "string",
+            "description": "Tipo de título",
+            "enum": [
+              "BILL",
+              "CMB",
+              "NOTE",
+              "BOND",
+              "TIPS",
+              "FRN"
+            ]
+          },
+          "title": {
+            "type": "object",
+            "properties": {
+              "cusip": {
+                "type": "string"
+              },
+              "isin": {
+                "type": "string"
+              },
+              "issue_date": {
+                "type": "string",
+                "format": "date"
+              },
+              "security_type": {
+                "type": "string"
+              },
+              "security_term": {
+                "type": "string"
+              },
+              "maturity_date": {
+                "type": "string",
+                "format": "date"
+              },
+              "dated_date": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "date"
+              },
+              "interest_rate": {
+                "type": [
+                  "number",
+                  "null"
+                ],
+                "description": "Cupón anual en porcentaje"
+              },
+              "interest_payment_frequency": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "first_interest_payment_date": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "date"
+              },
+              "price_per_100": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "high_discount_rate": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "high_investment_rate": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "tips": {
+                "type": "boolean"
+              },
+              "floating_rate": {
+                "type": "boolean"
+              },
+              "cash_management_bill": {
+                "type": "boolean"
+              },
+              "reopening": {
+                "type": "boolean"
+              },
+              "auction_date": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "date"
+              },
+              "announcement_date": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "date"
+              }
+            },
+            "description": "Subasta original"
+          },
+          "as_of": {
+            "type": "string",
+            "description": "Fecha de referencia",
+            "format": "date"
+          },
+          "days_to_maturity": {
+            "type": "integer",
+            "description": "Días de as_of al vencimiento"
+          },
+          "outstanding": {
+            "type": "boolean",
+            "description": "Vigente en as_of"
+          },
+          "pay_date": {
+            "type": "string",
+            "description": "Vencimiento o el siguiente día hábil de la Reserva Federal",
+            "format": "date"
+          },
+          "coupon": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "properties": {
+              "rate": {
+                "type": [
+                  "number",
+                  "null"
+                ],
+                "description": "Cupón anual en porcentaje"
+              },
+              "frequency": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "first_payment_date": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "date"
+              },
+              "previous_date": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "date"
+              },
+              "next_date": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "date"
+              },
+              "remaining_payments": {
+                "type": [
+                  "integer",
+                  "null"
+                ]
+              }
+            },
+            "description": "Calendario de cupones; null en letras"
+          },
+          "reopenings": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "issue_date": {
+                  "type": "string",
+                  "description": "Fecha de emisión de esa subasta",
+                  "format": "date"
+                },
+                "security_term": {
+                  "type": "string",
+                  "description": "Plazo de esa subasta"
+                },
+                "reopening": {
+                  "type": "boolean",
+                  "description": "true si es una reapertura"
+                },
+                "cash_management_bill": {
+                  "type": "boolean",
+                  "description": "Si es letra de caja"
+                },
+                "price_per_100": {
+                  "type": [
+                    "number",
+                    "null"
+                  ],
+                  "description": "Precio de la subasta por 100"
+                },
+                "high_discount_rate": {
+                  "type": [
+                    "number",
+                    "null"
+                  ],
+                  "description": "Tasa de descuento de corte"
+                },
+                "high_investment_rate": {
+                  "type": [
+                    "number",
+                    "null"
+                  ],
+                  "description": "Tasa de inversión de corte"
+                },
+                "auction_date": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "description": "Fecha de la subasta",
+                  "format": "date"
+                },
+                "announcement_date": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "description": "Fecha de anuncio",
+                  "format": "date"
+                }
+              }
+            },
+            "description": "Todas las subastas, la original incluida"
+          }
+        }
+      },
+      "TreasuryPriceResponse": {
+        "type": "object",
+        "properties": {
+          "isin": {
+            "type": "string"
+          },
+          "cusip": {
+            "type": "string"
+          },
+          "family": {
+            "type": "string",
+            "enum": [
+              "BILL",
+              "NOTE",
+              "BOND"
+            ]
+          },
+          "security_type": {
+            "type": "string"
+          },
+          "security_term": {
+            "type": "string"
+          },
+          "issue_date": {
+            "type": "string",
+            "format": "date"
+          },
+          "maturity_date": {
+            "type": "string",
+            "format": "date"
+          },
+          "coupon": {
+            "type": "number",
+            "description": "Notas y bonos: cupón anual en porcentaje"
+          },
+          "as_of": {
+            "type": "string",
+            "description": "Fecha de valuación",
+            "format": "date"
+          },
+          "rate_date": {
+            "type": "string",
+            "description": "Día de la curva usada",
+            "format": "date"
+          },
+          "rate_age_days": {
+            "type": "integer",
+            "description": "Días entre rate_date y as_of"
+          },
+          "method": {
+            "type": "string",
+            "enum": [
+              "bill_discount_interpolated",
+              "par_yield_interpolated"
+            ]
+          },
+          "units": {
+            "type": "string",
+            "enum": [
+              "percent"
+            ]
+          },
+          "currency": {
+            "type": "string",
+            "description": "Moneda de price",
+            "enum": [
+              "USD",
+              "ARS"
+            ]
+          },
+          "price": {
+            "type": "number",
+            "description": "Precio de modelo por 100 en currency; sucio en notas y bonos"
+          },
+          "price_usd_per_100": {
+            "type": "number",
+            "description": "El mismo precio en dólares por 100"
+          },
+          "price_per_100": {
+            "type": "number",
+            "description": "Letras: precio en dólares por 100"
+          },
+          "discount_rate": {
+            "type": "number",
+            "description": "Letras: tasa de descuento en porcentaje"
+          },
+          "coupon_equivalent": {
+            "type": "number",
+            "description": "Letras: equivalente de cupón en porcentaje"
+          },
+          "dirty_price": {
+            "type": "number",
+            "description": "Notas y bonos: precio sucio en dólares por 100"
+          },
+          "clean_price": {
+            "type": "number",
+            "description": "Notas y bonos: precio limpio en dólares por 100"
+          },
+          "accrued_interest": {
+            "type": "number",
+            "description": "Notas y bonos: interés corrido en dólares por 100"
+          },
+          "par_yield": {
+            "type": "number",
+            "description": "Notas y bonos: par yield interpolado en porcentaje"
+          },
+          "prev_coupon": {
+            "type": "string",
+            "format": "date"
+          },
+          "next_coupon": {
+            "type": "string",
+            "format": "date"
+          },
+          "residual_days": {
+            "type": "integer",
+            "description": "Días de as_of al vencimiento"
+          },
+          "fx_used": {
+            "type": "string",
+            "description": "Con currency en pesos",
+            "enum": [
+              "ccl",
+              "mep"
+            ]
+          },
+          "fx_value": {
+            "type": "number",
+            "description": "Pesos por dólar"
+          },
+          "fx_date": {
+            "type": "string",
+            "description": "Fecha del dólar usado",
+            "format": "date"
+          }
+        }
+      },
+      "TreasuryCurveResponse": {
+        "type": "object",
+        "properties": {
+          "curve": {
+            "type": "string",
+            "enum": [
+              "par_yield",
+              "bill_discount",
+              "bill_coupon_equivalent"
+            ]
+          },
+          "requested_date": {
+            "type": "string",
+            "format": "date"
+          },
+          "rate_date": {
+            "type": "string",
+            "format": "date"
+          },
+          "rate_age_days": {
+            "type": "integer"
+          },
+          "points": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "tenor": {
+                  "type": "string"
+                },
+                "tenor_days": {
+                  "type": "integer"
+                },
+                "rate": {
+                  "type": [
+                    "number",
+                    "null"
+                  ],
+                  "description": "En porcentaje"
+                }
+              }
+            }
+          },
+          "interpolated": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "properties": {
+              "tenor_days": {
+                "type": "integer"
+              },
+              "rate": {
+                "type": "number",
+                "description": "En porcentaje"
+              },
+              "method": {
+                "type": "string",
+                "enum": [
+                  "linear_days"
+                ]
+              },
+              "lower": {
+                "type": "object",
+                "properties": {
+                  "tenor": {
+                    "type": "string"
+                  },
+                  "tenor_days": {
+                    "type": "integer"
+                  },
+                  "rate": {
+                    "type": [
+                      "number",
+                      "null"
+                    ],
+                    "description": "En porcentaje"
+                  }
+                }
+              },
+              "upper": {
+                "type": "object",
+                "properties": {
+                  "tenor": {
+                    "type": "string"
+                  },
+                  "tenor_days": {
+                    "type": "integer"
+                  },
+                  "rate": {
+                    "type": [
+                      "number",
+                      "null"
+                    ],
+                    "description": "En porcentaje"
+                  }
+                }
+              }
+            }
+          },
+          "compare": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "properties": {
+              "requested_date": {
+                "type": "string",
+                "format": "date"
+              },
+              "rate_date": {
+                "type": "string",
+                "format": "date"
+              },
+              "rate_age_days": {
+                "type": "integer"
+              },
+              "points": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "tenor": {
+                      "type": "string"
+                    },
+                    "tenor_days": {
+                      "type": "integer"
+                    },
+                    "rate": {
+                      "type": [
+                        "number",
+                        "null"
+                      ],
+                      "description": "En porcentaje"
+                    },
+                    "change": {
+                      "type": [
+                        "number",
+                        "null"
+                      ],
+                      "description": "Principal menos comparada, en puntos porcentuales"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "TreasuryCurveHistoryResponse": {
+        "type": "object",
+        "properties": {
+          "curve": {
+            "type": "string"
+          },
+          "tenors": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "spread": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "from_date": {
+            "type": "string",
+            "format": "date"
+          },
+          "to_date": {
+            "type": "string",
+            "format": "date"
+          },
+          "total_records": {
+            "type": "integer"
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "rate_date": {
+                  "type": "string",
+                  "format": "date"
+                },
+                "spread": {
+                  "type": [
+                    "number",
+                    "null"
+                  ],
+                  "description": "A menos B, en puntos porcentuales"
+                }
+              },
+              "additionalProperties": {
+                "type": [
+                  "number",
+                  "null"
+                ],
+                "description": "Una clave por tenor, tasa en porcentaje"
+              }
+            }
+          }
+        }
+      },
+      "TreasuryCalculatorResponse": {
+        "type": "object",
+        "properties": {
+          "isin": {
+            "type": "string"
+          },
+          "family": {
+            "type": "string",
+            "enum": [
+              "BILL",
+              "NOTE",
+              "BOND"
+            ]
+          },
+          "maturity_date": {
+            "type": "string",
+            "format": "date"
+          },
+          "coupon": {
+            "type": "number",
+            "description": "Notas y bonos: cupón anual en porcentaje"
+          },
+          "operation_date": {
+            "type": "string",
+            "format": "date"
+          },
+          "settlement_date": {
+            "type": "string",
+            "format": "date"
+          },
+          "settlement_entry": {
+            "type": "string",
+            "enum": [
+              "24hs",
+              "CI"
+            ]
+          },
+          "input_used": {
+            "type": "string"
+          },
+          "units": {
+            "type": "string",
+            "enum": [
+              "fraction"
+            ]
+          },
+          "currency": {
+            "type": "string",
+            "enum": [
+              "USD",
+              "ARS"
+            ]
+          },
+          "convention": {
+            "type": "string",
+            "description": "Notas y bonos",
+            "enum": [
+              "street"
+            ]
+          },
+          "market_price": {
+            "type": "number",
+            "description": "Precio por 100 en currency"
+          },
+          "dirty_price": {
+            "type": "number",
+            "description": "Dólares por 100"
+          },
+          "clean_price": {
+            "type": "number",
+            "description": "Dólares por 100"
+          },
+          "accrued_interest": {
+            "type": "number",
+            "description": "Dólares por 100"
+          },
+          "price_per_100": {
+            "type": "number",
+            "description": "Letras: dólares por 100"
+          },
+          "discount_rate": {
+            "type": "number",
+            "description": "Letras, fracción"
+          },
+          "yield_to_maturity": {
+            "type": "number",
+            "description": "fracción"
+          },
+          "coupon_equivalent": {
+            "type": "number",
+            "description": "Letras, fracción"
+          },
+          "yield_leap_year": {
+            "type": "number",
+            "description": "Letras, fracción"
+          },
+          "govt_bond_equivalent": {
+            "type": "number",
+            "description": "Letras, fracción"
+          },
+          "simple_interest_act360": {
+            "type": "number",
+            "description": "Letras, fracción"
+          },
+          "cd_equivalent_act360": {
+            "type": "number",
+            "description": "Letras, fracción"
+          },
+          "annual_equivalent_yield": {
+            "type": "number",
+            "description": "Notas y bonos, fracción"
+          },
+          "true_yield": {
+            "type": "number",
+            "description": "Notas y bonos, fracción"
+          },
+          "current_yield": {
+            "type": "number",
+            "description": "Notas y bonos, fracción"
+          },
+          "days_to_maturity": {
+            "type": "integer",
+            "description": "Desde la liquidación"
+          },
+          "duration": {
+            "type": "number",
+            "description": "Años"
+          },
+          "modified_duration": {
+            "type": "number"
+          },
+          "convexity": {
+            "type": "number",
+            "description": "Notas y bonos"
+          },
+          "risk": {
+            "type": "number",
+            "description": "Notas y bonos: dólares por 100 por punto porcentual"
+          },
+          "dv01_per_1mm": {
+            "type": "number",
+            "description": "Notas y bonos: dólares por punto básico por 1.000.000 nominal"
+          },
+          "prev_coupon": {
+            "type": "string",
+            "format": "date"
+          },
+          "next_coupon": {
+            "type": "string",
+            "format": "date"
+          },
+          "value_at_maturity": {
+            "type": "number",
+            "description": "Letras: 100"
+          },
+          "year_basis": {
+            "type": "integer",
+            "description": "Letras: 365 o 366"
+          },
+          "warnings": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "coupon_missing",
+                "true_yield_unavailable",
+                "cd_equivalent_unavailable"
+              ]
+            }
+          },
+          "face": {
+            "type": "number"
+          },
+          "principal": {
+            "type": "number",
+            "description": "En currency"
+          },
+          "accrued_amount": {
+            "type": "number",
+            "description": "En currency"
+          },
+          "total": {
+            "type": "number",
+            "description": "En currency"
+          },
+          "fx_used": {
+            "type": "string",
+            "enum": [
+              "ccl",
+              "mep"
+            ]
+          },
+          "fx_value": {
+            "type": "number"
+          },
+          "fx_date": {
+            "type": "string",
+            "format": "date"
+          },
+          "overrides_applied": {
+            "type": "object",
+            "properties": {
+              "fx_value": {
+                "type": "number"
+              }
+            }
           }
         }
       },

@@ -1,0 +1,365 @@
+---
+title: 'Ficha de un US Treasury'
+openapi: 'GET /api/v1/treasuries/instruments/{id}'
+---
+
+<Note>
+  Devuelve la ficha de un título del Tesoro de Estados Unidos: la subasta original, todas las reaperturas y el calendario de cupones alrededor de `as_of`. Responde cualquier título del catálogo, también vencidos, TIPS y FRN. No trae precio: para eso está [`/price`](/api-reference/endpoint/treasuries-instruments-price). Requiere el scope `treasuries:read`.
+</Note>
+
+## Parámetros de ruta
+
+<ParamField path="id" type="string" required>
+  ISIN de 12 caracteres (`US91282CMM00`), ISIN sin dígito verificador de 11 (`US91282CMM0`) o CUSIP de 9 (`91282CMM0`). No distingue mayúsculas. Las tres formas devuelven la misma ficha.
+</ParamField>
+
+## Parámetros de consulta
+
+<ParamField query="as_of" type="string">
+  Fecha de referencia, `YYYY-MM-DD`, para `days_to_maturity`, `outstanding` y el calendario de cupones. Predeterminado: la fecha del día del servidor. Acepta fechas pasadas y futuras.
+</ParamField>
+
+## Ejemplo de solicitud
+
+<RequestExample>
+```bash cURL
+curl "https://api.doctacapital.com.ar/api/v1/treasuries/instruments/US91282CMM00" \
+  -H "Authorization: Bearer $DOCTA_TOKEN"
+```
+</RequestExample>
+
+## Respuesta exitosa
+
+<ResponseField name="isin" type="string">
+  ISIN de 12 caracteres, cualquiera sea la forma del `id` que mandaste.
+</ResponseField>
+
+<ResponseField name="cusip" type="string">
+  CUSIP de 9 caracteres.
+</ResponseField>
+
+<ResponseField name="kind" type="string">
+  Tipo de título: `BILL`, `CMB`, `NOTE`, `BOND`, `TIPS` o `FRN`.
+</ResponseField>
+
+<ResponseField name="title" type="object">
+  La subasta original del título, con los datos que publica el Tesoro.
+</ResponseField>
+
+<ResponseField name="title.cusip" type="string">
+  CUSIP.
+</ResponseField>
+
+<ResponseField name="title.isin" type="string">
+  ISIN.
+</ResponseField>
+
+<ResponseField name="title.issue_date" type="string">
+  Fecha de emisión de la subasta original.
+</ResponseField>
+
+<ResponseField name="title.security_type" type="string">
+  Tipo según el Tesoro: `Bill`, `Note` o `Bond`. Un TIPS o un FRN vienen como `Note` o `Bond`.
+</ResponseField>
+
+<ResponseField name="title.security_term" type="string">
+  Plazo de la subasta original (ej., `10-Year`).
+</ResponseField>
+
+<ResponseField name="title.maturity_date" type="string">
+  Fecha de vencimiento.
+</ResponseField>
+
+<ResponseField name="title.dated_date" type="string | null">
+  Fecha desde la que devenga el primer cupón. `null` en letras.
+</ResponseField>
+
+<ResponseField name="title.interest_rate" type="number | null">
+  Tasa de cupón anual, en porcentaje (`4.625` es 4,625%). `null` en letras y FRN.
+</ResponseField>
+
+<ResponseField name="title.interest_payment_frequency" type="string | null">
+  Frecuencia de pago de intereses. Puede venir en `null`.
+</ResponseField>
+
+<ResponseField name="title.first_interest_payment_date" type="string | null">
+  Fecha del primer pago de intereses. Puede venir en `null`.
+</ResponseField>
+
+<ResponseField name="title.price_per_100" type="number | null">
+  Precio de la subasta por 100 de valor nominal. Puede venir en `null`.
+</ResponseField>
+
+<ResponseField name="title.high_discount_rate" type="number | null">
+  Tasa de descuento de corte de la subasta. Puede venir en `null`.
+</ResponseField>
+
+<ResponseField name="title.high_investment_rate" type="number | null">
+  Tasa de inversión de corte de la subasta. Puede venir en `null`.
+</ResponseField>
+
+<ResponseField name="title.tips" type="boolean">
+  Si es un TIPS.
+</ResponseField>
+
+<ResponseField name="title.floating_rate" type="boolean">
+  Si es un FRN.
+</ResponseField>
+
+<ResponseField name="title.cash_management_bill" type="boolean">
+  Si es una letra de caja (CMB).
+</ResponseField>
+
+<ResponseField name="title.reopening" type="boolean">
+  Si esta subasta es una reapertura. En `title` es `false` salvo que el catálogo no tenga la subasta original.
+</ResponseField>
+
+<ResponseField name="title.auction_date" type="string | null">
+  Fecha de la subasta. Puede venir en `null`.
+</ResponseField>
+
+<ResponseField name="title.announcement_date" type="string | null">
+  Fecha de anuncio de la subasta.
+</ResponseField>
+
+<ResponseField name="as_of" type="string">
+  Fecha de referencia usada.
+</ResponseField>
+
+<ResponseField name="days_to_maturity" type="integer">
+  Días corridos de `as_of` al vencimiento. Negativo en un título vencido.
+</ResponseField>
+
+<ResponseField name="outstanding" type="boolean">
+  Si el título está vigente en `as_of`: emitido en o antes de esa fecha y con vencimiento posterior.
+</ResponseField>
+
+<ResponseField name="pay_date" type="string">
+  Día en que se paga el vencimiento: `maturity_date` si es día hábil en el calendario de la Reserva Federal, si no el siguiente hábil.
+</ResponseField>
+
+<ResponseField name="coupon" type="object | null">
+  Calendario de cupones en `as_of`. `null` en letras y letras de caja.
+</ResponseField>
+
+<ResponseField name="coupon.rate" type="number | null">
+  Tasa de cupón anual, en porcentaje. `null` en un FRN.
+</ResponseField>
+
+<ResponseField name="coupon.frequency" type="string | null">
+  Frecuencia de pago. Puede venir en `null`.
+</ResponseField>
+
+<ResponseField name="coupon.first_payment_date" type="string | null">
+  Fecha del primer pago. Puede venir en `null`.
+</ResponseField>
+
+<ResponseField name="coupon.previous_date" type="string | null">
+  Último cupón en o antes de `as_of`. En un título vencido es `maturity_date`. `null` antes del inicio del devengamiento y en un FRN.
+</ResponseField>
+
+<ResponseField name="coupon.next_date" type="string | null">
+  Próximo cupón después de `as_of`. `null` en un título vencido y en un FRN.
+</ResponseField>
+
+<ResponseField name="coupon.remaining_payments" type="integer | null">
+  Cupones que quedan por pagar después de `as_of`, el del vencimiento incluido. `0` en un título vencido. `null` en un FRN.
+</ResponseField>
+
+<ResponseField name="reopenings" type="array">
+  Todas las subastas del título, la original incluida, ordenadas por `issue_date`.
+</ResponseField>
+
+<ResponseField name="reopenings[].issue_date" type="string">
+  Fecha de emisión de esa subasta.
+</ResponseField>
+
+<ResponseField name="reopenings[].security_term" type="string">
+  Plazo de esa subasta (ej., `9-Year 11-Month` en una reapertura de una nota a 10 años).
+</ResponseField>
+
+<ResponseField name="reopenings[].reopening" type="boolean">
+  `false` en la subasta original, `true` en una reapertura.
+</ResponseField>
+
+<ResponseField name="reopenings[].cash_management_bill" type="boolean">
+  Si esa subasta fue de letra de caja.
+</ResponseField>
+
+<ResponseField name="reopenings[].price_per_100" type="number | null">
+  Precio de esa subasta por 100. Puede venir en `null`.
+</ResponseField>
+
+<ResponseField name="reopenings[].high_discount_rate" type="number | null">
+  Tasa de descuento de corte. Puede venir en `null`.
+</ResponseField>
+
+<ResponseField name="reopenings[].high_investment_rate" type="number | null">
+  Tasa de inversión de corte. Puede venir en `null`.
+</ResponseField>
+
+<ResponseField name="reopenings[].auction_date" type="string | null">
+  Fecha de esa subasta. Puede venir en `null`.
+</ResponseField>
+
+<ResponseField name="reopenings[].announcement_date" type="string | null">
+  Fecha de anuncio de esa subasta.
+</ResponseField>
+
+<Info>
+Varios datos de subasta vienen en <code>null</code>. El 11 de noviembre de 2026, <code>price_per_100</code>, <code>high_discount_rate</code>, <code>high_investment_rate</code>, <code>interest_payment_frequency</code> y <code>first_interest_payment_date</code> venían en <code>null</code> en todos los títulos vigentes. No los uses como precio: el precio está en <a href="/api-reference/endpoint/treasuries-instruments-price"><code>/price</code></a>.
+</Info>
+
+## Ejemplo de respuesta exitosa
+
+La nota tiene tres subastas. `reopenings` está recortado a la original y la primera reapertura.
+
+<ResponseExample>
+```json 200
+{
+  "isin": "US91282CMM00",
+  "cusip": "91282CMM0",
+  "kind": "NOTE",
+  "title": {
+    "cusip": "91282CMM0",
+    "isin": "US91282CMM00",
+    "issue_date": "2025-02-18",
+    "security_type": "Note",
+    "security_term": "10-Year",
+    "maturity_date": "2035-02-15",
+    "dated_date": "2025-02-15",
+    "interest_rate": 4.625,
+    "interest_payment_frequency": null,
+    "first_interest_payment_date": null,
+    "price_per_100": null,
+    "high_discount_rate": null,
+    "high_investment_rate": null,
+    "tips": false,
+    "floating_rate": false,
+    "cash_management_bill": false,
+    "reopening": false,
+    "auction_date": null,
+    "announcement_date": "2025-02-05"
+  },
+  "as_of": "2026-11-11",
+  "days_to_maturity": 3018,
+  "outstanding": true,
+  "pay_date": "2035-02-15",
+  "coupon": {
+    "rate": 4.625,
+    "frequency": null,
+    "first_payment_date": null,
+    "previous_date": "2026-08-15",
+    "next_date": "2027-02-15",
+    "remaining_payments": 17
+  },
+  "reopenings": [
+    {
+      "issue_date": "2025-02-18",
+      "security_term": "10-Year",
+      "reopening": false,
+      "cash_management_bill": false,
+      "price_per_100": null,
+      "high_discount_rate": null,
+      "high_investment_rate": null,
+      "auction_date": null,
+      "announcement_date": "2025-02-05"
+    },
+    {
+      "issue_date": "2025-03-17",
+      "security_term": "9-Year 11-Month",
+      "reopening": true,
+      "cash_management_bill": false,
+      "price_per_100": null,
+      "high_discount_rate": null,
+      "high_investment_rate": null,
+      "auction_date": null,
+      "announcement_date": "2025-03-06"
+    }
+  ]
+}
+```
+
+```json 200 letra
+{
+  "isin": "US912797VR56",
+  "cusip": "912797VR5",
+  "kind": "BILL",
+  "title": {
+    "cusip": "912797VR5",
+    "isin": "US912797VR56",
+    "issue_date": "2026-08-06",
+    "security_type": "Bill",
+    "security_term": "52-Week",
+    "maturity_date": "2027-08-05",
+    "dated_date": null,
+    "interest_rate": null,
+    "interest_payment_frequency": null,
+    "first_interest_payment_date": null,
+    "price_per_100": null,
+    "high_discount_rate": null,
+    "high_investment_rate": null,
+    "tips": false,
+    "floating_rate": false,
+    "cash_management_bill": false,
+    "reopening": false,
+    "auction_date": null,
+    "announcement_date": "2026-07-30"
+  },
+  "as_of": "2026-11-11",
+  "days_to_maturity": 267,
+  "outstanding": true,
+  "pay_date": "2027-08-05",
+  "coupon": null,
+  "reopenings": [
+    {
+      "issue_date": "2026-08-06",
+      "security_term": "52-Week",
+      "reopening": false,
+      "cash_management_bill": false,
+      "price_per_100": null,
+      "high_discount_rate": null,
+      "high_investment_rate": null,
+      "auction_date": null,
+      "announcement_date": "2026-07-30"
+    }
+  ]
+}
+```
+
+```json 404
+{
+  "type": "/errors/not-found",
+  "title": "Resource not found",
+  "status": 404,
+  "detail": "Title not in the Treasury catalog",
+  "details": {
+    "code": "not_in_catalog",
+    "isin": "US0378331005"
+  }
+}
+```
+
+```json 422
+{
+  "type": "/errors/validation-error",
+  "title": "Validation Error",
+  "status": 422,
+  "detail": "'US91282CMM01' fails the ISIN check digit",
+  "details": {
+    "code": "invalid_id"
+  }
+}
+```
+</ResponseExample>
+
+## Errores
+
+| Status | `details.code` | Cuándo |
+| --- | --- | --- |
+| 404 | `not_in_catalog` | El identificador es válido pero no es un título del Tesoro (`US0378331005` es una acción). `details.isin` trae el ISIN normalizado. |
+| 404 | `excluded_strips` | El CUSIP es de STRIPS, que no están en el catálogo. |
+| 422 | `invalid_id` | El `id` no tiene forma de ISIN, ISIN de 11 o CUSIP (`abc`), o falla el dígito verificador. |
+| 422 | `invalid_date` | `as_of` no es una fecha `YYYY-MM-DD` válida (`'as_of' must be YYYY-MM-DD, got 'hoy'`). |
+
+La taxonomía completa está en la [guía](/api-reference/treasuries-guia#errores).

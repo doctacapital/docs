@@ -1,0 +1,594 @@
+---
+title: 'Guía de US Treasuries'
+sidebarTitle: 'Guía de US Treasuries'
+description: 'Letras, notas y bonos del Tesoro de Estados Unidos en la API de Docta: catálogo, ficha, precio de modelo sobre la curva, curva diaria e histórica y calculadora de precio y rendimiento. Unidades, identificadores, errores y recetas.'
+icon: 'flag-usa'
+---
+
+<Note>
+  El dominio US Treasuries cubre los títulos del Tesoro de Estados Unidos: el catálogo de subastas desde 1980, la ficha de cada título, un precio de modelo sobre la curva del Tesoro, la curva diaria y su historia, y una calculadora que convierte entre precio y rendimiento. Todas las rutas están bajo `/api/v1/treasuries` y requieren el scope `treasuries:read`. Por ahora se consultan solo por REST: el [servidor MCP](/servidor-mcp) todavía no tiene herramientas de Treasuries.
+</Note>
+
+Esta página reúne lo que necesitás saber antes de llamar a cualquier endpoint del dominio, y recetas para armar pantallas y cálculos combinando las piezas. Cada ejemplo es una respuesta real de la API del 11 de noviembre de 2026, recortada donde se indica.
+
+## Qué hay en el dominio
+
+| Endpoint | Qué devuelve | Tasas en |
+| --- | --- | --- |
+| [`GET /instruments`](/api-reference/endpoint/treasuries-instruments) | Catálogo de títulos con filtros. Es el screener. No trae precio. | porcentaje (`coupon`) |
+| [`GET /instruments/{id}`](/api-reference/endpoint/treasuries-instruments-detail) | Ficha de un título: subasta original, reaperturas y calendario de cupones. | porcentaje (`coupon`) |
+| [`GET /instruments/{id}/price`](/api-reference/endpoint/treasuries-instruments-price) | Precio de modelo de una letra, nota o bono sobre la curva del Tesoro, en dólares o en pesos. | porcentaje |
+| [`GET /curve`](/api-reference/endpoint/treasuries-curve) | La curva de un día, con una tasa interpolada a N días y la comparación contra otra fecha. | porcentaje |
+| [`GET /curve/history`](/api-reference/endpoint/treasuries-curve-history) | Serie diaria de la curva por tenor, con un spread entre dos tenors. | porcentaje |
+| [`GET /calculator`](/api-reference/endpoint/treasuries-calculator) | Métricas de un título a partir de un precio o una tasa: precios, rendimientos, duration, convexidad, DV01 y montos. | fracción |
+
+## Unidades
+
+Las tasas no vienen en la misma escala en todos los endpoints. Es el error más fácil de cometer en este dominio.
+
+| Endpoint | Escala de las tasas | Ejemplo | Campo `units` |
+| --- | --- | --- | --- |
+| `/curve`, `/curve/history` | Porcentaje | `"rate": 4.98` es 4,98% | no tiene |
+| `/instruments/{id}/price` | Porcentaje | `"par_yield": 4.927972602739726` es 4,93% | `"percent"` |
+| `/calculator` | Fracción | `"yield_to_maturity": 0.042` es 4,2% | `"fraction"` |
+| `/instruments`, `/instruments/{id}` | Porcentaje (solo el cupón) | `"coupon": 4.625` es 4,625% | no tiene |
+
+El mismo nombre de campo cambia de escala según el endpoint. Para la letra `US912797VR56`, `discount_rate` vale `4.297802197802198` en `/price` y `0.0375` en `/calculator?input=discount_rate&value=0.0375`. Dentro de la calculadora, el cupón de notas y bonos (`coupon`) sigue en porcentaje: `4.625`.
+
+Los parámetros de la calculadora siguen la misma regla que su respuesta. Una tasa en `value` va como fracción (`value=0.042` es 4,2%) y la calculadora acepta rendimientos entre `-0.5` y `2.0`. Un `value=50` responde 422 con `invalid_value`.
+
+Las diferencias de la curva (`compare.points[].change`) y el `spread` de la historia están en puntos porcentuales: `"spread": 0.25` son 25 puntos básicos.
+
+Los precios siempre son por 100 de valor nominal. `currency` decide la moneda de pocos campos: `price` en `/price`, y `market_price`, `principal`, `accrued_amount` y `total` en la calculadora. Los demás precios (`price_usd_per_100`, `clean_price`, `dirty_price`, `accrued_interest`) quedan siempre en dólares por 100.
+
+## Identificadores
+
+Donde la API pide un título (`{id}` en la ruta o `id` en la calculadora) acepta tres formas, sin distinguir mayúsculas:
+
+- ISIN de 12 caracteres: `US91282CMM00`.
+- ISIN sin dígito verificador, 11 caracteres: `US91282CMM0`. La API completa el dígito.
+- CUSIP de 9 caracteres: `91282CMM0`.
+
+Las tres devuelven el mismo título y la respuesta siempre trae el ISIN de 12 caracteres. Un ISIN con el dígito verificador mal (`US91282CMM01`) o un texto con otra forma (`abc`) responde 422 con `invalid_id`. Para buscar por un fragmento de ISIN o CUSIP usá el parámetro `q` del [catálogo](/api-reference/endpoint/treasuries-instruments).
+
+## Tipos de título
+
+| `kind` | Qué es | Filtro `type` | `/price` y `/calculator` |
+| --- | --- | --- | --- |
+| `BILL` | Letra (bill), sin cupón, a descuento, de hasta 52 semanas | `bill` | Sí, con la curva `bill_discount` |
+| `CMB` | Letra de caja (cash management bill) | `cmb` | Sí, como una letra |
+| `NOTE` | Nota, cupón semestral, de 2 a 10 años | `note` | Sí, con la curva `par_yield` |
+| `BOND` | Bono, cupón semestral, 20 y 30 años | `bond` | Sí, con la curva `par_yield` |
+| `TIPS` | Nota o bono ajustado por inflación | `tips` | No: 404 `excluded_tips` |
+| `FRN` | Nota a tasa flotante | `frn` | No: 404 `excluded_frn` |
+
+`kind` sale de las marcas del título y no de `security_type`. Un TIPS o un FRN tienen `security_type` `Note` o `Bond`, y una letra de caja tiene `Bill`. En `/price` y en la calculadora el campo equivalente es `family`, que vale `BILL`, `NOTE` o `BOND`: una letra de caja aparece como `BILL`.
+
+Los STRIPS no están en el catálogo. Un CUSIP de STRIPS responde 404 con `excluded_strips` en la ficha, en `/price` y en la calculadora.
+
+El 11 de noviembre de 2026 el catálogo tenía 5.099 títulos desde 1980, y 454 vigentes: 238 notas, 112 bonos, 53 TIPS, 44 letras y 7 FRN.
+
+## Precio de modelo, no cotización
+
+`/price` no es una cotización de mercado, ni una operación ni el precio de un dealer. Es el precio que sale de valuar el título con la curva del Tesoro de un día (`rate_date`):
+
+- Una letra se valúa por descuento bancario: la tasa de descuento de la curva `bill_discount` interpolada linealmente en días al vencimiento, y precio `100 × (1 − d × días / 360)`.
+- Una nota o un bono se valúan descontando los cupones y el capital al `par_yield` interpolado linealmente en días al vencimiento, con capitalización semestral y devengamiento ACT/ACT al `as_of`. El `price` de una nota o un bono es el precio sucio (`dirty_price`).
+
+Por debajo del primer tenor o por encima del último, la interpolación toma la tasa del extremo. El catálogo y la ficha no traen precio: el único precio de la API sale de `/price`.
+
+## Fechas
+
+- Las tasas existen desde el 2 de enero de 2025. Pedir la curva, un precio o una calculadora para una fecha anterior responde 422 `no_rates_on_or_before`, con `first_rate_date: "2025-01-02"` en `details`. Esa fecha está verificada para `par_yield`: en las curvas de letras, mirá el `first_rate_date` del error.
+- Hay una curva por día hábil de Estados Unidos. Si pedís un fin de semana o un feriado, la API usa el último día con tasas anterior y lo informa en `rate_date` y `rate_age_days`. Por ejemplo, `/curve?date=2026-11-08` (domingo) devuelve la curva del viernes 6 con `rate_age_days: 2`.
+- Sin fecha, `/curve`, `/curve/history` y `/price` usan el último día con tasas. El catálogo, la ficha y la calculadora usan la fecha del día del servidor.
+- `/price` rechaza una fecha futura (422 `invalid_date`). La calculadora la acepta: valúa una operación a futuro con el calendario de pagos del título.
+- La liquidación de la calculadora sigue el calendario de feriados de la Reserva Federal. `24hs` liquida el primer día hábil posterior a `as_of` y `CI` el mismo `as_of` si es hábil. El 11 de noviembre de 2026 es feriado (Veterans Day), así que una operación del 10 con `24hs` liquida el 12.
+
+## Recetas
+
+Todas las requests llevan el token como `Bearer`. Ver [autenticación](/api-reference/endpoint/auth-token).
+
+### Screener de títulos vigentes
+
+Pedí el catálogo con `outstanding=true`. Sin ese filtro la API lista todos los títulos desde 1980, vencidos incluidos, hasta 1.000 filas. Con `limit=10000` traés los 454 vigentes en una sola request.
+
+```bash
+curl "https://api.doctacapital.com.ar/api/v1/treasuries/instruments?outstanding=true&limit=10000" \
+  -H "Authorization: Bearer $DOCTA_TOKEN"
+```
+
+Para acotar, combiná filtros: `type=bill` (letras), `type=note.bond` (notas y bonos), `maturity_from` y `maturity_to` (rango de vencimiento, inclusivo) y `term=52-Week` (plazo exacto de la subasta original). Las filas vienen ordenadas por vencimiento. Respuesta de `?type=bill&outstanding=true&limit=3`, con la primera fila de tres:
+
+```json
+{
+  "as_of": "2026-11-11",
+  "filters": {
+    "type": ["bill"],
+    "outstanding": true,
+    "maturity_from": null,
+    "maturity_to": null,
+    "term": null,
+    "q": null,
+    "include": null
+  },
+  "total": 44,
+  "returned": 3,
+  "data": [
+    {
+      "isin": "US912797UY17",
+      "cusip": "912797UY1",
+      "kind": "BILL",
+      "security_type": "Bill",
+      "security_term": "26-Week",
+      "issue_date": "2026-05-14",
+      "dated_date": null,
+      "maturity_date": "2026-11-12",
+      "days_to_maturity": 1,
+      "outstanding": true,
+      "coupon": null,
+      "interest_payment_frequency": null,
+      "first_interest_payment_date": null,
+      "reopenings": 2,
+      "auction": {
+        "auction_date": null,
+        "announcement_date": "2026-05-07",
+        "price_per_100": null,
+        "high_discount_rate": null,
+        "high_investment_rate": null
+      },
+      "last_auction": {
+        "issue_date": "2026-10-01",
+        "security_term": "6-Week",
+        "reopening": true,
+        "cash_management_bill": false,
+        "price_per_100": null,
+        "high_discount_rate": null,
+        "high_investment_rate": null,
+        "auction_date": null,
+        "announcement_date": "2026-09-24"
+      }
+    }
+  ]
+}
+```
+
+El catálogo no trae precio ni rendimiento. Para sumar esas columnas, pedí [`/price`](/api-reference/endpoint/treasuries-instruments-price) por cada letra, nota o bono de la lista (los TIPS y FRN no se valúan). Es una request por título.
+
+### Buscar por ISIN o CUSIP
+
+`q` busca un fragmento dentro del ISIN o del CUSIP, sin distinguir mayúsculas. Sirve para un buscador: con `q=91282CJK` aparece la nota `US91282CJK80`. Si ya tenés el identificador completo, pedí la [ficha](/api-reference/endpoint/treasuries-instruments-detail) directo.
+
+```bash
+curl "https://api.doctacapital.com.ar/api/v1/treasuries/instruments?q=US91282CMM00" \
+  -H "Authorization: Bearer $DOCTA_TOKEN"
+```
+
+```json
+{
+  "as_of": "2026-11-11",
+  "filters": {
+    "type": null,
+    "outstanding": false,
+    "maturity_from": null,
+    "maturity_to": null,
+    "term": null,
+    "q": "US91282CMM00",
+    "include": null
+  },
+  "total": 1,
+  "returned": 1,
+  "data": [
+    {
+      "isin": "US91282CMM00",
+      "cusip": "91282CMM0",
+      "kind": "NOTE",
+      "security_type": "Note",
+      "security_term": "10-Year",
+      "issue_date": "2025-02-18",
+      "dated_date": "2025-02-15",
+      "maturity_date": "2035-02-15",
+      "days_to_maturity": 3018,
+      "outstanding": true,
+      "coupon": 4.625,
+      "interest_payment_frequency": null,
+      "first_interest_payment_date": null,
+      "reopenings": 2,
+      "auction": {
+        "auction_date": null,
+        "announcement_date": "2025-02-05",
+        "price_per_100": null,
+        "high_discount_rate": null,
+        "high_investment_rate": null
+      },
+      "last_auction": {
+        "issue_date": "2025-04-15",
+        "security_term": "9-Year 10-Month",
+        "reopening": true,
+        "cash_management_bill": false,
+        "price_per_100": null,
+        "high_discount_rate": null,
+        "high_investment_rate": null,
+        "auction_date": null,
+        "announcement_date": "2025-04-03"
+      }
+    }
+  ]
+}
+```
+
+Un fragmento corto, como `912797`, matchea muchas letras, y como el orden es por vencimiento las primeras filas son las vencidas más antiguas. Para un buscador que muestre primero lo vigente, pedí también con `outstanding=true` y uní los resultados.
+
+### La curva de un día y su comparación contra otra fecha
+
+`GET /curve` devuelve la curva `par_yield` del último día con tasas, de 1 mes a 30 años. Para letras, pedí `curve=bill_discount` o `curve=bill_coupon_equivalent` (de 4 a 52 semanas). Con `date` elegís el día y con `compare_date` sumás la curva de otra fecha y el cambio por tenor.
+
+```bash
+curl "https://api.doctacapital.com.ar/api/v1/treasuries/curve?date=2026-11-10&tenor_days=300&compare_date=2026-01-02" \
+  -H "Authorization: Bearer $DOCTA_TOKEN"
+```
+
+Respuesta con `points` y `compare.points` recortados a tres de los 14 tenors:
+
+```json
+{
+  "curve": "par_yield",
+  "requested_date": "2026-11-10",
+  "rate_date": "2026-11-10",
+  "rate_age_days": 0,
+  "points": [
+    { "tenor": "2Y", "tenor_days": 730, "rate": 4.73 },
+    { "tenor": "10Y", "tenor_days": 3652, "rate": 4.98 },
+    { "tenor": "30Y", "tenor_days": 10957, "rate": 5.35 }
+  ],
+  "interpolated": {
+    "tenor_days": 300,
+    "rate": 4.4957142857142856,
+    "method": "linear_days",
+    "lower": { "tenor": "6M", "tenor_days": 183, "rate": 4.38 },
+    "upper": { "tenor": "1Y", "tenor_days": 365, "rate": 4.56 }
+  },
+  "compare": {
+    "requested_date": "2026-01-02",
+    "rate_date": "2026-01-02",
+    "rate_age_days": 0,
+    "points": [
+      { "tenor": "2Y", "tenor_days": 730, "rate": 3.47, "change": 1.26 },
+      { "tenor": "10Y", "tenor_days": 3652, "rate": 4.19, "change": 0.79 },
+      { "tenor": "30Y", "tenor_days": 10957, "rate": 4.86, "change": 0.49 }
+    ]
+  }
+}
+```
+
+Para graficar, poné `tenor_days` (o `tenor` como etiqueta) en el eje X y `rate` en el Y, una serie por fecha. `change` es la curva principal menos la comparada, en puntos porcentuales: el 2 años subió 1,26 puntos entre el 2 de enero y el 10 de noviembre.
+
+### La tasa interpolada a N días
+
+`tenor_days` agrega `interpolated`: la tasa interpolada linealmente en días entre los dos tenors que rodean ese plazo. Sirve para la tasa libre de riesgo a un plazo que no es un tenor publicado, por ejemplo los días al vencimiento de un título.
+
+```bash
+curl "https://api.doctacapital.com.ar/api/v1/treasuries/curve?tenor_days=300" \
+  -H "Authorization: Bearer $DOCTA_TOKEN"
+```
+
+La respuesta trae la curva completa y, en `interpolated`, el mismo bloque del ejemplo anterior: 4,4957% a 300 días, entre 4,38% a 183 días (6M) y 4,56% a 365 días (1Y). En un tenor exacto, `lower` y `upper` son el mismo punto. Por debajo del primer tenor o por encima del último, la tasa es la del extremo.
+
+### Comparar dos tenors y su spread
+
+`/curve/history` con `tenors` y `spread` arma el gráfico clásico de 2 contra 10 años con la pendiente de la curva.
+
+```bash
+curl "https://api.doctacapital.com.ar/api/v1/treasuries/curve/history?tenors=2Y.10Y&from_date=2026-10-26&to_date=2026-11-10&spread=10Y-2Y" \
+  -H "Authorization: Bearer $DOCTA_TOKEN"
+```
+
+Respuesta con las primeras dos y la última de 12 filas:
+
+```json
+{
+  "curve": "par_yield",
+  "tenors": ["2Y", "10Y"],
+  "spread": "10Y-2Y",
+  "from_date": "2026-10-26",
+  "to_date": "2026-11-10",
+  "total_records": 12,
+  "data": [
+    { "rate_date": "2026-10-26", "2Y": 4.68, "10Y": 5.0, "spread": 0.32 },
+    { "rate_date": "2026-10-27", "2Y": 4.7, "10Y": 4.99, "spread": 0.29 },
+    { "rate_date": "2026-11-10", "2Y": 4.73, "10Y": 4.98, "spread": 0.25 }
+  ]
+}
+```
+
+Cada tenor es una clave de la fila. `spread` es el primer tenor menos el segundo, en puntos porcentuales. Los tenors van separados por punto y `1.5M` lleva su propio punto: `tenors=1.5M.2Y` funciona. Para letras usá `curve=bill_discount` con tenors como `4W.52W`.
+
+### La ficha de un título
+
+```bash
+curl "https://api.doctacapital.com.ar/api/v1/treasuries/instruments/US91282CMM00" \
+  -H "Authorization: Bearer $DOCTA_TOKEN"
+```
+
+Respuesta con `reopenings` recortado a la subasta original (son tres):
+
+```json
+{
+  "isin": "US91282CMM00",
+  "cusip": "91282CMM0",
+  "kind": "NOTE",
+  "title": {
+    "cusip": "91282CMM0",
+    "isin": "US91282CMM00",
+    "issue_date": "2025-02-18",
+    "security_type": "Note",
+    "security_term": "10-Year",
+    "maturity_date": "2035-02-15",
+    "dated_date": "2025-02-15",
+    "interest_rate": 4.625,
+    "interest_payment_frequency": null,
+    "first_interest_payment_date": null,
+    "price_per_100": null,
+    "high_discount_rate": null,
+    "high_investment_rate": null,
+    "tips": false,
+    "floating_rate": false,
+    "cash_management_bill": false,
+    "reopening": false,
+    "auction_date": null,
+    "announcement_date": "2025-02-05"
+  },
+  "as_of": "2026-11-11",
+  "days_to_maturity": 3018,
+  "outstanding": true,
+  "pay_date": "2035-02-15",
+  "coupon": {
+    "rate": 4.625,
+    "frequency": null,
+    "first_payment_date": null,
+    "previous_date": "2026-08-15",
+    "next_date": "2027-02-15",
+    "remaining_payments": 17
+  },
+  "reopenings": [
+    {
+      "issue_date": "2025-02-18",
+      "security_term": "10-Year",
+      "reopening": false,
+      "cash_management_bill": false,
+      "price_per_100": null,
+      "high_discount_rate": null,
+      "high_investment_rate": null,
+      "auction_date": null,
+      "announcement_date": "2025-02-05"
+    }
+  ]
+}
+```
+
+Con `as_of` ves el calendario de cupones de otra fecha. La ficha responde también títulos vencidos, TIPS y FRN, aunque esos no tengan precio.
+
+### La cotización: precio de modelo y su rendimiento
+
+Docta Terminal muestra para cada título un precio y su rendimiento. No hay un endpoint que lo devuelva junto: es `/price` y después la calculadora con ese precio.
+
+<Steps>
+  <Step title="Pedí el precio de modelo">
+    ```bash
+    curl "https://api.doctacapital.com.ar/api/v1/treasuries/instruments/US91282CMM00/price" \
+      -H "Authorization: Bearer $DOCTA_TOKEN"
+    ```
+
+    De la respuesta te sirven `price_usd_per_100` y `rate_date`:
+
+    ```json
+    {
+      "isin": "US91282CMM00",
+      "family": "NOTE",
+      "as_of": "2026-11-10",
+      "rate_date": "2026-11-10",
+      "units": "percent",
+      "currency": "USD",
+      "price": 99.0500870138465,
+      "price_usd_per_100": 99.0500870138465,
+      "dirty_price": 99.0500870138465,
+      "clean_price": 97.95667668775954,
+      "par_yield": 4.927972602739726
+    }
+    ```
+  </Step>
+  <Step title="Pasá ese precio a la calculadora">
+    Encadená por precio y no por tasa: `/price` responde tasas en porcentaje y la calculadora las espera en fracción. Usá `as_of` igual a `rate_date` y `settlement_entry=24hs`. El tipo de `input` depende del título:
+
+    - Nota o bono: `input=dirty`, porque el `price_usd_per_100` de una nota o un bono es el precio sucio.
+    - Letra: `input=price`, porque una letra no tiene cupón y su precio es uno solo.
+
+    ```bash
+    curl "https://api.doctacapital.com.ar/api/v1/treasuries/calculator?id=US91282CMM00&input=dirty&value=99.0500870138465&settlement_entry=24hs&as_of=2026-11-10" \
+      -H "Authorization: Bearer $DOCTA_TOKEN"
+    ```
+
+    De la respuesta (recortada), `yield_to_maturity` es el rendimiento de la cotización, en fracción:
+
+    ```json
+    {
+      "operation_date": "2026-11-10",
+      "settlement_date": "2026-11-12",
+      "settlement_entry": "24hs",
+      "input_used": "dirty",
+      "units": "fraction",
+      "market_price": 97.93154081819432,
+      "dirty_price": 99.0500870138465,
+      "clean_price": 97.93154081819432,
+      "yield_to_maturity": 0.04931922060197841,
+      "duration": 6.864119376345536
+    }
+    ```
+  </Step>
+</Steps>
+
+<Warning>
+  En una nota o un bono, `input=price` toma el valor como precio limpio. Si le pasás el `price_usd_per_100` de `/price`, que es sucio, el rendimiento sale bajo: con el mismo request y `input=price`, `yield_to_maturity` da `0.04764478847381476` en lugar de `0.04931922060197841`.
+</Warning>
+
+Ese rendimiento difiere un poco del `par_yield` de `/price` porque `24hs` liquida el día hábil siguiente (acá el 12 de noviembre, por el feriado del 11) y `/price` valúa al `as_of`. Si querés el rendimiento exacto del precio de modelo, usá `settlement_entry=CI`, que liquida el mismo `as_of`. Con `CI` la calculadora da `0.04927972602739711`, que es el `par_yield` `4.927972602739726` pasado a fracción.
+
+Para la letra `US912797VR56`, `/price` dio `price_usd_per_100: 96.80052503052504` y la calculadora con `input=price&value=96.80052503052504&settlement_entry=24hs&as_of=2026-11-10` dio `yield_to_maturity: 0.04503531599403868`.
+
+### Valuar en pesos
+
+`currency=ars_ccl` o `currency=ars_mep` convierte el precio al dólar CCL o MEP del día de la valuación, o al último publicado antes. La respuesta informa el dólar usado en `fx_value` y su fecha en `fx_date`.
+
+```bash
+curl "https://api.doctacapital.com.ar/api/v1/treasuries/instruments/US91282CMM00/price?currency=ars_ccl" \
+  -H "Authorization: Bearer $DOCTA_TOKEN"
+```
+
+```json
+{
+  "currency": "ARS",
+  "price": 166277.26384039284,
+  "price_usd_per_100": 99.0500870138465,
+  "fx_used": "ccl",
+  "fx_value": 1678.71900826446,
+  "fx_date": "2026-11-06"
+}
+```
+
+En la calculadora, `currency` dice en qué moneda está el precio que mandás. Con `currency=ars_ccl&input=clean&value=150000` le decís que pagás 150.000 pesos por 100 dólares nominales. La API lo pasa a dólares con el CCL (`clean_price: 89.3538461538463`) y calcula el rendimiento de ese precio (`yield_to_maturity: 0.06296599461393954`). Las tasas en `value` no cambian con la moneda.
+
+Para fijar el dólar en lugar de usar el del día, mandá `fx_value`. Solo funciona con `currency=ars_ccl` o `ars_mep`. Con `usd` responde 422 `invalid_fx_value`.
+
+```bash
+curl "https://api.doctacapital.com.ar/api/v1/treasuries/calculator?id=US91282CMM00&input=clean&value=150000&currency=ars_mep&fx_value=1480&face=100000" \
+  -H "Authorization: Bearer $DOCTA_TOKEN"
+```
+
+```json
+{
+  "input_used": "clean",
+  "currency": "ARS",
+  "market_price": 150000.0,
+  "clean_price": 101.35135135135135,
+  "yield_to_maturity": 0.04426924531777693,
+  "face": 100000.0,
+  "principal": 150000000.0,
+  "accrued_amount": 1655448.369565217,
+  "total": 151655448.36956525,
+  "fx_used": "mep",
+  "fx_value": 1480.0,
+  "overrides_applied": { "fx_value": 1480.0 }
+}
+```
+
+Con `fx_value` la respuesta no trae `fx_date` y suma `overrides_applied`.
+
+Aunque el cuerpo diga `"currency": "ARS"`, no todos los precios pasan a pesos:
+
+| Endpoint | En pesos | Siempre en dólares por 100 |
+| --- | --- | --- |
+| `/price` | `price` | `price_usd_per_100`, `price_per_100`, `dirty_price`, `clean_price`, `accrued_interest` |
+| `/calculator` | `market_price`, `principal`, `accrued_amount`, `total`, y el `value` de un input de precio | `dirty_price`, `clean_price`, `accrued_interest`, `price_per_100` |
+
+`principal`, `accrued_amount` y `total` son montos por el nominal de `face`, no precios por 100. La relación entre las dos monedas es `fx_value`: en el ejemplo, `150000 / 1480` da `101.35135135135135`, el `clean_price` en dólares.
+
+### Montos con `face`
+
+`face` es el valor nominal que tenés o querés operar. La calculadora suma `principal` (nominal por precio limpio), `accrued_amount` (interés corrido) y `total` (lo que pagás), en la moneda de `currency`.
+
+```bash
+curl "https://api.doctacapital.com.ar/api/v1/treasuries/calculator?id=US91282CMM00&input=clean&value=101.5&face=100000" \
+  -H "Authorization: Bearer $DOCTA_TOKEN"
+```
+
+```json
+{
+  "settlement_date": "2026-11-12",
+  "clean_price": 101.5,
+  "accrued_interest": 1.1185461956521738,
+  "face": 100000.0,
+  "principal": 101500.0,
+  "accrued_amount": 1118.5461956521738,
+  "total": 102618.54619565216
+}
+```
+
+Para una letra, `accrued_amount` es `0.0` y `principal` es igual a `total`: 1.000.000 nominales de `US912797VR56` al 3,75% de descuento dan `total: 972291.6666666667`.
+
+### Qué podés armar combinando piezas
+
+| Pantalla o cálculo | Piezas |
+| --- | --- |
+| Screener con precio y rendimiento | `/instruments?outstanding=true` y, por cada letra, nota o bono, `/price` y la calculadora |
+| Buscador de títulos | `/instruments?q=...` dos veces, con y sin `outstanding=true` |
+| Ficha con cotización | `/instruments/{id}`, `/price` y la calculadora |
+| Gráfico de la curva contra otra fecha | `/curve?compare_date=...` |
+| Spread de un título contra la curva | El rendimiento de la calculadora contra `/curve?tenor_days=` con los días al vencimiento. Pasá uno de los dos a la misma escala antes de restar. |
+| Pendiente de la curva en el tiempo | `/curve/history?tenors=2Y.10Y&spread=10Y-2Y` |
+| Valuación de una tenencia en pesos | `/price?currency=ars_ccl`, o la calculadora con `face` y `currency` |
+
+## Errores
+
+Los errores del dominio usan el mismo sobre que el resto de la API y suman `details`, con un `code` estable que distingue cada caso:
+
+```json
+{
+  "type": "/errors/not-found",
+  "title": "Resource not found",
+  "status": 404,
+  "detail": "US9127933Y02 matured on 1980-04-03",
+  "details": {
+    "code": "matured",
+    "isin": "US9127933Y02",
+    "maturity_date": "1980-04-03"
+  }
+}
+```
+
+- `type`, `title` y `status` dependen solo del status HTTP: `/errors/not-found` y `Resource not found` para 404, `/errors/validation-error` y `Validation Error` para 422.
+- `detail` es el mensaje, en inglés. Sirve para mostrarlo o loguearlo, pero puede cambiar.
+- `details.code` es lo que tu código tiene que leer. Algunos códigos suman datos en `details`: `isin`, `maturity_date`, `issue_date`, `first_rate_date` o `fx_used`.
+
+Un 422 es un parámetro inválido o un dato que no existe para esa fecha. Un 404 es un título que no está en el catálogo o que no se puede valuar en esa fecha. Repetir la misma request da el mismo error.
+
+| `code` | Status | Cuándo | Extras en `details` | Endpoints |
+| --- | --- | --- | --- | --- |
+| `invalid_id` | 422 | El identificador no tiene forma de ISIN, ISIN de 11 o CUSIP, o falla el dígito verificador. | | ficha, `/price`, calculadora |
+| `invalid_date` | 422 | Una fecha no es `YYYY-MM-DD` o no existe (`2026-02-30`). En `/price`, también un `as_of` futuro. | | todos |
+| `invalid_type` | 422 | `type` con un valor fuera de `bill`, `cmb`, `note`, `bond`, `tips`, `frn`. | | catálogo |
+| `invalid_include` | 422 | `include` distinto de `reopenings`. | | catálogo |
+| `invalid_parameter` | 422 | `limit` fuera de 1 a 10000, `outstanding` que no es booleano, o `tenor_days` fuera de 1 a 20000. | | catálogo, `/curve` |
+| `invalid_curve` | 422 | `curve` fuera de `par_yield`, `bill_discount`, `bill_coupon_equivalent`. | | `/curve`, `/curve/history` |
+| `invalid_tenor` | 422 | Un tenor que no es de la curva pedida (`8Y`). | | `/curve/history` |
+| `invalid_spread` | 422 | `spread` sin la forma `A-B` o con un tenor que no es de la curva. | | `/curve/history` |
+| `invalid_range` | 422 | `from_date` posterior a `to_date`. | | `/curve/history` |
+| `invalid_currency` | 422 | `currency` fuera de `usd`, `ars_ccl`, `ars_mep`. | | `/price`, calculadora |
+| `missing_parameter` | 422 | Falta `input` o `value`. Si falta `id`, la respuesta también es 422. | | calculadora |
+| `invalid_input` | 422 | `input` desconocido, un input de letras en una nota o un bono, o `annual_equivalent` en una letra. | | calculadora |
+| `invalid_value` | 422 | `value`, `face` o `fx_value` no son números; un precio menor o igual a 0; un rendimiento fuera de -0,5 a 2,0; `annual_equivalent` menor o igual a -1; `face` menor o igual a 0; una tasa de letra que da un precio no positivo. | | calculadora |
+| `invalid_settlement_entry` | 422 | `settlement_entry` distinto de `24hs` o `CI`. | | calculadora |
+| `invalid_fx_value` | 422 | `fx_value` sin `currency` en pesos, o menor o igual a 0. | | calculadora |
+| `no_rates_on_or_before` | 422 | No hay tasas en o antes de la fecha pedida. | `first_rate_date` | `/curve`, `/price`, calculadora |
+| `no_rates` | 422 | La curva pedida no tiene ninguna tasa cargada. | `first_rate_date` | `/curve`, `/curve/history`, `/price`, calculadora |
+| `no_fx` | 422 | No hay dólar CCL o MEP en o antes de la fecha. | `fx_used` | `/price`, calculadora |
+| `did_not_converge` | 422 | Un precio que implica un rendimiento fuera de -0,5 a 2,0. | `isin` | calculadora |
+| `not_in_catalog` | 404 | El identificador es válido pero el título no está en el catálogo del Tesoro (por ejemplo, el ISIN de una acción). | `isin` | ficha, `/price`, calculadora |
+| `excluded_strips` | 404 | El CUSIP es de STRIPS. | `isin` | ficha, `/price`, calculadora |
+| `excluded_tips` | 404 | El título es un TIPS. | `isin` | `/price`, calculadora |
+| `excluded_frn` | 404 | El título es un FRN. | `isin` | `/price`, calculadora |
+| `excluded_other` | 404 | El título es de un tipo que no se valúa. | `isin` | `/price`, calculadora |
+| `matured` | 404 | El título vence en o antes de la fecha de valuación (`as_of` en `/price`, la liquidación en la calculadora). | `isin`, `maturity_date` | `/price`, calculadora |
+| `not_issued` | 404 | La fecha de valuación es anterior a la emisión. | `isin`, `issue_date` | `/price`, calculadora |
+
+En `/price` y en la calculadora gana el primer error que aplica, en este orden: parámetros e identificador (422), título fuera del catálogo o excluido (404), vencido (404), no emitido (404), sin tasas (422), sin dólar (422) y, en la calculadora, el precio que no converge (422). En la calculadora, los chequeos que dependen del tipo de título, como un input de letras en una nota o el rango de un rendimiento, corren después de ubicar el título en el catálogo.
+
+Además de estos, la API responde 401 sin token válido, 403 si tu cliente no tiene el scope `treasuries:read` y 429 si superaste el límite de tu plan:
+
+```json
+{
+  "type": "/errors/insufficient-permissions",
+  "title": "Insufficient permissions. Required scope: treasuries:read",
+  "status": 403,
+  "detail": "Insufficient permissions. Required scope: treasuries:read"
+}
+```

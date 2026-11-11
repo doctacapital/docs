@@ -1,0 +1,152 @@
+---
+title: 'Historia de la curva del Tesoro'
+openapi: 'GET /api/v1/treasuries/curve/history'
+---
+
+<Note>
+  Devuelve la serie diaria de la curva del Tesoro de Estados Unidos por tenor, una fila por día con tasas, en orden ascendente. Con `spread` cada fila suma la diferencia entre dos tenors. Las tasas vienen en porcentaje (`4.98` es 4,98%) y el spread en puntos porcentuales. Requiere el scope `treasuries:read`.
+</Note>
+
+## Parámetros de consulta
+
+<ParamField query="curve" type="string" default="par_yield">
+  `par_yield` (notas y bonos, de `1M` a `30Y`), `bill_discount` o `bill_coupon_equivalent` (letras, de `4W` a `52W`). Ver los tenors de cada curva en [Curva del Tesoro](/api-reference/endpoint/treasuries-curve).
+</ParamField>
+
+<ParamField query="tenors" type="string">
+  Tenors separados por punto, sin distinguir mayúsculas: `2Y.10Y`. `1.5M` lleva su propio punto y funciona igual (`1.5M.2Y`). Un tenor repetido se devuelve una vez. Predeterminado: todos los tenors de la curva.
+</ParamField>
+
+<ParamField query="from_date" type="string">
+  Primera fecha, `YYYY-MM-DD`, inclusiva. Predeterminado: un año antes de `to_date`.
+</ParamField>
+
+<ParamField query="to_date" type="string">
+  Última fecha, `YYYY-MM-DD`, inclusiva. Predeterminado: el último día con tasas.
+</ParamField>
+
+<ParamField query="spread" type="string">
+  Dos tenors de la curva con la forma `A-B`, por ejemplo `10Y-2Y`. Suma `spread` a cada fila: la tasa de A menos la de B. Si A o B no están en `tenors`, se agregan al final de la lista.
+</ParamField>
+
+<Info>
+Las tasas existen desde el 2 de enero de 2025. Un rango que empieza antes no da error: las filas empiezan ese día. Un rango sin días con tasas devuelve <code>total_records: 0</code>. Los días sin curva (fines de semana y feriados de Estados Unidos) no tienen fila.
+</Info>
+
+## Ejemplo de solicitud
+
+<RequestExample>
+```bash cURL
+curl "https://api.doctacapital.com.ar/api/v1/treasuries/curve/history?tenors=2Y.10Y&from_date=2026-10-26&to_date=2026-11-10&spread=10Y-2Y" \
+  -H "Authorization: Bearer $DOCTA_TOKEN"
+```
+</RequestExample>
+
+## Respuesta exitosa
+
+<ResponseField name="curve" type="string">
+  Curva devuelta.
+</ResponseField>
+
+<ResponseField name="tenors" type="string[]">
+  Tenors de cada fila, en el orden pedido, con los de `spread` agregados al final si no estaban.
+</ResponseField>
+
+<ResponseField name="spread" type="string | null">
+  El spread calculado, normalizado en mayúscula (ej., `10Y-2Y`), o `null`.
+</ResponseField>
+
+<ResponseField name="from_date" type="string">
+  Primera fecha del rango usado.
+</ResponseField>
+
+<ResponseField name="to_date" type="string">
+  Última fecha del rango usado.
+</ResponseField>
+
+<ResponseField name="total_records" type="integer">
+  Cantidad de filas en `data`.
+</ResponseField>
+
+<ResponseField name="data" type="array">
+  Una fila por día con tasas, ordenadas por fecha ascendente.
+</ResponseField>
+
+<ResponseField name="data[].rate_date" type="string">
+  Fecha de la curva.
+</ResponseField>
+
+<ResponseField name="data[].<tenor>" type="number | null">
+  Una clave por cada tenor de `tenors` (ej., `"2Y"`, `"10Y"`, `"1.5M"`), con la tasa de ese día en porcentaje. `null` si ese día no hay dato para el tenor.
+</ResponseField>
+
+<ResponseField name="data[].spread" type="number | null">
+  Solo con `spread`. Tasa de A menos tasa de B, en puntos porcentuales, redondeada a 6 decimales. `null` si falta alguna de las dos.
+</ResponseField>
+
+## Ejemplo de respuesta exitosa
+
+La serie trae 12 filas. Se muestran las primeras dos y la última.
+
+<ResponseExample>
+```json 200
+{
+  "curve": "par_yield",
+  "tenors": ["2Y", "10Y"],
+  "spread": "10Y-2Y",
+  "from_date": "2026-10-26",
+  "to_date": "2026-11-10",
+  "total_records": 12,
+  "data": [
+    { "rate_date": "2026-10-26", "2Y": 4.68, "10Y": 5.0, "spread": 0.32 },
+    { "rate_date": "2026-10-27", "2Y": 4.7, "10Y": 4.99, "spread": 0.29 },
+    { "rate_date": "2026-11-10", "2Y": 4.73, "10Y": 4.98, "spread": 0.25 }
+  ]
+}
+```
+
+```json 200 bill_discount
+{
+  "curve": "bill_discount",
+  "tenors": ["4W", "52W"],
+  "spread": "52W-4W",
+  "from_date": "2026-11-02",
+  "to_date": "2026-11-10",
+  "total_records": 7,
+  "data": [
+    { "rate_date": "2026-11-02", "4W": 3.9, "52W": 4.18, "spread": 0.28 },
+    { "rate_date": "2026-11-03", "4W": 3.88, "52W": 4.2, "spread": 0.32 },
+    { "rate_date": "2026-11-04", "4W": 3.85, "52W": 4.19, "spread": 0.34 },
+    { "rate_date": "2026-11-05", "4W": 3.89, "52W": 4.09, "spread": 0.2 },
+    { "rate_date": "2026-11-06", "4W": 3.88, "52W": 4.13, "spread": 0.25 },
+    { "rate_date": "2026-11-09", "4W": 3.89, "52W": 4.18, "spread": 0.29 },
+    { "rate_date": "2026-11-10", "4W": 3.88, "52W": 4.34, "spread": 0.46 }
+  ]
+}
+```
+
+```json 422
+{
+  "type": "/errors/validation-error",
+  "title": "Validation Error",
+  "status": 422,
+  "detail": "'8Y' is not a tenor of the curve; valid: ['1M', '1.5M', '2M', '3M', '4M', '6M', '1Y', '2Y', '3Y', '5Y', '7Y', '10Y', '20Y', '30Y']",
+  "details": {
+    "code": "invalid_tenor"
+  }
+}
+```
+</ResponseExample>
+
+## Errores
+
+| Status | `details.code` | Cuándo |
+| --- | --- | --- |
+| 422 | `invalid_curve` | `curve` fuera de las tres curvas. |
+| 422 | `invalid_tenor` | Un tenor de `tenors` no es de la curva pedida. El mensaje lista los válidos. |
+| 422 | `invalid_spread` | `spread` sin la forma `A-B` o con un tenor que no es de la curva (`'spread' must be 'A-B' with two tenors of the curve [...], got '10Y'`). |
+| 422 | `invalid_date` | `from_date` o `to_date` no son una fecha `YYYY-MM-DD` válida. |
+| 422 | `invalid_range` | `from_date` es posterior a `to_date`. |
+| 422 | `no_rates` | La curva no tiene ninguna tasa cargada. Trae `first_rate_date`. |
+
+La taxonomía completa está en la [guía](/api-reference/treasuries-guia#errores).

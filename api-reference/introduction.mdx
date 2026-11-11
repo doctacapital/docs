@@ -1,11 +1,13 @@
 ---
 title: 'API de Docta'
-description: 'Documentación de la API de Docta: bonos (catálogo, cashflows, curvas de rendimiento) y FCI (screener, series, performance y analytics de industria).'
+description: 'Documentación de la API de Docta: bonos (catálogo, cashflows, curvas de rendimiento), FCI (screener, series, performance y analytics de industria) y US Treasuries (catálogo, precio de modelo, curva del Tesoro y calculadora).'
 ---
 
 ## Bienvenido a la API de Docta
 
 La API de Docta brinda datos especializados del mercado argentino. Bonos: catálogo de instrumentos, detalle enriquecido, flujos de fondos, yields intradiarios y curvas históricas. FCI: screener del universo de fondos, detalle con composición y fees, series diarias, performance, comparaciones y analytics de la industria (AUM, gestoras, flujos). La autenticación sigue el flujo de credenciales de cliente OAuth 2.0.
+
+US Treasuries: catálogo de letras, notas y bonos del Tesoro de Estados Unidos desde 1980, ficha por título, precio de modelo sobre la curva del Tesoro (en dólares o en pesos al CCL o MEP), curva diaria e histórica desde el 2 de enero de 2025 y una calculadora de precio y rendimiento. Requiere el scope `treasuries:read`. La curva y el precio responden tasas en porcentaje y la calculadora en fracción. Leé la [guía de US Treasuries](/api-reference/treasuries-guia) antes de encadenarlos.
 
 <Card
   title="URL Base"
