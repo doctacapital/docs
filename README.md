@@ -1,18 +1,22 @@
-# Docta API — documentación
+# Docta API: documentación
 
 Documentación pública de la **API de Docta**, publicada con [Mintlify](https://mintlify.com) en
-**https://docs.doctacapital.com.ar**.
+**https://docs.docta.com.ar**.
 
-Cubre dos dominios del mercado argentino:
+Cubre tres dominios del mercado argentino y uno de Estados Unidos:
 
-- **Bonos** (9 endpoints): catálogo e instrumentos, rendimientos intradiarios e históricos,
-  flujos de fondos, valor residual, comparador y calculadora precio ↔ TIR.
-- **FCI** (16 endpoints): screener del universo de fondos, ficha con composición y fees,
-  series diarias, performance, benchmarks, comparaciones y analytics de industria.
+- **Bonos** (9 endpoints, `bonds:read`): catálogo e instrumentos, rendimientos intradiarios
+  e históricos, flujos de fondos, valor residual, comparador y calculadora precio ↔ TIR.
+- **FCI** (16 endpoints, `fci:read`): screener del universo de fondos, ficha con composición
+  y fees, series diarias, performance, benchmarks, comparaciones y analytics de industria.
+- **Dólar futuro** (4 endpoints, `futures:read`): contratos de dólar de A3 en tiempo real
+  con tasas implícitas, velas diarias por contrato y bandas cambiarias del BCRA.
+- **US Treasuries** (6 endpoints, `treasuries:read`): catálogo de títulos del Tesoro, ficha,
+  precio de modelo, curva diaria e histórica y calculadora.
 
 > **Este repo es la fuente de verdad del alcance público de la API.** El
 > [servidor MCP](https://mcp.docta.com.ar/mcp) expone una herramienta por endpoint
-> documentado acá (26 herramientas ↔ 25 endpoints + `get_my_usage`). Los endpoints que
+> documentado acá (36 herramientas: 35 endpoints más `get_my_usage`). Los endpoints que
 > existen en el gateway pero no están documentados acá se consideran deprecados: no se
 > exponen ni se documentan sin decisión previa.
 
@@ -27,6 +31,7 @@ api-reference/
   introduction.mdx            # autenticación, planes y credenciales
   openapi.json                # spec OpenAPI 3.1 — playground de cada endpoint
   endpoint/*.mdx              # una página por endpoint (frontmatter title + openapi)
+  treasuries-guia.mdx         # guía de US Treasuries: unidades y recetas
 ```
 
 Las páginas de endpoint combinan la spec (`openapi: 'GET /api/v1/...'` en el frontmatter,
@@ -44,12 +49,16 @@ mint broken-links # chequeo de links internos
 ## Publicación
 
 El deploy es automático al pushear a `main` (GitHub app de Mintlify). Al agregar una página
-nueva, acordate de sumarla a la navegación en `docs.json` — si no, queda accesible por URL
+nueva, acordate de sumarla a la navegación en `docs.json`. Si no, queda accesible por URL
 pero no aparece en el sidebar.
 
 ## Convenciones
 
 - Español (es-AR) en todo el contenido publicado.
 - Las tasas y retornos son decimales (`0.1046` = 10,46%); las fechas, `YYYY-MM-DD`.
+- Excepción: en US Treasuries la curva, su historia y el precio de modelo responden tasas
+  en porcentaje. Solo la calculadora usa decimales. Ver `api-reference/treasuries-guia.mdx`.
+- Al sumar o quitar un endpoint, actualizá el conteo de herramientas en `servidor-mcp.mdx`
+  y `onboarding-ia.mdx`, y la tool del MCP en `docto/apps/mcp`.
 - Antes de documentar un endpoint, verificalo contra producción y escribí los campos a
   partir de la respuesta real, nunca del nombre del endpoint.
