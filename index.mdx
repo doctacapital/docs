@@ -1,17 +1,19 @@
 ---
 title: "API de Docta"
-description: "API de bonos de Argentina y Fondos Comunes de Inversión (FCI): catálogo de bonos, cashflows, curvas de rendimiento, screener de fondos, series y analytics de industria."
+description: "API de bonos de Argentina, Fondos Comunes de Inversión (FCI), dólar futuro y US Treasuries: catálogo de bonos, cashflows, curvas de rendimiento, screener de fondos, series, analytics de industria, contratos de dólar futuro de A3 en tiempo real, curva del Tesoro de Estados Unidos y calculadora de Treasuries."
 ---
 
 ## Resumen de la API
 
-La API de Docta cubre dos dominios del mercado argentino: **bonos** (instrumentos, detalles completos, cashflows proyectados y curvas/yields intradiarios e históricos) y **FCI** (screener del universo de fondos, ficha con composición y fees, series diarias, performance y analytics de la industria).
-Todos los datos intradiarios de bonos tienen un delay de ~20 minutos.
+La API de Docta cubre tres dominios del mercado argentino: **bonos** (instrumentos, detalles completos, cashflows proyectados y curvas/yields intradiarios e históricos), **FCI** (screener del universo de fondos, ficha con composición y fees, series diarias, performance y analytics de la industria) y **dólar futuro** (contratos vigentes de A3 con tasas implícitas, velas diarias y bandas cambiarias).
+Todos los datos intradiarios de bonos tienen un delay de ~20 minutos. Los de dólar futuro son en tiempo real.
 
 <Note>
   ¿Desarrollás con agentes de IA? Empezá por el [Onboarding para
   IA](/onboarding-ia) o conectá el [servidor MCP](/servidor-mcp).
 </Note>
+
+Además del mercado argentino, la API cubre **US Treasuries**: el catálogo de letras, notas y bonos del Tesoro de Estados Unidos, un precio de modelo sobre la curva del Tesoro, la curva diaria desde 2025 y una calculadora de precio y rendimiento. Empezá por la [guía de US Treasuries](/api-reference/treasuries-guia).
 
 ## Planes
 
@@ -19,21 +21,21 @@ Todos los datos intradiarios de bonos tienen un delay de ~20 minutos.
   <Card
     title="Basic (Gratuito)"
     icon="leaf"
-    href="https://app.doctacapital.com.ar/pricing#api"
+    href="https://app.docta.com.ar/pricing#api"
   >
     - **RPM**: 10 - **Límite diario**: 15 requests por día
   </Card>
   <Card
     title="Intermedio"
     icon="bolt"
-    href="https://app.doctacapital.com.ar/pricing#api"
+    href="https://app.docta.com.ar/pricing#api"
   >
     - **RPM**: 60 - **Límite diario**: 100 requests por día
   </Card>
   <Card
     title="Pro"
     icon="rocket"
-    href="https://app.doctacapital.com.ar/pricing#api"
+    href="https://app.docta.com.ar/pricing#api"
   >
     - **RPM**: 120 - **Límite diario**: requests ilimitadas
   </Card>
@@ -43,14 +45,14 @@ Todos los datos intradiarios de bonos tienen un delay de ~20 minutos.
 
 ## Credenciales (API key)
 
-Generás tus credenciales creando una cuenta en [Docta Terminal](https://app.doctacapital.com.ar).
+Generás tus credenciales creando una cuenta en [Docta Terminal](https://app.docta.com.ar).
 
 <Steps>
   <Step title="Creá tu cuenta">
-    Registrate e iniciá sesión en [Docta Terminal](https://app.doctacapital.com.ar/auth).
+    Registrate e iniciá sesión en [Docta Terminal](https://app.docta.com.ar/auth).
   </Step>
   <Step title="Generá tu API key">
-    En tu perfil, buscá la sección de [API](https://app.doctacapital.com.ar/dashboard/account/api) y genera tus **credenciales**.
+    En tu perfil, buscá la sección de [API](https://app.docta.com.ar/dashboard/account/api) y genera tus **credenciales**.
 
     <Warning>
     Tratá tu client_secret como un secreto. No la publiques en repositorios ni la incluyas en el frontend.
@@ -98,5 +100,21 @@ Generás tus credenciales creando una cuenta en [Docta Terminal](https://app.doc
   >
     Calcula métricas de pricing y análisis de un bono específico basado en
     parámetros de precio objetivo.
+  </Card>
+  <Card
+    title="Dólar futuro"
+    icon="chart-candlestick"
+    href="/api-reference/endpoint/futures-instruments"
+  >
+    Contratos de dólar de A3 en tiempo real, con tasas implícitas, velas
+    diarias y bandas cambiarias.
+  </Card>
+  <Card
+    title="US Treasuries"
+    icon="flag-usa"
+    href="/api-reference/treasuries-guia"
+  >
+    Catálogo, precio de modelo, curva del Tesoro de Estados Unidos y
+    calculadora de letras, notas y bonos.
   </Card>
 </Columns>

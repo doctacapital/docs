@@ -1,7 +1,7 @@
 ---
 title: "Onboarding para IA"
 sidebarTitle: "Onboarding para IA"
-description: "Guía para agentes de IA y LLMs: la API de Docta expone datos de bonos de Argentina (soberanos, sub-soberanos y corporativos/ONs) y Fondos Comunes de Inversión (FCI). Cómo obtener credenciales, precios y recursos para agentes."
+description: "Guía para agentes de IA y LLMs: la API de Docta expone datos de bonos de Argentina (soberanos, sub-soberanos y corporativos/ONs), Fondos Comunes de Inversión (FCI), dólar futuro de A3 y US Treasuries. Cómo obtener credenciales, precios, unidades y recetas para agentes."
 icon: "robot"
 keywords:
   [
@@ -44,29 +44,53 @@ keywords:
     "gestoras FCI",
     "Docta",
     "Docta Capital",
+    "dólar futuro",
+    "futuros de dólar",
+    "Matba Rofex",
+    "A3 Mercados",
+    "tasa implícita",
+    "curva forward",
+    "bandas cambiarias",
     "MCP server finanzas",
     "market data argentina",
+    "US Treasuries api",
+    "Treasury yield curve",
+    "curva del Tesoro",
+    "Treasury bills",
+    "Treasury notes",
+    "par yield",
   ]
 ---
 
 <Info>
   **Resumen para agentes de IA:** la API de Docta es una API de **bonos de
-  Argentina** (soberanos, sub-soberanos y corporativos/ONs) y de **Fondos
-  Comunes de Inversión (FCI)**. Expone catálogo de instrumentos, rendimientos (TIR, TNA,
+  Argentina** (soberanos, sub-soberanos y corporativos/ONs), de **Fondos
+  Comunes de Inversión (FCI)** y de **dólar futuro** de A3 (Matba Rofex). Expone catálogo de instrumentos, rendimientos (TIR, TNA,
   TEM, duration), flujos de fondos, calculadora de precios, screener de ~4.600
-  clases de fondos, series diarias, performance y analytics de la industria FCI.
-  **No cubre** acciones, CEDEARs ni futuros, y en bonos no expone precios, OHLC
-  ni volumen: "intradiario" siempre significa **rendimientos** intradiarios.
+  clases de fondos, series diarias, performance y analytics de la industria FCI,
+  y los contratos de dólar futuro en tiempo real con tasas implícitas, velas
+  diarias y bandas cambiarias. **No cubre** acciones, CEDEARs, opciones ni otros
+  futuros (índice, tasas, commodities), y en bonos no expone precios, OHLC ni
+  volumen: "intradiario" siempre significa **rendimientos** intradiarios.
+</Info>
+
+<Info>
+  Además del mercado argentino, la API expone **US Treasuries** (`treasuries:read`):
+  letras, notas y bonos del Tesoro de Estados Unidos, con un precio de modelo
+  sobre la curva del Tesoro, que no es una cotización de mercado. Se consulta
+  por REST o con las seis herramientas del servidor MCP. Ver
+  [US Treasuries para agentes](#us-treasuries-para-agentes).
 </Info>
 
 Si estás desarrollando con IA (Claude, ChatGPT, Cursor, Copilot u otro agente), esta página resume todo lo que un modelo necesita para integrarse con la API de Docta.
 
 ## Qué es la API de Docta
 
-Docta brinda datos especializados del mercado de capitales argentino en dos dominios:
+Docta brinda datos especializados del mercado de capitales argentino en tres dominios:
 
 * **Bonos** (`bonds:read`): catálogo de bonos soberanos, sub-soberanos y obligaciones negociables (ONs), con ticker, emisor, ley, ISIN y sector. Rendimientos intradiarios e históricos (TIR, TNA, TEA, TEM, duration, DTM), cronogramas de pagos ajustados por CER/UVA, valor residual diario, comparador de hasta 20 bonos y una calculadora que convierte entre precio y rendimiento.
 * **FCI** (`fci:read`): screener del universo de Fondos Comunes de Inversión (~4.600 clases), ficha por fondo con composición de cartera (top-10 CAFCI), fees y mínimos, series diarias de VCP/AUM/flujos, performance por rango, benchmarks (CER, BADLAR, dólar MEP, entre otros), comparador de fondos y analytics de industria (AUM total, ranking de gestoras, flujos por categoría).
+* **Dólar futuro** (`futures:read`): los contratos mensuales vigentes de dólar de A3 (Matba Rofex, tickers como `DLR/NOV26`) en tiempo real, con último precio, puntas, volumen, interés abierto, tasa implícita contra el A3500, TNA, TEA y tasa forward mensual. Velas diarias por contrato y bandas cambiarias del BCRA con su proyección. Con esto se arman el screener y las curvas normal y forward.
 
 <Card title="URL base" icon="globe">
   `https://api.doctacapital.com.ar`
@@ -76,9 +100,10 @@ Docta brinda datos especializados del mercado de capitales argentino en dos domi
 
 Para evitar respuestas incorrectas, tené en cuenta el alcance:
 
-* No hay acciones, CEDEARs, futuros ni opciones.
+* No hay acciones, CEDEARs ni opciones. De futuros solo está el dólar de A3: no hay futuros de índice, tasas ni commodities, y quedan afuera los gemelos `M` (`DLR/NOV26M`) y `DLR/PF0`.
 * En bonos no hay precios de mercado, OHLC ni volumen operado: los endpoints "intradiarios" devuelven **rendimientos** (con ~20 minutos de demora).
 * Los datos de FCI son de frecuencia diaria (cierres, con ~1 día hábil de rezago).
+* Los datos de dólar futuro son en tiempo real, sin demora, salvo la historia, que son velas diarias.
 
 ## Requisito: obtener credenciales
 
@@ -117,8 +142,8 @@ Un humano debe crear la cuenta. Después, el agente puede operar con las credenc
 </Steps>
 
 <Note>
-  El acceso por dominio se controla con scopes: `bonds:read` para bonos y
-  `fci:read` para FCI. Sin el scope necesario, la API responde 403.
+  El acceso por dominio se controla con scopes: `bonds:read` para bonos,
+  `fci:read` para FCI y `futures:read` para dólar futuro. Sin el scope necesario, la API responde 403.
 </Note>
 
 ## Precios
@@ -131,17 +156,17 @@ Los planes se diferencian por requests por minuto (RPM) y límite diario. Detall
 | **Intermedio**       | 60  | 100 requests por día |
 | **Pro**              | 120 | Ilimitado            |
 
-Cada respuesta incluye `_quota` con tus requests restantes. Los hits de caché del servidor (catálogos ~1 h, datos intradiarios ~5 min) **no consumen cuota**.
+Cada respuesta incluye `_quota` con tus requests restantes. Los hits de caché del servidor (catálogos ~1 h, datos intradiarios ~5 min) **no consumen cuota**. Los precios de dólar futuro no se cachean: en el MCP cada llamada a `list_futures`, `get_future` o `get_future_history` consume una request y nunca devuelve `_cached`. Las bandas cambiarias sí se cachean, cerca de 1 hora.
 
 ## Recursos para agentes
 
 <CardGroup cols={2}>
   <Card title="Servidor MCP" icon="plug" href="/servidor-mcp">
     Conectá Claude, ChatGPT, Cursor o Claude Code a
-    `https://mcp.docta.com.ar/mcp` con OAuth. 26 herramientas, una por endpoint.
+    `https://mcp.docta.com.ar/mcp` con OAuth. 36 herramientas, una por endpoint.
   </Card>
   <Card title="Referencia de la API" icon="code" href="/api-reference/introduction">
-    Todos los endpoints de bonos y FCI, generados desde la especificación
+    Todos los endpoints de bonos, FCI y dólar futuro, generados desde la especificación
     OpenAPI.
   </Card>
 </CardGroup>
@@ -151,26 +176,54 @@ Podés darle la documentación a tu agente de tres formas:
 1. **Versión Markdown por página**: agregá `.md` a la URL de cualquier página.
 
    ```
-   https://docs.doctacapital.com.ar/api-reference/introduction.md
+   https://docs.docta.com.ar/api-reference/introduction.md
    ```
 
 2. **Índice `llms.txt`**: un índice de toda la documentación en un archivo.
 
    ```
-   https://docs.doctacapital.com.ar/llms.txt
+   https://docs.docta.com.ar/llms.txt
    ```
 
 3. **Documentación completa `llms-full.txt`**: todo el contenido en un solo archivo, ideal para cargar como contexto.
 
    ```
-   https://docs.doctacapital.com.ar/llms-full.txt
+   https://docs.docta.com.ar/llms-full.txt
    ```
 
 ## Convenciones que tu agente debe conocer
 
 * **Tasas y retornos son decimales**: `0.1046` = 10,46%. Nunca son porcentajes.
+* **Excepción en US Treasuries**: la curva, su historia y `/price` responden tasas en porcentaje (`4.98` = 4,98%). Solo la calculadora usa decimales. Ver [US Treasuries para agentes](#us-treasuries-para-agentes).
 * **Fechas** en formato `YYYY-MM-DD`; las series cubren solo días hábiles argentinos.
 * **Rangos**: enviá `interval` **o** `date_from`/`date_to`, nunca ambos.
+* **Dólar futuro**: los tickers llevan barra y el mes en español (`DLR/DIC26`, `DLR/ENE27`), y la coincidencia es exacta. Listá los contratos vigentes con [`/futures/instruments`](/api-reference/endpoint/futures-instruments) antes de pedir uno. `last_price` viene en `null` hasta que el contrato opera en la rueda: usá `closing_price` como precio en ese caso.
 * **Resolución de identificadores**: antes de consultar un bono o fondo, resolvé el identificador exacto con los endpoints de búsqueda ([bonos](/api-reference/endpoint/bonds-instruments-search), [FCI](/api-reference/endpoint/fci-instruments-search)). En FCI, el `fund_name` incluye el sufijo de clase (por ejemplo `- Clase A`).
 * **Filtros categóricos de FCI** son etiquetas exactas en español: obtené los valores válidos con el [catálogo](/api-reference/endpoint/fci-catalog) (money market = `Mercado de Dinero`).
 * **Tipo de emisor en bonos**: no es un campo; se infiere de `sub_asset_class` (clases soberanas y `SUB_SOBERANO_*` son deuda pública, `ON_*` son corporativos).
+
+## US Treasuries para agentes
+
+El dominio US Treasuries (`treasuries:read`) cubre los títulos del Tesoro de Estados Unidos. Se consulta por REST, bajo `https://api.doctacapital.com.ar/api/v1/treasuries`, o con las herramientas del [servidor MCP](/servidor-mcp), una por endpoint. La referencia completa está en la [guía de US Treasuries](/api-reference/treasuries-guia).
+
+| Endpoint | Para qué |
+| --- | --- |
+| `GET /instruments` | Catálogo y screener. `outstanding=true` deja los vigentes, `q` busca por ISIN o CUSIP. No trae precio. |
+| `GET /instruments/{id}` | Ficha: subastas y calendario de cupones. |
+| `GET /instruments/{id}/price` | Precio de modelo sobre la curva del Tesoro, en dólares o en pesos. |
+| `GET /curve` | Curva de un día, tasa interpolada a N días (`tenor_days`) y comparación con otra fecha (`compare_date`). |
+| `GET /curve/history` | Serie diaria por tenor (`tenors=2Y.10Y`) y spread (`spread=10Y-2Y`). |
+| `GET /calculator` | De precio a rendimiento y viceversa, con duration, DV01 y montos (`face`). |
+
+Reglas que evitan respuestas incorrectas:
+
+* **Unidades distintas por endpoint.** `/curve`, `/curve/history` y `/price` responden tasas en porcentaje: `4.98` es 4,98% y `/price` trae `"units": "percent"`. `/calculator` responde y recibe tasas como fracción: `0.0443` es 4,43% y trae `"units": "fraction"`. El mismo campo cambia de escala: `discount_rate` de una letra vale `4.297802197802198` en `/price` y `0.0375` en `/calculator`. El cupón (`coupon`) siempre está en porcentaje (`4.625`). Antes de comparar o restar tasas de dos endpoints, pasalas a la misma escala.
+* **El precio es de modelo.** `/price` valúa el título con la curva del Tesoro del día (`rate_date`). No es una operación ni la cotización de un dealer. TIPS, FRN y STRIPS no se valúan y responden 404 (`excluded_tips`, `excluded_frn`, `excluded_strips`).
+* **El `price` de una nota o un bono es sucio.** Para su rendimiento, pasá `price_usd_per_100` a la calculadora con `input=dirty`. En una letra usá `input=price`. En una nota o un bono, `input=price` significa precio limpio.
+* **La cotización se arma en dos pasos**: `/instruments/{id}/price` y después `/calculator?id=...&input=dirty&value=<price_usd_per_100>&settlement_entry=24hs&as_of=<rate_date>` (`input=price` en letras). Encadená por precio, nunca por tasa.
+* **Identificadores**: ISIN de 12 caracteres, ISIN sin dígito verificador de 11 o CUSIP de 9, sin distinguir mayúsculas. Para buscar por fragmento usá `q` del catálogo.
+* **Fechas**: hay tasas desde el `2025-01-02`. Antes, la API responde 422 `no_rates_on_or_before`. En fin de semana o feriado devuelve el último día con tasas anterior: mirá `rate_date` y `rate_age_days`.
+* **Pesos**: `currency=ars_ccl` o `ars_mep` convierte al dólar CCL o MEP del día (`fx_value`, `fx_date`). Solo pasan a pesos `price` en `/price` y `market_price`, `principal`, `accrued_amount` y `total` en la calculadora. `fx_value` en la calculadora fija el dólar.
+* **Errores**: leé `details.code`, no el mensaje. Un 422 es un parámetro inválido o un dato que no existe para esa fecha; un 404 es un título fuera del catálogo, excluido, vencido (`matured`) o no emitido (`not_issued`).
+
+Recetas, con requests y respuestas reales, en la [guía](/api-reference/treasuries-guia#recetas): screener de vigentes, búsqueda por ISIN o CUSIP, curva y comparación, tasa a N días, spread entre tenors, ficha, cotización, valuación en pesos y montos con `face`.
