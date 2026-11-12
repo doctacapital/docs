@@ -29,7 +29,7 @@ onboarding-ia.mdx             # guía para agentes de IA / LLMs
 servidor-mcp.mdx              # guía del servidor MCP (Mintlify reserva /mcp)
 api-reference/
   introduction.mdx            # autenticación, planes y credenciales
-  openapi.json                # spec OpenAPI 3.1 — playground de cada endpoint
+  openapi.json                # spec OpenAPI 3.1, genera el playground de cada endpoint
   endpoint/*.mdx              # una página por endpoint (frontmatter title + openapi)
   treasuries-guia.mdx         # guía de US Treasuries: unidades y recetas
 ```
