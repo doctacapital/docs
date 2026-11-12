@@ -1,45 +1,64 @@
-# Mintlify Starter Kit
+# Docta API: documentación
 
-Use the starter kit to get your docs deployed and ready to customize.
+Documentación pública de la **API de Docta**, publicada con [Mintlify](https://mintlify.com) en
+**https://docs.docta.com.ar**.
 
-Click the green **Use this template** button at the top of this repo to copy the Mintlify starter kit. The starter kit contains examples with
+Cubre tres dominios del mercado argentino y uno de Estados Unidos:
 
-- Guide pages
-- Navigation
-- Customizations
-- API reference pages
-- Use of popular components
+- **Bonos** (9 endpoints, `bonds:read`): catálogo e instrumentos, rendimientos intradiarios
+  e históricos, flujos de fondos, valor residual, comparador y calculadora precio ↔ TIR.
+- **FCI** (16 endpoints, `fci:read`): screener del universo de fondos, ficha con composición
+  y fees, series diarias, performance, benchmarks, comparaciones y analytics de industria.
+- **Dólar futuro** (4 endpoints, `futures:read`): contratos de dólar de A3 en tiempo real
+  con tasas implícitas, velas diarias por contrato y bandas cambiarias del BCRA.
+- **US Treasuries** (6 endpoints, `treasuries:read`): catálogo de títulos del Tesoro, ficha,
+  precio de modelo, curva diaria e histórica y calculadora.
 
-**[Follow the full quickstart guide](https://starter.mintlify.com/quickstart)**
+> **Este repo es la fuente de verdad del alcance público de la API.** El
+> [servidor MCP](https://mcp.docta.com.ar/mcp) expone una herramienta por endpoint
+> documentado acá (36 herramientas: 35 endpoints más `get_my_usage`). Los endpoints que
+> existen en el gateway pero no están documentados acá se consideran deprecados: no se
+> exponen ni se documentan sin decisión previa.
 
-## Development
-
-Install the [Mintlify CLI](https://www.npmjs.com/package/mint) to preview your documentation changes locally. To install, use the following command:
+## Estructura
 
 ```
-npm i -g mint
+docs.json                     # navegación, tema y SEO del sitio
+index.mdx                     # home
+onboarding-ia.mdx             # guía para agentes de IA / LLMs
+servidor-mcp.mdx              # guía del servidor MCP (Mintlify reserva /mcp)
+api-reference/
+  introduction.mdx            # autenticación, planes y credenciales
+  openapi.json                # spec OpenAPI 3.1, genera el playground de cada endpoint
+  endpoint/*.mdx              # una página por endpoint (frontmatter title + openapi)
+  treasuries-guia.mdx         # guía de US Treasuries: unidades y recetas
 ```
 
-Run the following command at the root of your documentation, where your `docs.json` is located:
+Las páginas de endpoint combinan la spec (`openapi: 'GET /api/v1/...'` en el frontmatter,
+que genera el playground) con prosa escrita a mano: `<ParamField>`, `<ResponseField>` y
+ejemplos de request/response reales de producción.
 
+## Desarrollo
+
+```bash
+npm i -g mint     # CLI de Mintlify
+mint dev          # preview en http://localhost:3000
+mint broken-links # chequeo de links internos
 ```
-mint dev
-```
 
-View your local preview at `http://localhost:3000`.
+## Publicación
 
-## Publishing changes
+El deploy es automático al pushear a `main` (GitHub app de Mintlify). Al agregar una página
+nueva, acordate de sumarla a la navegación en `docs.json`. Si no, queda accesible por URL
+pero no aparece en el sidebar.
 
-Install our GitHub app from your [dashboard](https://dashboard.mintlify.com/settings/organization/github-app) to propagate changes from your repo to your deployment. Changes are deployed to production automatically after pushing to the default branch.
+## Convenciones
 
-## Need help?
-
-### Troubleshooting
-
-- If your dev environment isn't running: Run `mint update` to ensure you have the most recent version of the CLI.
-- If a page loads as a 404: Make sure you are running in a folder with a valid `docs.json`.
-
-### Resources
-- [Mintlify documentation](https://mintlify.com/docs)
-- [Mintlify community](https://mintlify.com/community)
-
+- Español (es-AR) en todo el contenido publicado.
+- Las tasas y retornos son decimales (`0.1046` = 10,46%); las fechas, `YYYY-MM-DD`.
+- Excepción: en US Treasuries la curva, su historia y el precio de modelo responden tasas
+  en porcentaje. Solo la calculadora usa decimales. Ver `api-reference/treasuries-guia.mdx`.
+- Al sumar o quitar un endpoint, actualizá el conteo de herramientas en `servidor-mcp.mdx`
+  y `onboarding-ia.mdx`, y la tool del MCP en `docto/apps/mcp`.
+- Antes de documentar un endpoint, verificalo contra producción y escribí los campos a
+  partir de la respuesta real, nunca del nombre del endpoint.
