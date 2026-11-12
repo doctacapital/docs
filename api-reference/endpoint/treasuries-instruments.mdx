@@ -1,0 +1,299 @@
+---
+title: 'Catálogo de US Treasuries'
+openapi: 'GET /api/v1/treasuries/instruments'
+---
+
+<Note>
+  Lista los títulos del Tesoro de Estados Unidos, una fila por título: las reaperturas se agrupan en la subasta original. Cubre letras, letras de caja, notas, bonos, TIPS y FRN desde 1980. Es la base del screener y del buscador. No trae precio: para eso está [`/price`](/api-reference/endpoint/treasuries-instruments-price). Requiere el scope `treasuries:read`.
+</Note>
+
+## Parámetros de consulta
+
+Todos son opcionales. Sin ninguno, la API devuelve las primeras 1.000 filas de los 5.099 títulos del catálogo, vencidos incluidos.
+
+<ParamField query="type" type="string">
+  Tipos de título separados por punto, sin distinguir mayúsculas: `bill`, `cmb`, `note`, `bond`, `tips`, `frn`. Ejemplo: `type=note.bond`. Sin `type` entran todos.
+</ParamField>
+
+<ParamField query="as_of" type="string">
+  Fecha de referencia, `YYYY-MM-DD`. Define qué títulos están vigentes (`outstanding`), los `days_to_maturity` y `last_auction`. Predeterminado: la fecha del día del servidor. Acepta fechas pasadas y futuras.
+</ParamField>
+
+<ParamField query="outstanding" type="string" default="false">
+  `true` deja solo los títulos vigentes en `as_of`: emitidos en o antes de esa fecha (`issue_date <= as_of`) y que vencen después (`as_of < maturity_date`). `false` lista todos. Acepta `true`, `false`, `1`, `0`, `yes`, `no`.
+</ParamField>
+
+<ParamField query="maturity_from" type="string">
+  Vencimiento mínimo, inclusivo, `YYYY-MM-DD`.
+</ParamField>
+
+<ParamField query="maturity_to" type="string">
+  Vencimiento máximo, inclusivo, `YYYY-MM-DD`.
+</ParamField>
+
+<ParamField query="term" type="string">
+  Plazo exacto de la subasta original, tal como lo publica el Tesoro, sin distinguir mayúsculas: `52-Week`, `26-Week`, `2-Year`, `10-Year`, `30-Year`. Algunos títulos tienen plazos como `29-Year 9-Month`.
+</ParamField>
+
+<ParamField query="q" type="string">
+  Fragmento del ISIN o del CUSIP, sin distinguir mayúsculas. `q=91282CJK` encuentra `US91282CJK80`.
+</ParamField>
+
+<ParamField query="limit" type="string" default="1000">
+  Máximo de filas, de 1 a 10000. `total` informa cuántos títulos cumplen los filtros aunque no entren todos.
+</ParamField>
+
+<ParamField query="include" type="string">
+  Datos extra, separados por punto. El único valor es `reopenings`, que agrega a cada fila `auctions` con todas las subastas del título.
+</ParamField>
+
+<Info>
+Las filas vienen ordenadas por <code>maturity_date</code> ascendente y, en el mismo vencimiento, por ISIN. Con <code>outstanding=true&limit=10000</code> traés todos los títulos vigentes en una request: eran 454 el 11 de noviembre de 2026.
+</Info>
+
+## Ejemplo de solicitud
+
+<RequestExample>
+```bash cURL
+curl "https://api.doctacapital.com.ar/api/v1/treasuries/instruments?type=bill&outstanding=true&limit=3" \
+  -H "Authorization: Bearer $DOCTA_TOKEN"
+```
+</RequestExample>
+
+## Respuesta exitosa
+
+<ResponseField name="as_of" type="string">
+  Fecha de referencia usada, `YYYY-MM-DD`.
+</ResponseField>
+
+<ResponseField name="filters" type="object">
+  Los filtros aplicados, ya normalizados: `type` (lista en minúscula o `null`), `outstanding` (booleano), `maturity_from`, `maturity_to`, `term`, `q` (en mayúscula) e `include` (lista o `null`). Un filtro que no mandaste vuelve en `null`.
+</ResponseField>
+
+<ResponseField name="total" type="integer">
+  Títulos que cumplen los filtros, antes de aplicar `limit`.
+</ResponseField>
+
+<ResponseField name="returned" type="integer">
+  Filas devueltas en `data`.
+</ResponseField>
+
+<ResponseField name="data" type="array">
+  Un título por fila.
+</ResponseField>
+
+<ResponseField name="data[].isin" type="string">
+  ISIN de 12 caracteres.
+</ResponseField>
+
+<ResponseField name="data[].cusip" type="string">
+  CUSIP de 9 caracteres.
+</ResponseField>
+
+<ResponseField name="data[].kind" type="string">
+  Tipo de título: `BILL`, `CMB`, `NOTE`, `BOND`, `TIPS` o `FRN`. Sale de las marcas del título: un TIPS o un FRN tienen `security_type` `Note` o `Bond`, y una letra de caja tiene `Bill`.
+</ResponseField>
+
+<ResponseField name="data[].security_type" type="string">
+  Tipo según el Tesoro: `Bill`, `Note` o `Bond`.
+</ResponseField>
+
+<ResponseField name="data[].security_term" type="string">
+  Plazo de la subasta original (ej., `52-Week`, `10-Year`).
+</ResponseField>
+
+<ResponseField name="data[].issue_date" type="string">
+  Fecha de emisión de la subasta original.
+</ResponseField>
+
+<ResponseField name="data[].dated_date" type="string | null">
+  Fecha desde la que devenga el primer cupón. `null` en letras.
+</ResponseField>
+
+<ResponseField name="data[].maturity_date" type="string">
+  Fecha de vencimiento.
+</ResponseField>
+
+<ResponseField name="data[].days_to_maturity" type="integer">
+  Días corridos de `as_of` al vencimiento. Negativo en un título vencido.
+</ResponseField>
+
+<ResponseField name="data[].outstanding" type="boolean">
+  Si el título está vigente en `as_of`.
+</ResponseField>
+
+<ResponseField name="data[].coupon" type="number | null">
+  Tasa de cupón anual, en porcentaje (`4.625` es 4,625%). `null` en letras y FRN.
+</ResponseField>
+
+<ResponseField name="data[].interest_payment_frequency" type="string | null">
+  Frecuencia de pago de intereses según el Tesoro. Puede venir en `null`: el 11 de noviembre de 2026 venía en `null` en los 454 títulos vigentes.
+</ResponseField>
+
+<ResponseField name="data[].first_interest_payment_date" type="string | null">
+  Fecha del primer pago de intereses. Puede venir en `null`, igual que `interest_payment_frequency`.
+</ResponseField>
+
+<ResponseField name="data[].reopenings" type="integer">
+  Cantidad de reaperturas: subastas del título además de la original.
+</ResponseField>
+
+<ResponseField name="data[].auction" type="object">
+  Datos de la subasta original: `auction_date`, `announcement_date`, `price_per_100`, `high_discount_rate` y `high_investment_rate`. Solo `announcement_date` viene completo en todo el catálogo vigente. Los demás pueden venir en `null`, y el 11 de noviembre de 2026 `price_per_100`, `high_discount_rate` y `high_investment_rate` venían en `null` en todos los títulos vigentes.
+</ResponseField>
+
+<ResponseField name="data[].last_auction" type="object | null">
+  La última subasta hecha en o antes de `as_of`, la original o una reapertura: `issue_date`, `security_term` (plazo de esa subasta, ej., `9-Year 10-Month`), `reopening`, `cash_management_bill`, `price_per_100`, `high_discount_rate`, `high_investment_rate`, `auction_date` y `announcement_date`. Cuando `auction_date` es `null`, la fecha que cuenta es `issue_date`. `null` si `as_of` es anterior a la primera subasta.
+</ResponseField>
+
+<ResponseField name="data[].auctions" type="array">
+  Solo con `include=reopenings`. Todas las subastas del título, la original incluida, ordenadas por `issue_date`, con los mismos campos que `last_auction`: `issue_date`, `security_term`, `reopening`, `cash_management_bill`, `price_per_100`, `high_discount_rate`, `high_investment_rate`, `auction_date` y `announcement_date`.
+</ResponseField>
+
+## Ejemplo de respuesta exitosa
+
+La respuesta trae tres letras. Acá se muestra la primera.
+
+<ResponseExample>
+```json 200
+{
+  "as_of": "2026-11-11",
+  "filters": {
+    "type": ["bill"],
+    "outstanding": true,
+    "maturity_from": null,
+    "maturity_to": null,
+    "term": null,
+    "q": null,
+    "include": null
+  },
+  "total": 44,
+  "returned": 3,
+  "data": [
+    {
+      "isin": "US912797UY17",
+      "cusip": "912797UY1",
+      "kind": "BILL",
+      "security_type": "Bill",
+      "security_term": "26-Week",
+      "issue_date": "2026-05-14",
+      "dated_date": null,
+      "maturity_date": "2026-11-12",
+      "days_to_maturity": 1,
+      "outstanding": true,
+      "coupon": null,
+      "interest_payment_frequency": null,
+      "first_interest_payment_date": null,
+      "reopenings": 2,
+      "auction": {
+        "auction_date": null,
+        "announcement_date": "2026-05-07",
+        "price_per_100": null,
+        "high_discount_rate": null,
+        "high_investment_rate": null
+      },
+      "last_auction": {
+        "issue_date": "2026-10-01",
+        "security_term": "6-Week",
+        "reopening": true,
+        "cash_management_bill": false,
+        "price_per_100": null,
+        "high_discount_rate": null,
+        "high_investment_rate": null,
+        "auction_date": null,
+        "announcement_date": "2026-09-24"
+      }
+    }
+  ]
+}
+```
+
+```json 200 include=reopenings
+{
+  "as_of": "2026-11-11",
+  "filters": {
+    "type": null,
+    "outstanding": false,
+    "maturity_from": null,
+    "maturity_to": null,
+    "term": null,
+    "q": "91282CJK",
+    "include": ["reopenings"]
+  },
+  "total": 1,
+  "returned": 1,
+  "data": [
+    {
+      "isin": "US91282CJK80",
+      "cusip": "91282CJK8",
+      "kind": "NOTE",
+      "security_type": "Note",
+      "security_term": "3-Year",
+      "issue_date": "2023-11-15",
+      "dated_date": "2023-11-15",
+      "maturity_date": "2026-11-15",
+      "days_to_maturity": 4,
+      "outstanding": true,
+      "coupon": 4.625,
+      "interest_payment_frequency": null,
+      "first_interest_payment_date": null,
+      "reopenings": 0,
+      "auction": {
+        "auction_date": null,
+        "announcement_date": "2023-11-01",
+        "price_per_100": null,
+        "high_discount_rate": null,
+        "high_investment_rate": null
+      },
+      "last_auction": {
+        "issue_date": "2023-11-15",
+        "security_term": "3-Year",
+        "reopening": false,
+        "cash_management_bill": false,
+        "price_per_100": null,
+        "high_discount_rate": null,
+        "high_investment_rate": null,
+        "auction_date": null,
+        "announcement_date": "2023-11-01"
+      },
+      "auctions": [
+        {
+          "issue_date": "2023-11-15",
+          "security_term": "3-Year",
+          "reopening": false,
+          "cash_management_bill": false,
+          "price_per_100": null,
+          "high_discount_rate": null,
+          "high_investment_rate": null,
+          "auction_date": null,
+          "announcement_date": "2023-11-01"
+        }
+      ]
+    }
+  ]
+}
+```
+
+```json 422
+{
+  "type": "/errors/validation-error",
+  "title": "Validation Error",
+  "status": 422,
+  "detail": "'type' accepts ['bill', 'cmb', 'note', 'bond', 'tips', 'frn'] separated by dots, got ['foo']",
+  "details": {
+    "code": "invalid_type"
+  }
+}
+```
+</ResponseExample>
+
+## Errores
+
+| Status | `details.code` | Cuándo |
+| --- | --- | --- |
+| 422 | `invalid_type` | `type` con un valor fuera de la lista. |
+| 422 | `invalid_include` | `include` distinto de `reopenings`. |
+| 422 | `invalid_parameter` | `limit` fuera de 1 a 10000 (`'limit' must be between 1 and 10000, got 0`) u `outstanding` que no es booleano. |
+| 422 | `invalid_date` | `as_of`, `maturity_from` o `maturity_to` no son una fecha `YYYY-MM-DD` válida. |
+
+Un filtro que no matchea nada no es un error: devuelve `total: 0` y `data` vacío. La taxonomía completa está en la [guía](/api-reference/treasuries-guia#errores).

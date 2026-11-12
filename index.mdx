@@ -1,6 +1,6 @@
 ---
 title: "API de Docta"
-description: "API de bonos de Argentina, Fondos Comunes de Inversión (FCI) y dólar futuro: catálogo de bonos, cashflows, curvas de rendimiento, screener de fondos, series, analytics de industria y contratos de dólar futuro de A3 en tiempo real."
+description: "API de bonos de Argentina, Fondos Comunes de Inversión (FCI), dólar futuro y US Treasuries: catálogo de bonos, cashflows, curvas de rendimiento, screener de fondos, series, analytics de industria, contratos de dólar futuro de A3 en tiempo real, curva del Tesoro de Estados Unidos y calculadora de Treasuries."
 ---
 
 ## Resumen de la API
@@ -12,6 +12,8 @@ Todos los datos intradiarios de bonos tienen un delay de ~20 minutos. Los de dó
   ¿Desarrollás con agentes de IA? Empezá por el [Onboarding para
   IA](/onboarding-ia) o conectá el [servidor MCP](/servidor-mcp).
 </Note>
+
+Además del mercado argentino, la API cubre **US Treasuries**: el catálogo de letras, notas y bonos del Tesoro de Estados Unidos, un precio de modelo sobre la curva del Tesoro, la curva diaria desde 2025 y una calculadora de precio y rendimiento. Empezá por la [guía de US Treasuries](/api-reference/treasuries-guia).
 
 ## Planes
 
@@ -98,5 +100,21 @@ Generás tus credenciales creando una cuenta en [Docta Terminal](https://app.doc
   >
     Calcula métricas de pricing y análisis de un bono específico basado en
     parámetros de precio objetivo.
+  </Card>
+  <Card
+    title="Dólar futuro"
+    icon="chart-candlestick"
+    href="/api-reference/endpoint/futures-instruments"
+  >
+    Contratos de dólar de A3 en tiempo real, con tasas implícitas, velas
+    diarias y bandas cambiarias.
+  </Card>
+  <Card
+    title="US Treasuries"
+    icon="flag-usa"
+    href="/api-reference/treasuries-guia"
+  >
+    Catálogo, precio de modelo, curva del Tesoro de Estados Unidos y
+    calculadora de letras, notas y bonos.
   </Card>
 </Columns>

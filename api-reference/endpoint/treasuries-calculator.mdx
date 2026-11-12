@@ -1,0 +1,430 @@
+---
+title: 'Calculadora de US Treasuries'
+openapi: 'GET /api/v1/treasuries/calculator'
+---
+
+<Note>
+  Calcula las métricas de una letra, nota o bono del Tesoro de Estados Unidos a partir de un precio o una tasa: precios limpio y sucio, interés corrido, rendimientos, duration, convexidad, DV01 y, con `face`, los montos de la operación. Las tasas, de entrada y de salida, van como fracción (`0.042` es 4,2%). Requiere el scope `treasuries:read`.
+</Note>
+
+<Warning>
+  Esta es la única ruta del dominio que responde tasas como fracción (`units: "fraction"`). La curva, su historia y `/price` responden en porcentaje. `discount_rate` de la letra `US912797VR56` vale `4.297802197802198` en `/price` y `0.0375` acá. El cupón (`coupon`) sigue en porcentaje: `4.625`.
+</Warning>
+
+## Convenciones
+
+- Notas y bonos usan la convención street: `yield_to_maturity` es el rendimiento nominal anual con capitalización semestral, con interés compuesto en cada período salvo el último, que es simple. No es una tasa efectiva: la efectiva anual es `annual_equivalent_yield`. El interés corrido se devenga ACT/ACT.
+- Letras: precio `100 × (1 − discount_rate × días / 360)`. `yield_to_maturity` es el rendimiento equivalente de cupón con la fórmula del Tesoro, en base 365 o 366 según la liquidación.
+- La liquidación sigue el calendario de feriados de la Reserva Federal. `24hs` liquida el primer día hábil posterior a `as_of` y `CI` el mismo `as_of`, o el siguiente hábil si no lo es. El 11 de noviembre de 2026 es feriado: una operación del 10 con `24hs` liquida el 12.
+- Ningún valor se redondea. Los campos que no aplican al título no vienen en la respuesta: no hay `null`.
+
+## Parámetros de consulta
+
+<ParamField query="id" type="string" required>
+  ISIN de 12 caracteres (`US91282CMM00`), ISIN sin dígito verificador de 11 o CUSIP de 9 (`912797VR5`). No distingue mayúsculas. Sin `id` la respuesta es 422.
+</ParamField>
+
+<ParamField query="input" type="string" required>
+  Qué es `value`. Sin `input` la respuesta es 422 `missing_parameter`. Los valores válidos dependen del título, ver la tabla de abajo.
+</ParamField>
+
+<ParamField query="value" type="string" required>
+  Un precio por 100 de valor nominal, en la moneda de `currency`, o una tasa como fracción (`0.042` es 4,2%). Un precio tiene que ser mayor que 0 y un rendimiento tiene que estar entre `-0.5` y `2.0`. Sin `value` la respuesta es 422 `missing_parameter`.
+</ParamField>
+
+<ParamField query="as_of" type="string">
+  Fecha de la operación, `YYYY-MM-DD`. Predeterminado: la fecha del día del servidor. Acepta fechas futuras para valuar una operación a futuro. Tiene que haber tasas en o antes de esa fecha (desde el 2025-01-02).
+</ParamField>
+
+<ParamField query="settlement_entry" type="string" default="24hs">
+  `24hs` (primer día hábil de Estados Unidos posterior a `as_of`) o `CI` (`as_of`, o el siguiente hábil si no lo es).
+</ParamField>
+
+<ParamField query="currency" type="string" default="usd">
+  Moneda del precio que mandás en `value` y de `market_price`, `principal`, `accrued_amount` y `total`: `usd`, `ars_ccl` o `ars_mep`. En pesos, la API convierte con el dólar CCL o MEP de `as_of`, o el último publicado antes. No afecta a las tasas.
+</ParamField>
+
+<ParamField query="fx_value" type="string">
+  Pesos por dólar que reemplazan al CCL o MEP del día. Solo con `currency=ars_ccl` o `ars_mep`, y mayor que 0.
+</ParamField>
+
+<ParamField query="face" type="string">
+  Valor nominal de la operación, mayor que 0. Suma `face`, `principal`, `accrued_amount` y `total`.
+</ParamField>
+
+## Valores de `input`
+
+| `input` | Qué es `value` | Notas y bonos | Letras |
+| --- | --- | --- | --- |
+| `price` | Precio por 100 | Precio limpio (`input_used: "clean"`) | Precio (`input_used: "price"`) |
+| `clean` | Precio limpio por 100 | Sí | Igual que `price` |
+| `dirty` | Precio sucio por 100 | Sí (`input_used: "dirty"`) | Igual que `price` |
+| `yield` | Rendimiento al vencimiento, fracción | Rendimiento street semestral | Rendimiento equivalente de cupón |
+| `annual_equivalent` | Rendimiento efectivo anual, fracción | Sí | No: 422 `invalid_input` |
+| `discount_rate` | Tasa de descuento bancario, fracción | No: 422 `invalid_input` | Sí |
+| `leap_year_yield` | Rendimiento equivalente de cupón en base 366, fracción | No: 422 `invalid_input` | Sí |
+| `govt_equivalent` | Rendimiento equivalente de bono, street semestral, fracción | No: 422 `invalid_input` | Sí |
+| `simple_act360` | Interés simple Act/360, fracción | No: 422 `invalid_input` | Sí |
+
+<Warning>
+  En una nota o un bono, `price` es precio limpio. El `price_usd_per_100` de [`/price`](/api-reference/endpoint/treasuries-instruments-price) de una nota o un bono es sucio: pasalo con `input=dirty`.
+</Warning>
+
+## Ejemplo de solicitud
+
+<RequestExample>
+```bash cURL
+curl "https://api.doctacapital.com.ar/api/v1/treasuries/calculator?id=US91282CMM00&input=clean&value=101.5&face=100000" \
+  -H "Authorization: Bearer $DOCTA_TOKEN"
+```
+</RequestExample>
+
+## Respuesta exitosa
+
+### Campos comunes
+
+<ResponseField name="isin" type="string">
+  ISIN de 12 caracteres.
+</ResponseField>
+
+<ResponseField name="family" type="string">
+  `BILL` (letras y letras de caja), `NOTE` o `BOND`.
+</ResponseField>
+
+<ResponseField name="maturity_date" type="string">
+  Fecha de vencimiento.
+</ResponseField>
+
+<ResponseField name="operation_date" type="string">
+  Fecha de la operación (`as_of`).
+</ResponseField>
+
+<ResponseField name="settlement_date" type="string">
+  Fecha de liquidación. Todas las métricas se calculan a esta fecha.
+</ResponseField>
+
+<ResponseField name="settlement_entry" type="string">
+  `24hs` o `CI`.
+</ResponseField>
+
+<ResponseField name="input_used" type="string">
+  Cómo se leyó `value`: `clean`, `dirty`, `price` (letras), `yield`, `annual_equivalent`, `discount_rate`, `leap_year_yield`, `govt_equivalent` o `simple_act360`.
+</ResponseField>
+
+<ResponseField name="units" type="string">
+  Siempre `fraction`: las tasas de esta respuesta son fracciones.
+</ResponseField>
+
+<ResponseField name="currency" type="string">
+  `USD`, o `ARS` con `currency` en pesos. Solo aplica a `market_price`, `principal`, `accrued_amount` y `total`.
+</ResponseField>
+
+<ResponseField name="market_price" type="number">
+  Precio de mercado por 100, en `currency`. En notas y bonos es el precio limpio. En letras es el precio; si lo mandaste en `value`, vuelve tal cual.
+</ResponseField>
+
+<ResponseField name="dirty_price" type="number">
+  Precio sucio en dólares por 100, cualquiera sea `currency`.
+</ResponseField>
+
+<ResponseField name="clean_price" type="number">
+  Precio limpio en dólares por 100. En letras es igual a `dirty_price`.
+</ResponseField>
+
+<ResponseField name="accrued_interest" type="number">
+  Interés corrido a la liquidación, en dólares por 100. `0.0` en letras.
+</ResponseField>
+
+<ResponseField name="yield_to_maturity" type="number">
+  Rendimiento al vencimiento, fracción. En notas y bonos, el street semestral; en letras, el equivalente de cupón.
+</ResponseField>
+
+<ResponseField name="days_to_maturity" type="integer">
+  Días corridos de la liquidación al vencimiento.
+</ResponseField>
+
+<ResponseField name="duration" type="number">
+  En años. En notas y bonos, duration de Macaulay; en letras, días al vencimiento sobre `year_basis`.
+</ResponseField>
+
+<ResponseField name="modified_duration" type="number">
+  Duration modificada: variación porcentual del precio sucio por unidad de rendimiento.
+</ResponseField>
+
+<ResponseField name="warnings" type="string[]">
+  Solo si algo no se pudo calcular: `coupon_missing` (el catálogo no tiene el cupón y se calculó con 0), `true_yield_unavailable` o `cd_equivalent_unavailable`. El campo afectado no viene.
+</ResponseField>
+
+### Solo notas y bonos
+
+<ResponseField name="coupon" type="number">
+  Tasa de cupón anual, en porcentaje (`4.625`).
+</ResponseField>
+
+<ResponseField name="convention" type="string">
+  Siempre `street`.
+</ResponseField>
+
+<ResponseField name="annual_equivalent_yield" type="number">
+  Rendimiento efectivo anual, fracción: `(1 + yield_to_maturity / 2)² − 1`.
+</ResponseField>
+
+<ResponseField name="true_yield" type="number">
+  Rendimiento street con cada pago corrido al día hábil en que se cobra, fracción.
+</ResponseField>
+
+<ResponseField name="current_yield" type="number">
+  Rendimiento corriente: cupón anual sobre precio limpio, fracción.
+</ResponseField>
+
+<ResponseField name="convexity" type="number">
+  Convexidad, en años al cuadrado.
+</ResponseField>
+
+<ResponseField name="risk" type="number">
+  Cambio del precio sucio, en dólares por 100, ante un punto porcentual de rendimiento: `modified_duration × dirty_price / 100`.
+</ResponseField>
+
+<ResponseField name="dv01_per_1mm" type="number">
+  Cambio en dólares de 1.000.000 de valor nominal ante un punto básico de rendimiento: `risk × 100`.
+</ResponseField>
+
+<ResponseField name="prev_coupon" type="string">
+  Último cupón en o antes de la liquidación.
+</ResponseField>
+
+<ResponseField name="next_coupon" type="string">
+  Próximo cupón.
+</ResponseField>
+
+### Solo letras
+
+<ResponseField name="price_per_100" type="number">
+  Precio en dólares por 100.
+</ResponseField>
+
+<ResponseField name="discount_rate" type="number">
+  Tasa de descuento bancario, fracción.
+</ResponseField>
+
+<ResponseField name="coupon_equivalent" type="number">
+  Rendimiento equivalente de cupón, fracción. Igual a `yield_to_maturity`.
+</ResponseField>
+
+<ResponseField name="yield_leap_year" type="number">
+  Rendimiento equivalente de cupón en base 366, fracción.
+</ResponseField>
+
+<ResponseField name="govt_bond_equivalent" type="number">
+  Rendimiento equivalente de bono: el precio descontado con la convención street sobre períodos semestrales teóricos contados hacia atrás desde el vencimiento, fracción.
+</ResponseField>
+
+<ResponseField name="simple_interest_act360" type="number">
+  Interés simple Act/360, fracción.
+</ResponseField>
+
+<ResponseField name="cd_equivalent_act360" type="number">
+  Equivalente de certificado de depósito Act/360, con dos períodos cortados en la próxima fecha semestral teórica, fracción.
+</ResponseField>
+
+<ResponseField name="value_at_maturity" type="number">
+  Siempre `100.0`.
+</ResponseField>
+
+<ResponseField name="year_basis" type="integer">
+  `365`, o `366` si entre la liquidación y un año después hay un 29 de febrero.
+</ResponseField>
+
+### Con `face`
+
+<ResponseField name="face" type="number">
+  El valor nominal pedido.
+</ResponseField>
+
+<ResponseField name="principal" type="number">
+  `face × clean_price / 100`, en `currency`. En pesos, multiplicado por `fx_value`.
+</ResponseField>
+
+<ResponseField name="accrued_amount" type="number">
+  `face × accrued_interest / 100`, en `currency`. En pesos, multiplicado por `fx_value`.
+</ResponseField>
+
+<ResponseField name="total" type="number">
+  `face × dirty_price / 100`, en `currency`: lo que se paga. En pesos, multiplicado por `fx_value`.
+</ResponseField>
+
+### Con `currency` en pesos
+
+<ResponseField name="fx_used" type="string">
+  `ccl` o `mep`.
+</ResponseField>
+
+<ResponseField name="fx_value" type="number">
+  Pesos por dólar usados.
+</ResponseField>
+
+<ResponseField name="fx_date" type="string">
+  Fecha del dólar usado. No viene si mandaste `fx_value`.
+</ResponseField>
+
+<ResponseField name="overrides_applied" type="object">
+  Solo con `fx_value`: `{"fx_value": <el valor que mandaste>}`.
+</ResponseField>
+
+### En qué moneda viene cada precio
+
+| Campo | Moneda |
+| --- | --- |
+| `value` de un input de precio | `currency` |
+| `market_price`, `principal`, `accrued_amount`, `total` | `currency` |
+| `dirty_price`, `clean_price`, `accrued_interest`, `price_per_100` | Siempre dólares por 100 |
+
+Con `currency=ars_mep&fx_value=1480&input=clean&value=150000`, `market_price` es `150000.0` y `clean_price` es `101.35135135135135`, que es `150000 / 1480`.
+
+## Ejemplo de respuesta exitosa
+
+<ResponseExample>
+```json 200 nota, face
+{
+  "isin": "US91282CMM00",
+  "family": "NOTE",
+  "maturity_date": "2035-02-15",
+  "coupon": 4.625,
+  "operation_date": "2026-11-11",
+  "settlement_date": "2026-11-12",
+  "settlement_entry": "24hs",
+  "input_used": "clean",
+  "units": "fraction",
+  "currency": "USD",
+  "convention": "street",
+  "market_price": 101.5,
+  "dirty_price": 102.61854619565217,
+  "clean_price": 101.5,
+  "accrued_interest": 1.1185461956521738,
+  "yield_to_maturity": 0.04405432964586303,
+  "annual_equivalent_yield": 0.04453952563599972,
+  "true_yield": 0.04405249610847223,
+  "current_yield": 0.04556650246305419,
+  "duration": 6.894548592276823,
+  "modified_duration": 6.745954344052409,
+  "convexity": 54.416148325638304,
+  "risk": 6.922600274889025,
+  "dv01_per_1mm": 692.2600274889026,
+  "prev_coupon": "2026-08-15",
+  "next_coupon": "2027-02-15",
+  "days_to_maturity": 3017,
+  "face": 100000.0,
+  "principal": 101500.0,
+  "accrued_amount": 1118.5461956521738,
+  "total": 102618.54619565216
+}
+```
+
+```json 200 letra
+{
+  "isin": "US912797VR56",
+  "family": "BILL",
+  "maturity_date": "2027-08-05",
+  "operation_date": "2026-11-11",
+  "settlement_date": "2026-11-12",
+  "settlement_entry": "24hs",
+  "input_used": "price",
+  "units": "fraction",
+  "currency": "USD",
+  "market_price": 97.2,
+  "dirty_price": 97.2,
+  "clean_price": 97.2,
+  "accrued_interest": 0.0,
+  "price_per_100": 97.2,
+  "discount_rate": 0.037894736842105294,
+  "yield_to_maturity": 0.03928559435660183,
+  "coupon_equivalent": 0.03928559435660183,
+  "yield_leap_year": 0.03939400949326707,
+  "govt_bond_equivalent": 0.03923113749631968,
+  "simple_interest_act360": 0.03898635477582843,
+  "cd_equivalent_act360": 0.038745170760189546,
+  "days_to_maturity": 266,
+  "duration": 0.7287671232876712,
+  "modified_duration": 0.7170972531758097,
+  "value_at_maturity": 100.0,
+  "year_basis": 365
+}
+```
+
+```json 200 pesos con fx_value
+{
+  "isin": "US91282CMM00",
+  "family": "NOTE",
+  "maturity_date": "2035-02-15",
+  "coupon": 4.625,
+  "operation_date": "2026-11-11",
+  "settlement_date": "2026-11-12",
+  "settlement_entry": "24hs",
+  "input_used": "clean",
+  "units": "fraction",
+  "currency": "ARS",
+  "convention": "street",
+  "market_price": 150000.0,
+  "dirty_price": 102.46989754700353,
+  "clean_price": 101.35135135135135,
+  "accrued_interest": 1.1185461956521738,
+  "yield_to_maturity": 0.04426924531777693,
+  "annual_equivalent_yield": 0.044759186838028375,
+  "true_yield": 0.044267400327325956,
+  "current_yield": 0.04563333333333333,
+  "duration": 6.893316381845625,
+  "modified_duration": 6.744039609884239,
+  "convexity": 54.392291312369686,
+  "risk": 6.910610478777715,
+  "dv01_per_1mm": 691.0610478777716,
+  "prev_coupon": "2026-08-15",
+  "next_coupon": "2027-02-15",
+  "days_to_maturity": 3017,
+  "face": 100000.0,
+  "principal": 150000000.0,
+  "accrued_amount": 1655448.369565217,
+  "total": 151655448.36956525,
+  "fx_used": "mep",
+  "fx_value": 1480.0,
+  "overrides_applied": {
+    "fx_value": 1480.0
+  }
+}
+```
+
+```json 422
+{
+  "type": "/errors/validation-error",
+  "title": "Validation Error",
+  "status": 422,
+  "detail": "'value' of a yield must be in [-0.5, 2.0], got 50.0",
+  "details": {
+    "code": "invalid_value"
+  }
+}
+```
+</ResponseExample>
+
+Con `currency=ars_ccl` y sin `fx_value`, la respuesta trae `fx_used: "ccl"`, `fx_value: 1678.71900826446` y `fx_date: "2026-11-06"`, el último CCL publicado antes de la operación del 11 de noviembre.
+
+## Errores
+
+| Status | `details.code` | Cuándo | Ejemplo de `detail` |
+| --- | --- | --- | --- |
+| 422 | `invalid_id` | El `id` no tiene forma de ISIN, ISIN de 11 o CUSIP, o falla el dígito verificador. | `'US0000000000' fails the ISIN check digit` |
+| 422 | `missing_parameter` | Falta `input` o `value`. | `'value' is required` |
+| 422 | `invalid_input` | `input` desconocido, un input de letras en una nota o un bono, o `annual_equivalent` en una letra. | `'discount_rate' applies to bills only` |
+| 422 | `invalid_value` | `value`, `face` o `fx_value` no son números; precio menor o igual a 0; rendimiento fuera de -0,5 a 2,0; `annual_equivalent` menor o igual a -1; `face` menor o igual a 0; tasa de letra que da un precio no positivo. | `'value' of a yield must be in [-0.5, 2.0], got 50.0` |
+| 422 | `invalid_settlement_entry` | `settlement_entry` distinto de `24hs` o `CI`. | `'settlement_entry' must be one of ['24hs', 'CI'], got '48hs'` |
+| 422 | `invalid_currency` | `currency` fuera de `usd`, `ars_ccl`, `ars_mep`. | |
+| 422 | `invalid_fx_value` | `fx_value` sin `currency` en pesos, o menor o igual a 0. | `'fx_value' needs 'currency' ars_ccl or ars_mep` |
+| 422 | `invalid_date` | `as_of` mal formado o inexistente. | `'as_of' is not a calendar date: '2026-02-30'` |
+| 404 | `not_in_catalog`, `excluded_tips`, `excluded_frn`, `excluded_strips`, `excluded_other` | El título no está en el catálogo o no se valúa. Trae `isin`. | `TIPS are not valued: they need the CPI index` |
+| 404 | `matured` | El título vence en o antes de la liquidación. Trae `isin` y `maturity_date`. | `US9127933Y02 matured on 1980-04-03` |
+| 404 | `not_issued` | La liquidación es anterior a la emisión. Trae `isin` e `issue_date`. | `US91282CMM00 is issued on 2025-02-18` |
+| 422 | `no_rates_on_or_before` | `as_of` anterior a la primera curva (2025-01-02). Trae `first_rate_date`. | |
+| 422 | `no_rates` | La curva del título no tiene ninguna tasa cargada. Trae `first_rate_date`. | |
+| 422 | `no_fx` | No hay dólar CCL o MEP en o antes de `as_of`. Trae `fx_used`. | |
+| 422 | `did_not_converge` | El precio implica un rendimiento fuera de -0,5 a 2,0. Trae `isin`. | `dirty price 1.1186461956521738 implies a yield outside [-0.5, 2.0]` |
+
+Sin `id` la respuesta también es 422. La taxonomía completa y el orden en que se evalúan están en la [guía](/api-reference/treasuries-guia#errores).
