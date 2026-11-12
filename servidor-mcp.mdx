@@ -3,7 +3,7 @@ title: "Servidor MCP"
 description: "Conectá Claude, ChatGPT o tu editor a los datos de mercado de Docta"
 ---
 
-Docta expone un servidor remoto [MCP (Model Context Protocol)](https://modelcontextprotocol.io) para que asistentes de IA consulten datos del mercado argentino desde la conversación: bonos (rendimientos, duration, flujos de fondos, paridad), FCI (screener, series, performance, gestoras y flujos de industria) y dólar futuro (contratos de A3 en tiempo real, curvas y bandas cambiarias).
+Docta expone un servidor remoto [MCP (Model Context Protocol)](https://modelcontextprotocol.io) para que asistentes de IA consulten datos del mercado argentino desde la conversación: bonos (rendimientos, duration, flujos de fondos, paridad), FCI (screener, series, performance, gestoras y flujos de industria) y dólar futuro (contratos de A3 en tiempo real, curvas y bandas cambiarias). También cubre US Treasuries: catálogo, precio de modelo, curva del Tesoro y calculadora.
 
 <Card title="URL del servidor" icon="plug">
   `https://mcp.docta.com.ar/mcp`
@@ -30,7 +30,7 @@ La forma recomendada: iniciás sesión con tu cuenta de Docta y autorizás el ac
 
 ## Herramientas disponibles
 
-El servidor expone 30 herramientas, una por cada endpoint documentado de la API. Las herramientas disponibles dependen de los scopes de tu cuenta: `bonds:read`, `fci:read` y `futures:read`.
+El servidor expone 36 herramientas, una por cada endpoint documentado de la API. Las herramientas disponibles dependen de los scopes de tu cuenta: `bonds:read`, `fci:read`, `futures:read` y `treasuries:read`.
 
 ### Bonos
 
@@ -77,8 +77,19 @@ El servidor expone 30 herramientas, una por cada endpoint documentado de la API.
 | `get_future_history` | `/futures/history/{ticker}` | Velas diarias de un contrato, vigente o vencido |
 | `get_futures_tc_bands` | `/futures/tc-bands` | Bandas cambiarias del BCRA y su proyección con un supuesto de inflación |
 
+### US Treasuries
+
+| Herramienta | Endpoint | Qué hace |
+| --- | --- | --- |
+| `list_treasuries` | `/treasuries/instruments` | Catálogo, screener y búsqueda por ISIN o CUSIP. Por defecto trae los títulos vigentes |
+| `get_treasury` | `/treasuries/instruments/{id}` | Ficha del título: subasta original, reaperturas y calendario de cupones |
+| `get_treasury_model_price` | `/treasuries/instruments/{id}/price` | Precio de modelo sobre la curva del Tesoro, en dólares o en pesos. No es una cotización |
+| `get_treasury_curve` | `/treasuries/curve` | Curva de un día, tasa interpolada a N días y comparación contra otra fecha |
+| `get_treasury_curve_history` | `/treasuries/curve/history` | Serie diaria por tenor y spread entre dos tenors |
+| `calculate_treasury` | `/treasuries/calculator` | Calculadora: de precio a rendimiento y viceversa, con duration y montos |
+
 <Note>
-  El alcance es **renta fija argentina, FCI y dólar futuro de A3**. La API no cubre acciones,
+  En el mercado argentino el alcance es **renta fija, FCI y dólar futuro de A3**. La API no cubre acciones,
   CEDEARs, opciones ni otros futuros (índice, tasas, commodities). Del dólar futuro solo entran
   los contratos mensuales como `DLR/NOV26`. Quedan afuera los gemelos `M` (`DLR/NOV26M`) y
   `DLR/PF0`. En bonos la API no expone precios, OHLC ni volumen operado: donde dice "intradiario" se trata de
@@ -86,12 +97,21 @@ El servidor expone 30 herramientas, una por cada endpoint documentado de la API.
   (VCP/AUM al cierre) y los retornos son decimales (0.05 = 5%).
 </Note>
 
+<Note>
+  En US Treasuries la curva, su historia y el precio de modelo responden tasas en porcentaje
+  (4.98 = 4,98%), y la calculadora en decimales (0.0498). Cada resultado lo indica en `_units`.
+  `get_treasury_model_price` devuelve un precio de modelo calculado sobre la curva del Tesoro,
+  no una cotización de mercado. `list_treasuries` trae por defecto los títulos vigentes y las
+  primeras 100 filas: con `outstanding=false`, `limit` e `include_auctions` se obtiene el resto.
+  El detalle está en la [guía de US Treasuries](/api-reference/treasuries-guia).
+</Note>
+
 ## Cuotas y caché
 
 - Cada llamada a una herramienta consume requests de tu [plan de API](https://app.docta.com.ar/pricing#api), con una excepción importante: las respuestas se cachean del lado del servidor (catálogos ~1 h, datos intradiarios ~5 min) y **los hits de caché no consumen tu cuota**.
 - `list_futures`, `get_future` y `get_future_history` no cachean, porque los precios son en tiempo real: nunca devuelven `_cached` y cada llamada consume una request de tu cuota. `get_futures_tc_bands` sí cachea, cerca de 1 hora, porque las bandas cambian a lo sumo una vez por día.
 - Cada respuesta incluye `_quota` (requests restantes) y `_cached`. La herramienta `get_my_usage` muestra tu estado sin gastar requests.
-- Los datos intradiarios de bonos tienen ~20 minutos de demora. Los de dólar futuro son en tiempo real. Las tasas son decimales (0.1046 = 10,46%).
+- Los datos intradiarios de bonos tienen ~20 minutos de demora. Los de dólar futuro son en tiempo real. Las tasas son decimales (0.1046 = 10,46%), salvo las de US Treasuries indicadas arriba.
 
 ## Alternativa: autenticación por headers
 
@@ -116,10 +136,6 @@ Para clientes CLI o entornos donde OAuth no aplica, podés enviar tus [credencia
   Las conexiones OAuth se revocan desde tu cuenta.
 </Note>
 
-## Si no ves las herramientas de dólar futuro
+## Si no ves las herramientas de dólar futuro o de US Treasuries
 
-Las herramientas dependen de los permisos que aceptaste al conectar. Si conectaste el servidor por OAuth antes de que existiera el permiso `futures:read`, quitá el conector y volvé a agregarlo para aceptar el permiso nuevo. Con autenticación por headers no hace falta: alcanza con que tu cliente tenga el scope.
-
-## US Treasuries
-
-El servidor MCP todavía no tiene herramientas de US Treasuries. Los endpoints de ese dominio (scope `treasuries:read`) se consultan solo por REST: ver la [guía de US Treasuries](/api-reference/treasuries-guia).
+Las herramientas dependen de los permisos que aceptaste al conectar. Si conectaste el servidor por OAuth antes de que existieran los permisos `futures:read` y `treasuries:read`, quitá el conector y volvé a agregarlo para aceptar los permisos nuevos. Con autenticación por headers no hace falta: alcanza con que tus credenciales tengan esos scopes, y todas las cuentas los tienen.

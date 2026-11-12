@@ -78,7 +78,7 @@ keywords:
   Además del mercado argentino, la API expone **US Treasuries** (`treasuries:read`):
   letras, notas y bonos del Tesoro de Estados Unidos, con un precio de modelo
   sobre la curva del Tesoro, que no es una cotización de mercado. Se consulta
-  solo por REST: el servidor MCP no tiene herramientas de Treasuries. Ver
+  por REST o con las seis herramientas del servidor MCP. Ver
   [US Treasuries para agentes](#us-treasuries-para-agentes).
 </Info>
 
@@ -163,7 +163,7 @@ Cada respuesta incluye `_quota` con tus requests restantes. Los hits de caché d
 <CardGroup cols={2}>
   <Card title="Servidor MCP" icon="plug" href="/servidor-mcp">
     Conectá Claude, ChatGPT, Cursor o Claude Code a
-    `https://mcp.docta.com.ar/mcp` con OAuth. 30 herramientas, una por endpoint.
+    `https://mcp.docta.com.ar/mcp` con OAuth. 36 herramientas, una por endpoint.
   </Card>
   <Card title="Referencia de la API" icon="code" href="/api-reference/introduction">
     Todos los endpoints de bonos, FCI y dólar futuro, generados desde la especificación
@@ -204,7 +204,7 @@ Podés darle la documentación a tu agente de tres formas:
 
 ## US Treasuries para agentes
 
-El dominio US Treasuries (`treasuries:read`) cubre los títulos del Tesoro de Estados Unidos. Se consulta solo por REST, bajo `https://api.doctacapital.com.ar/api/v1/treasuries`: el [servidor MCP](/servidor-mcp) todavía no tiene herramientas para este dominio. La referencia completa está en la [guía de US Treasuries](/api-reference/treasuries-guia).
+El dominio US Treasuries (`treasuries:read`) cubre los títulos del Tesoro de Estados Unidos. Se consulta por REST, bajo `https://api.doctacapital.com.ar/api/v1/treasuries`, o con las herramientas del [servidor MCP](/servidor-mcp), una por endpoint. La referencia completa está en la [guía de US Treasuries](/api-reference/treasuries-guia).
 
 | Endpoint | Para qué |
 | --- | --- |
