@@ -1,12 +1,12 @@
 ---
 title: "API de Docta"
-description: "API de bonos de Argentina, Fondos Comunes de Inversión (FCI) y US Treasuries: catálogo de bonos, cashflows, curvas de rendimiento, screener de fondos, series, analytics de industria, curva del Tesoro de Estados Unidos y calculadora de Treasuries."
+description: "API de bonos de Argentina, Fondos Comunes de Inversión (FCI), dólar futuro y US Treasuries: catálogo de bonos, cashflows, curvas de rendimiento, screener de fondos, series, analytics de industria, contratos de dólar futuro de A3 en tiempo real, curva del Tesoro de Estados Unidos y calculadora de Treasuries."
 ---
 
 ## Resumen de la API
 
-La API de Docta cubre dos dominios del mercado argentino: **bonos** (instrumentos, detalles completos, cashflows proyectados y curvas/yields intradiarios e históricos) y **FCI** (screener del universo de fondos, ficha con composición y fees, series diarias, performance y analytics de la industria).
-Todos los datos intradiarios de bonos tienen un delay de ~20 minutos.
+La API de Docta cubre tres dominios del mercado argentino: **bonos** (instrumentos, detalles completos, cashflows proyectados y curvas/yields intradiarios e históricos), **FCI** (screener del universo de fondos, ficha con composición y fees, series diarias, performance y analytics de la industria) y **dólar futuro** (contratos vigentes de A3 con tasas implícitas, velas diarias y bandas cambiarias).
+Todos los datos intradiarios de bonos tienen un delay de ~20 minutos. Los de dólar futuro son en tiempo real.
 
 <Note>
   ¿Desarrollás con agentes de IA? Empezá por el [Onboarding para
@@ -100,6 +100,14 @@ Generás tus credenciales creando una cuenta en [Docta Terminal](https://app.doc
   >
     Calcula métricas de pricing y análisis de un bono específico basado en
     parámetros de precio objetivo.
+  </Card>
+  <Card
+    title="Dólar futuro"
+    icon="chart-candlestick"
+    href="/api-reference/endpoint/futures-instruments"
+  >
+    Contratos de dólar de A3 en tiempo real, con tasas implícitas, velas
+    diarias y bandas cambiarias.
   </Card>
   <Card
     title="US Treasuries"
