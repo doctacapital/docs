@@ -22,9 +22,10 @@ Los datos son los del mercado en el momento de la llamada, sin la demora de ~20 
 
 - Las tasas y variaciones son decimales: `0.0172` = 1,72 %.
 - Los precios están en ARS por dólar.
-- `trade_volume`, `bid_size` y `offer_size` pueden venir como float (`142615.0`).
+- `trade_volume`, `open_interest`, `bid_size` y `offer_size` se cuentan en contratos de USD 1.000. Pueden venir como float (`142615.0`).
 - Las fechas van en `YYYY-MM-DD`. `operation_date` es ISO 8601 con offset, tal como llega del feed.
 - Un campo sin dato para un contrato vuelve en `null`. Nunca se omite.
+- `last_price` viene en `null` hasta que el contrato opera en la rueda. El 12 de noviembre de 2026 a las 11:00, 7 de los 13 contratos todavía no habían operado. Las tasas (`implied_rate`, `tna`, `tea`, `forward_tem`) llegan igual. Si necesitás un precio para ese contrato, usá `closing_price`.
 
 ## Ejemplo de Solicitud
 
@@ -121,7 +122,7 @@ La API no calcula curvas. Las armás vos con `instruments`, que ya viene ordenad
     Mismo eje X, con `forward_tem` en el eje Y. Cada punto es la tasa mensual implícita entre el vencimiento anterior y ese contrato. El primer punto mide el tramo entre el A3500 de `spot` y el primer vencimiento.
   </Step>
   <Step title="Futuros y bandas">
-    Pedí [`GET /api/v1/futures/tc-bands`](/api-reference/endpoint/futures-tc-bands) y graficá `lower_band` y `upper_band` por `date`. Encima, poné cada contrato como un punto con `maturity_date` en X y `last_price` en Y. Sin `date_to`, las bandas llegan hasta el vencimiento del último contrato, así que cubren toda la curva.
+    Pedí [`GET /api/v1/futures/tc-bands`](/api-reference/endpoint/futures-tc-bands) y graficá `lower_band` y `upper_band` por `date`. Encima, poné cada contrato como un punto con `maturity_date` en X y `last_price` en Y. Si `last_price` es `null`, usá `closing_price`. Sin `date_to`, las bandas llegan hasta el vencimiento del último contrato, así que cubren toda la curva.
   </Step>
 </Steps>
 

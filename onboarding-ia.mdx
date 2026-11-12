@@ -156,7 +156,7 @@ Los planes se diferencian por requests por minuto (RPM) y límite diario. Detall
 | **Intermedio**       | 60  | 100 requests por día |
 | **Pro**              | 120 | Ilimitado            |
 
-Cada respuesta incluye `_quota` con tus requests restantes. Los hits de caché del servidor (catálogos ~1 h, datos intradiarios ~5 min) **no consumen cuota**. Dólar futuro no se cachea: en el MCP cada llamada a esas herramientas consume una request y nunca devuelve `_cached`.
+Cada respuesta incluye `_quota` con tus requests restantes. Los hits de caché del servidor (catálogos ~1 h, datos intradiarios ~5 min) **no consumen cuota**. Los precios de dólar futuro no se cachean: en el MCP cada llamada a `list_futures`, `get_future` o `get_future_history` consume una request y nunca devuelve `_cached`. Las bandas cambiarias sí se cachean, cerca de 1 hora.
 
 ## Recursos para agentes
 
@@ -197,7 +197,7 @@ Podés darle la documentación a tu agente de tres formas:
 * **Excepción en US Treasuries**: la curva, su historia y `/price` responden tasas en porcentaje (`4.98` = 4,98%). Solo la calculadora usa decimales. Ver [US Treasuries para agentes](#us-treasuries-para-agentes).
 * **Fechas** en formato `YYYY-MM-DD`; las series cubren solo días hábiles argentinos.
 * **Rangos**: enviá `interval` **o** `date_from`/`date_to`, nunca ambos.
-* **Dólar futuro**: los tickers llevan barra (`DLR/NOV26`) y la coincidencia es exacta. Listá los contratos vigentes con [`/futures/instruments`](/api-reference/endpoint/futures-instruments) antes de pedir uno.
+* **Dólar futuro**: los tickers llevan barra y el mes en español (`DLR/DIC26`, `DLR/ENE27`), y la coincidencia es exacta. Listá los contratos vigentes con [`/futures/instruments`](/api-reference/endpoint/futures-instruments) antes de pedir uno. `last_price` viene en `null` hasta que el contrato opera en la rueda: usá `closing_price` como precio en ese caso.
 * **Resolución de identificadores**: antes de consultar un bono o fondo, resolvé el identificador exacto con los endpoints de búsqueda ([bonos](/api-reference/endpoint/bonds-instruments-search), [FCI](/api-reference/endpoint/fci-instruments-search)). En FCI, el `fund_name` incluye el sufijo de clase (por ejemplo `- Clase A`).
 * **Filtros categóricos de FCI** son etiquetas exactas en español: obtené los valores válidos con el [catálogo](/api-reference/endpoint/fci-catalog) (money market = `Mercado de Dinero`).
 * **Tipo de emisor en bonos**: no es un campo; se infiere de `sub_asset_class` (clases soberanas y `SUB_SOBERANO_*` son deuda pública, `ON_*` son corporativos).

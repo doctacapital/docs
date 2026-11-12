@@ -4,7 +4,7 @@ openapi: 'GET /api/v1/futures/history/{ticker}'
 ---
 
 <Note>
-  Devuelve las velas diarias de un contrato de dólar futuro de A3: apertura, máximo, mínimo, cierre y volumen por día. Es la serie del gráfico de evolución de precio de la ficha del contrato. Requiere el scope `futures:read`.
+  Devuelve las velas diarias de un contrato de dólar futuro de A3: apertura, máximo, mínimo, cierre y volumen por día. Es la serie del gráfico de evolución de precio de la ficha del contrato. También responde contratos vencidos, que ya no aparecen en [`/futures/instruments`](/api-reference/endpoint/futures-instruments). En un contrato vigente, la última vela es la rueda en curso. Requiere el scope `futures:read`.
 </Note>
 
 ## Parámetros de ruta
